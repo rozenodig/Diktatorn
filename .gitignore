@@ -1,1 +1,7 @@
 research/
+node_modules/
+dist/
+build/
+native/*/.build/
+.DS_Store
+*.log
