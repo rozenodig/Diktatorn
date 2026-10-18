@@ -1,0 +1,83 @@
+# Design decisions
+
+Each entry records the choice, the alternatives that were considered, and why. Rationale sections are written by the author.
+
+## 1. Native helper
+
+**Choice:** A small Swift executable for OS integration, talking to Electron over stdio with one JSON message per line.
+**Alternatives considered:** N-API add-on (Objective-C++), Rust (napi-rs).
+**Rationale:** _TODO_
+
+## 2. Key capture
+
+**Choice:**
+- Hold fn = push-to-talk; double-tap fn = hands-free toggle.
+- Esc cancels. A configurable fallback hotkey covers keyboards without fn.
+- An active CGEventTap, plus IOHID where fn is not reported.
+- Permissions: Accessibility and Input Monitoring.
+
+**Alternatives considered:** CGEventTap only; Electron `globalShortcut` (no fn, no key-up).
+**Rationale:** _TODO_
+
+## 3. Audio capture and voice activity detection
+
+**Choice:**
+- Capture: `getUserMedia` in a hidden renderer, via an AudioWorklet at 16 kHz mono.
+- Voice activity detection: whisper.cpp's built-in Silero, used only to trim silence and to skip empty recordings.
+
+**Alternatives considered:** capture in the Swift helper (AVAudioEngine); a native Node audio module; Silero in the renderer; an energy gate.
+**Rationale:** _TODO_
+
+## 4. Speech-recognition runtime and models
+
+**Choice:**
+- Runtime: whisper.cpp (pinned release, Metal) inside a dedicated Swift process that keeps models loaded.
+- Swedish model: kb-whisper-medium (q5_0).
+- English model: whisper large-v3-turbo (q5_0).
+- kb-whisper-large (q5_0) as an optional higher-accuracy model.
+
+**Alternatives considered:** a Node binding for whisper.cpp in a utility process; the whisper.cpp HTTP server; WhisperKit (Core ML).
+**Rationale:** _TODO_
+
+## 5. Language handling
+
+**Choice:** Automatic detection restricted to Swedish and English, routing to the Swedish or English model, with a manual override (Auto / Svenska / English).
+**Alternatives considered:** a separate hotkey or setting per language; one model for everything.
+**Rationale:** _TODO_
+
+## 6. Text cleanup
+
+**Choice:** a hybrid pipeline.
+1. Conservative rules always run (unambiguous fillers, spacing, capitalisation).
+2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used.
+3. Dictionary replacements and snippets are applied deterministically at the end.
+
+**Alternatives considered:** rules only; LLM only.
+**Rationale:** _TODO_
+
+## 7. Insertion
+
+**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table (e.g. terminals: plain text, no trailing newline).
+**Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
+**Rationale:** _TODO_
+
+## 8. Overlay
+
+**Choice:** A click-through, non-focusable Electron panel shown without activation. A native non-activating panel is the fallback if the overlay ever needs to be clickable.
+**Alternatives considered:** native non-activating `NSPanel` from the start; a clickable window that re-activates the previous app.
+**Rationale:** _TODO_
+
+## 9. Storage
+
+**Choice:** JSON files for settings and the dictionary, SQLite for history. No audio is stored by default.
+**Alternatives considered:** JSON/JSONL only; SQLite for everything.
+**Rationale:** _TODO_
+
+## 10. Speech engine boundary
+
+**Choice:**
+- An utterance-level interface behind a process boundary: `ensureLoaded`, `speechSegments`, `detectLanguage`, `transcribe` and `close`.
+- The engine provides mechanisms only. Policy (silence trimming, the empty-recording gate, language routing) lives in the caller.
+- A future meeting mode reuses it by segmenting audio before calling `transcribe`.
+**Alternatives considered:** a streaming session API; a local HTTP service.
+**Rationale:** _TODO_
