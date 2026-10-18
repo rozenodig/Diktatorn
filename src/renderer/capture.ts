@@ -2,16 +2,15 @@
 // into memory, and hands the whole utterance to the main process on stop.
 const api = window.diktatorn.capture;
 
-let ctx: AudioContext | null = null;
+// Created at window load so the first recording only has to open the microphone.
+const ctx = new AudioContext({ sampleRate: 16_000 });
+const workletReady = ctx.audioWorklet.addModule("./worklet.js");
 let session: { stream: MediaStream; node: AudioWorkletNode; chunks: Float32Array[] } | null = null;
 let starting: Promise<void> = Promise.resolve();
 
 async function start(): Promise<void> {
   const t0 = performance.now();
-  if (!ctx) {
-    ctx = new AudioContext({ sampleRate: 16_000 });
-    await ctx.audioWorklet.addModule("./worklet.js");
-  }
+  await workletReady;
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
   });
