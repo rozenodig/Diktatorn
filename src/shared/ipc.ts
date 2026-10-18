@@ -12,7 +12,7 @@ export const IPC = {
 } as const;
 
 export interface StatusUpdate {
-  key: "keys" | "asr" | "mic" | "recording";
+  key: "keys" | "paste" | "asr" | "mic" | "recording";
   ok: boolean;
   text: string;
 }
@@ -28,4 +28,5 @@ export interface DebugResult {
   speechMs: number;
   micStartMs: number | null;
   timings: { vadMs: number; detectMs: number; transcribeMs: number; totalMs: number };
+  insertion: { app: string | null; kind: string; pasted: boolean; restored: boolean; note: string; ms: number } | null;
 }

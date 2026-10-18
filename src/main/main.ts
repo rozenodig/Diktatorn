@@ -1,9 +1,11 @@
-// Electron main process: wires the key helper, microphone capture and the speech engine
-// together, and shows every utterance in the debug window.
+// Electron main process: wires the macOS helper, microphone capture and the speech engine
+// together, inserts each transcript into the frontmost app, and shows every utterance in
+// the debug window.
 import { app, BrowserWindow, ipcMain, session, systemPreferences, type IpcMainEvent } from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { IPC, type DebugResult, type StatusUpdate } from "../shared/ipc.ts";
+import { planInsertion } from "./apps.ts";
 import { transcribeUtterance } from "./dictation.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
 import type { Lang } from "./language.ts";
@@ -14,8 +16,8 @@ import { WhisperProcessEngine } from "./speech-engine.ts";
 // Hard-coded until the settings window exists.
 const SETTINGS = { languageMode: "auto", primaryLanguage: "sv" } as const;
 const MIN_HOLD_MS = 150;
-/** The key helper exits with this code once Input Monitoring is granted, so it can be restarted. */
-const KEYS_EXIT_PERMISSION_GRANTED = 3;
+/** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
+const HELPER_EXIT_PERMISSION_GRANTED = 3;
 
 const binary = (name: string) => join(app.getAppPath(), "build", "bin", name);
 const renderer = (file: string) => join(import.meta.dirname, "..", "renderer", file);
@@ -25,7 +27,7 @@ let debugWin: BrowserWindow | null = null;
 let captureWin: BrowserWindow | null = null;
 let engine: WhisperProcessEngine | null = null;
 let engineReady = false;
-let keys: JsonLinesProcess | null = null;
+let helper: JsonLinesProcess | null = null;
 
 const ptt = new PushToTalk({ minHoldMs: MIN_HOLD_MS });
 const statuses = new Map<string, StatusUpdate>();
@@ -50,6 +52,27 @@ function act(action: PttAction): void {
 /** Only accept IPC from the window that is supposed to send it. */
 const from = (win: BrowserWindow | null, e: IpcMainEvent) => win !== null && e.sender === win.webContents;
 
+async function insert(text: string): Promise<DebugResult["insertion"]> {
+  if (!helper) return null;
+  const t0 = performance.now();
+  const front = await helper.request("frontmost");
+  const bundleId = (front.bundleId as string | null) ?? null;
+  const plan = planInsertion(text, bundleId);
+  if (!plan) return null;
+  const res = await helper.request("insert", { text: plan.text, restoreDelayMs: plan.restoreDelayMs });
+  setStatus(res.pasted
+    ? { key: "paste", ok: true, text: "pastes into the frontmost app" }
+    : { key: "paste", ok: false, text: String(res.note) });
+  return {
+    app: bundleId,
+    kind: plan.kind,
+    pasted: res.pasted === true,
+    restored: res.restored === true,
+    note: String(res.note ?? ""),
+    ms: performance.now() - t0,
+  };
+}
+
 async function handleAudio(samples: Float32Array): Promise<void> {
   if (!engine || !engineReady) {
     setStatus({ key: "asr", ok: false, text: "speech engine not ready; utterance dropped" });
@@ -57,6 +80,7 @@ async function handleAudio(samples: Float32Array): Promise<void> {
   }
   const r = await transcribeUtterance(engine, samples, SETTINGS, previousLanguage);
   if (r.language) previousLanguage = r.language.language;
+  const insertion = r.text ? await insert(r.text) : null;
   const result: DebugResult = {
     at: new Date().toLocaleTimeString("sv-SE"),
     text: r.text,
@@ -68,9 +92,11 @@ async function handleAudio(samples: Float32Array): Promise<void> {
     speechMs: r.speechMs,
     micStartMs,
     timings: r.timings,
+    insertion,
   };
   const mic = micStartMs === null ? "-" : `${Math.round(micStartMs)} ms`;
-  console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms (audio ${Math.round(r.audioMs)} ms, mic start ${mic}): ${result.text || "(no speech)"}`);
+  const where = insertion ? ` -> ${insertion.app ?? "?"} (${insertion.pasted ? "pasted" : "not pasted"}, ${insertion.restored ? "restored" : insertion.note || "not restored"})` : "";
+  console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms (audio ${Math.round(r.audioMs)} ms, mic start ${mic}): ${result.text || "(no speech)"}${where}`);
   debugWin?.webContents.send(IPC.debugResult, result);
   setStatus({ key: "recording", ok: true, text: "idle" });
 }
@@ -100,31 +126,34 @@ async function startSpeechEngine(): Promise<void> {
   }
 }
 
-function startKeyHelper(): void {
-  if (!existsSync(binary("diktatorn-keys"))) {
+const PERMISSION_HINT = 'Diktatorn ("Electron" when started with npm start) in System Settings → Privacy & Security';
+
+function startHelper(): void {
+  if (!existsSync(binary("diktatorn-helper"))) {
     setStatus({ key: "keys", ok: false, text: "missing helper; run npm run build:native" });
     return;
   }
-  const proc = new JsonLinesProcess("keys", binary("diktatorn-keys"));
-  keys = proc;
-  type KeysEvent = { event: string; down?: boolean; t: number; inputMonitoring?: boolean; tap?: boolean; hid?: boolean; message?: string; reason?: string };
-  proc.on("event", (msg: KeysEvent) => {
+  const proc = new JsonLinesProcess("helper", binary("diktatorn-helper"));
+  helper = proc;
+  type HelperEvent = {
+    event: string; down?: boolean; t: number; inputMonitoring?: boolean; accessibility?: boolean;
+    tap?: boolean; hid?: boolean; message?: string; reason?: string;
+  };
+  proc.on("event", (msg: HelperEvent) => {
     switch (msg.event) {
       case "ready":
         setStatus(msg.inputMonitoring
           ? { key: "keys", ok: true, text: `hold fn to dictate (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tap ? "on" : "off"})` }
-          : {
-              key: "keys",
-              ok: false,
-              text: "Input Monitoring not granted. Allow Diktatorn (\"Electron\" when started with npm start) " +
-                "in System Settings → Privacy & Security → Input Monitoring; fn starts working as soon as it is on.",
-            });
+          : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; fn starts working as soon as it is on.` });
+        setStatus(msg.accessibility
+          ? { key: "paste", ok: true, text: "pastes into the frontmost app" }
+          : { key: "paste", ok: false, text: `Accessibility not granted; transcripts are left on the clipboard. Allow ${PERMISSION_HINT} → Accessibility.` });
         break;
       case "permission":
-        setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting key helper…" });
+        setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting helper…" });
         break;
       case "debug":
-        console.log(`[keys] debug ${JSON.stringify(msg)}`);
+        console.log(`[helper] debug ${JSON.stringify(msg)}`);
         break;
       case "fn":
         act(msg.down ? ptt.fnDown(msg.t) : ptt.fnUp(msg.t));
@@ -133,7 +162,7 @@ function startKeyHelper(): void {
         act(ptt.chord(msg.t));
         break;
       case "tap":
-        console.warn(`[keys] event tap re-enabled after ${msg.reason}`);
+        console.warn(`[helper] event tap re-enabled after ${msg.reason}`);
         break;
       case "error":
         setStatus({ key: "keys", ok: false, text: msg.message ?? "error" });
@@ -141,8 +170,8 @@ function startKeyHelper(): void {
     }
   });
   proc.on("exit", (code: number | null) => {
-    if (keys !== proc) return; // superseded or shutting down
-    if (code === KEYS_EXIT_PERMISSION_GRANTED) startKeyHelper();
+    if (helper !== proc) return; // superseded or shutting down
+    if (code === HELPER_EXIT_PERMISSION_GRANTED) startHelper();
     else setStatus({ key: "keys", ok: false, text: `helper exited (code ${code})` });
   });
 }
@@ -179,7 +208,7 @@ app.whenReady().then(async () => {
 
   setStatus({ key: "recording", ok: true, text: "idle" });
   // A pending permission prompt must not hold up the helpers, so none of these block each other.
-  startKeyHelper();
+  startHelper();
   void startSpeechEngine();
   void ensureMicrophone();
 });
@@ -187,7 +216,7 @@ app.whenReady().then(async () => {
 app.on("window-all-closed", () => app.quit());
 app.on("will-quit", () => {
   engine?.close();
-  const k = keys;
-  keys = null;
-  k?.close();
+  const h = helper;
+  helper = null;
+  h?.close();
 });

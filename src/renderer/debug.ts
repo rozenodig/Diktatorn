@@ -44,6 +44,11 @@ api.onResult((r: DebugResult) => {
         ` · vad ${ms(t.vadMs)} · detect ${ms(t.detectMs)} · transcribe ${ms(t.transcribeMs)} · total ${ms(t.totalMs)}`,
     ),
   );
+  const ins = r.insertion;
+  if (ins) {
+    const outcome = `${ins.pasted ? "pasted" : "not pasted"}, clipboard ${ins.restored ? "restored" : ins.note || "not restored"}`;
+    item.append(el("div", "meta", `→ ${ins.app ?? "unknown app"} (${ins.kind}) · ${outcome} · ${ms(ins.ms)}`));
+  }
   resultsEl.prepend(item);
 });
 

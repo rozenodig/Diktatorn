@@ -15,5 +15,5 @@ TAIL_PID=$!
 trap 'kill "$TAIL_PID" 2>/dev/null' EXIT
 
 ENV_ARGS=()
-[ -n "${DIKTATORN_KEYS_DEBUG:-}" ] && ENV_ARGS+=(--env "DIKTATORN_KEYS_DEBUG=$DIKTATORN_KEYS_DEBUG")
+[ -n "${DIKTATORN_HELPER_DEBUG:-}" ] && ENV_ARGS+=(--env "DIKTATORN_HELPER_DEBUG=$DIKTATORN_HELPER_DEBUG")
 open -n -W -a "$APP" --stdout "$LOG" --stderr "$LOG" ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} --args "$ROOT"

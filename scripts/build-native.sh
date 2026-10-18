@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the native pieces: whisper.cpp (static, Metal) and the two Swift executables.
-# Output: build/bin/diktatorn-keys, build/bin/diktatorn-asr
+# Output: build/bin/diktatorn-helper, build/bin/diktatorn-asr
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -28,9 +28,9 @@ cmake --build "$WHISPER_BUILD" --config Release -j "$(sysctl -n hw.ncpu)" >/dev/
 
 mkdir -p "$BIN"
 
-echo "diktatorn-keys"
-swiftc -O -target "$TARGET" -framework ApplicationServices -framework IOKit \
-  "$ROOT/native/keys/main.swift" -o "$BIN/diktatorn-keys"
+echo "diktatorn-helper"
+swiftc -O -target "$TARGET" -framework AppKit -framework ApplicationServices -framework IOKit \
+  "$ROOT"/native/helper/*.swift -o "$BIN/diktatorn-helper"
 
 echo "diktatorn-asr"
 swiftc -O -target "$TARGET" \
