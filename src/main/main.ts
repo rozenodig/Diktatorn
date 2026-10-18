@@ -14,6 +14,8 @@ import { WhisperProcessEngine } from "./speech-engine.ts";
 // Hard-coded until the settings window exists.
 const SETTINGS = { languageMode: "auto", primaryLanguage: "sv" } as const;
 const MIN_HOLD_MS = 150;
+/** The key helper exits with this code once Input Monitoring is granted, so it can be restarted. */
+const KEYS_EXIT_PERMISSION_GRANTED = 3;
 
 const binary = (name: string) => join(app.getAppPath(), "build", "bin", name);
 const renderer = (file: string) => join(import.meta.dirname, "..", "renderer", file);
@@ -67,7 +69,8 @@ async function handleAudio(samples: Float32Array): Promise<void> {
     micStartMs,
     timings: r.timings,
   };
-  console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms: ${result.text || "(no speech)"}`);
+  const mic = micStartMs === null ? "-" : `${Math.round(micStartMs)} ms`;
+  console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms (audio ${Math.round(r.audioMs)} ms, mic start ${mic}): ${result.text || "(no speech)"}`);
   debugWin?.webContents.send(IPC.debugResult, result);
   setStatus({ key: "recording", ok: true, text: "idle" });
 }
@@ -102,13 +105,26 @@ function startKeyHelper(): void {
     setStatus({ key: "keys", ok: false, text: "missing helper; run npm run build:native" });
     return;
   }
-  keys = new JsonLinesProcess("keys", binary("diktatorn-keys"));
-  keys.on("event", (msg: { event: string; down?: boolean; t: number; inputMonitoring?: boolean; message?: string; reason?: string }) => {
+  const proc = new JsonLinesProcess("keys", binary("diktatorn-keys"));
+  keys = proc;
+  type KeysEvent = { event: string; down?: boolean; t: number; inputMonitoring?: boolean; tap?: boolean; hid?: boolean; message?: string; reason?: string };
+  proc.on("event", (msg: KeysEvent) => {
     switch (msg.event) {
       case "ready":
         setStatus(msg.inputMonitoring
-          ? { key: "keys", ok: true, text: "hold fn to dictate" }
-          : { key: "keys", ok: false, text: "Input Monitoring not granted (System Settings → Privacy → Input Monitoring), then restart" });
+          ? { key: "keys", ok: true, text: `hold fn to dictate (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tap ? "on" : "off"})` }
+          : {
+              key: "keys",
+              ok: false,
+              text: "Input Monitoring not granted. Allow Diktatorn (\"Electron\" when started with npm start) " +
+                "in System Settings → Privacy & Security → Input Monitoring; fn starts working as soon as it is on.",
+            });
+        break;
+      case "permission":
+        setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting key helper…" });
+        break;
+      case "debug":
+        console.log(`[keys] debug ${JSON.stringify(msg)}`);
         break;
       case "fn":
         act(msg.down ? ptt.fnDown(msg.t) : ptt.fnUp(msg.t));
@@ -124,7 +140,11 @@ function startKeyHelper(): void {
         break;
     }
   });
-  keys.on("exit", () => setStatus({ key: "keys", ok: false, text: "helper exited" }));
+  proc.on("exit", (code: number | null) => {
+    if (keys !== proc) return; // superseded or shutting down
+    if (code === KEYS_EXIT_PERMISSION_GRANTED) startKeyHelper();
+    else setStatus({ key: "keys", ok: false, text: `helper exited (code ${code})` });
+  });
 }
 
 ipcMain.on(IPC.captureStarted, (e, ms: number) => {
@@ -167,5 +187,7 @@ app.whenReady().then(async () => {
 app.on("window-all-closed", () => app.quit());
 app.on("will-quit", () => {
   engine?.close();
-  keys?.close();
+  const k = keys;
+  keys = null;
+  k?.close();
 });

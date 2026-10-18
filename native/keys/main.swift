@@ -3,18 +3,27 @@
 // Protocol: one JSON object per line on stdout. Commands arrive on stdin; EOF means the
 // parent is gone and the helper exits.
 //   out  {"event":"ready","inputMonitoring":true}
+//   out  {"event":"permission","inputMonitoring":true} granted while running; exits with code 3 so the
+//                                                      parent restarts it with a tap that receives events
 //   out  {"event":"fn","down":true,"t":123456.7}       t = monotonic milliseconds
 //   out  {"event":"chord","t":...}                      another key went down while fn was held
 //   out  {"event":"tap","enabled":true,"reason":"..."}  the system disabled the tap; we re-enabled it
 //   out  {"event":"error","message":"..."}
 //   in   {"cmd":"shutdown"}
 //
-// Privacy: no key codes or characters ever leave this process.
+// Privacy: no key codes or characters ever leave this process. The opt-in debug mode
+// (DIKTATORN_KEYS_DEBUG=1) reports modifier-key changes only, never character keys.
+//
+// Without Input Monitoring the system still lets us create a listen-only tap but silently
+// withholds keyboard events from it, so permission is checked explicitly.
 
 import ApplicationServices
+import IOKit.hid
 import Foundation
 
 let fnKeyCode: Int64 = 63  // kVK_Function
+let exitPermissionGranted: Int32 = 3
+let debugModifiers = ProcessInfo.processInfo.environment["DIKTATORN_KEYS_DEBUG"] != nil
 
 func emit(_ object: [String: Any]) {
     guard let data = try? JSONSerialization.data(withJSONObject: object),
@@ -26,9 +35,51 @@ func nowMs() -> Double {
     Double(DispatchTime.now().uptimeNanoseconds) / 1_000_000
 }
 
+/// Single source of truth for the fn state. Both the event tap and IOHID report into it,
+/// so a press seen by both is emitted once.
+final class FnState {
+    private(set) var down = false
+
+    func set(down: Bool, source: String) {
+        if debugModifiers { emit(["event": "debug", "fn": down, "source": source]) }
+        guard down != self.down else { return }
+        self.down = down
+        emit(["event": "fn", "down": down, "t": nowMs()])
+    }
+}
+
+/// Reads fn straight from keyboard HID reports. Apple keyboards handle fn/Globe below the
+/// event-tap layer, so the tap alone does not reliably see it. The value filter limits the
+/// reports we receive to the fn usage only.
+final class FnHID {
+    private let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
+    private let state: FnState
+
+    init(state: FnState) { self.state = state }
+
+    func start() -> Bool {
+        let keyboards = [kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop, kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard]
+        IOHIDManagerSetDeviceMatching(manager, keyboards as CFDictionary)
+        let fnUsages = [
+            [kIOHIDElementUsagePageKey: 0x00FF, kIOHIDElementUsageKey: 0x03],  // built-in keyboards (top case)
+            [kIOHIDElementUsagePageKey: 0xFF01, kIOHIDElementUsageKey: 0x03],  // external Apple keyboards
+        ]
+        IOHIDManagerSetInputValueMatchingMultiple(manager, fnUsages as CFArray)
+        let context = Unmanaged.passUnretained(self).toOpaque()
+        IOHIDManagerRegisterInputValueCallback(manager, { context, _, _, value in
+            let me = Unmanaged<FnHID>.fromOpaque(context!).takeUnretainedValue()
+            me.state.set(down: IOHIDValueGetIntegerValue(value) != 0, source: "hid")
+        }, context)
+        IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+        return IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone)) == kIOReturnSuccess
+    }
+}
+
 final class FnTap {
     private var tap: CFMachPort?
-    private var fnDown = false
+    private let state: FnState
+
+    init(state: FnState) { self.state = state }
 
     func start() -> Bool {
         let mask = (1 << CGEventType.flagsChanged.rawValue) | (1 << CGEventType.keyDown.rawValue)
@@ -58,13 +109,14 @@ final class FnTap {
             if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
             emit(["event": "tap", "enabled": true, "reason": type == .tapDisabledByTimeout ? "timeout" : "userInput"])
         case .flagsChanged:
-            guard event.getIntegerValueField(.keyboardEventKeycode) == fnKeyCode else { return }
-            let down = event.flags.contains(.maskSecondaryFn)
-            guard down != fnDown else { return }
-            fnDown = down
-            emit(["event": "fn", "down": down, "t": nowMs()])
+            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+            if debugModifiers {
+                emit(["event": "debug", "keyCode": keyCode, "flags": event.flags.rawValue])
+            }
+            guard keyCode == fnKeyCode else { return }
+            state.set(down: event.flags.contains(.maskSecondaryFn), source: "tap")
         case .keyDown:
-            if fnDown { emit(["event": "chord", "t": nowMs()]) }
+            if state.down { emit(["event": "chord", "t": nowMs()]) }
         default:
             break
         }
@@ -88,16 +140,23 @@ func readCommands() {
 setvbuf(stdout, nil, _IOLBF, 0)
 readCommands()
 
-let granted = CGPreflightListenEventAccess()
-if !granted { _ = CGRequestListenEventAccess() }
-
-let fnTap = FnTap()
-guard fnTap.start() else {
+if !CGPreflightListenEventAccess() {
+    _ = CGRequestListenEventAccess()  // shows the system prompt once; afterwards the app is listed, switched off
     emit(["event": "ready", "inputMonitoring": false])
-    emit(["event": "error", "message": "could not create event tap; grant Input Monitoring and restart"])
-    // Stay alive so the parent can show the permission state; exit on stdin EOF.
+    // A tap created now would never receive keys, so wait for the grant and let the parent restart us.
+    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+        guard CGPreflightListenEventAccess() else { return }
+        emit(["event": "permission", "inputMonitoring": true])
+        exit(exitPermissionGranted)
+    }
     CFRunLoopRun()
-    exit(1)
 }
-emit(["event": "ready", "inputMonitoring": true])
-CFRunLoopRun()
+
+let fnState = FnState()
+let fnTap = FnTap(state: fnState)
+let fnHID = FnHID(state: fnState)
+let tapOK = fnTap.start()
+let hidOK = fnHID.start()
+emit(["event": "ready", "inputMonitoring": true, "tap": tapOK, "hid": hidOK])
+if !tapOK && !hidOK { emit(["event": "error", "message": "could not open the keyboard (event tap and HID both failed)"]) }
+CFRunLoopRun()  // on total failure, stay alive so the parent shows the error; exit on stdin EOF

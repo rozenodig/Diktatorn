@@ -23,13 +23,13 @@ cmake -S "$WHISPER_SRC" -B "$WHISPER_BUILD" \
   -DGGML_METAL_EMBED_LIBRARY=ON \
   -DWHISPER_BUILD_EXAMPLES=OFF \
   -DWHISPER_BUILD_TESTS=OFF \
-  -DWHISPER_BUILD_SERVER=OFF -Wno-dev -Wno-deprecated >/dev/null
+  -DWHISPER_BUILD_SERVER=OFF -Wno-author -Wno-deprecated >/dev/null
 cmake --build "$WHISPER_BUILD" --config Release -j "$(sysctl -n hw.ncpu)" >/dev/null
 
 mkdir -p "$BIN"
 
 echo "diktatorn-keys"
-swiftc -O -target "$TARGET" -framework ApplicationServices \
+swiftc -O -target "$TARGET" -framework ApplicationServices -framework IOKit \
   "$ROOT/native/keys/main.swift" -o "$BIN/diktatorn-keys"
 
 echo "diktatorn-asr"
