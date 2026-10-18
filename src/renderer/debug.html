@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <title>Diktatorn — debug</title>
+    <style>
+      :root { color-scheme: light dark; font: 13px -apple-system, system-ui, sans-serif; }
+      body { margin: 16px; }
+      h1 { font-size: 15px; margin: 0 0 12px; }
+      #status { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin-bottom: 12px; }
+      .ok { color: #2a8a3a; } .bad { color: #c0392b; }
+      button { font: inherit; padding: 6px 12px; margin-bottom: 12px; }
+      .result { border-top: 1px solid #8884; padding: 8px 0; }
+      .text { font-size: 15px; margin: 2px 0 4px; white-space: pre-wrap; }
+      .meta { color: #888; font-variant-numeric: tabular-nums; }
+    </style>
+  </head>
+  <body>
+    <h1>Diktatorn — debug</h1>
+    <div id="status"></div>
+    <button id="record" title="Hold to record without the fn key">Hold to record</button>
+    <div id="results"></div>
+    <script type="module" src="./debug.js"></script>
+  </body>
+</html>
