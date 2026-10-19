@@ -67,6 +67,11 @@ export class LlamaCleaner implements Cleaner {
     return this.complete(text, timeoutMs);
   }
 
+  /** Called if the process exits, including after close(). */
+  onExit(cb: (reason: string) => void): void {
+    this.proc.on("exit", (code: number | null, signal: string | null) => cb(`code ${code}, signal ${signal}`));
+  }
+
   close(): void {
     this.proc.close();
   }

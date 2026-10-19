@@ -38,6 +38,7 @@ import type { Lang } from "./language.ts";
 import { ModelStore } from "./model-store.ts";
 import { DEFAULT_CLEANUP_MODEL, DEFAULT_MODELS, MODELS, type ModelId } from "./models.ts";
 import { Overlay } from "./overlay.ts";
+import { RestartPolicy } from "./restart.ts";
 import { SettingsStore } from "./settings.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
@@ -85,6 +86,8 @@ let dictionary: DictionaryEntry[] = [];
 let setup = false;
 
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
+const engineRestarts = new RestartPolicy();
+const cleanerRestarts = new RestartPolicy();
 const statuses = new Map<string, StatusUpdate>();
 const recent: RecentDictation[] = [];
 let previousLanguage: Lang | null = null;
@@ -255,7 +258,11 @@ function loadSpeechEngine(): Promise<void> {
       setStatus({ key: "asr", ok: true, text: "waiting for the speech models to download…" });
       return;
     }
-    engine ??= new WhisperProcessEngine(binary("diktatorn-asr"));
+    if (!engine) {
+      const created = new WhisperProcessEngine(binary("diktatorn-asr"));
+      created.onExit((reason) => speechEngineExited(created, reason));
+      engine = created;
+    }
     if (!engineReady) setStatus({ key: "asr", ok: true, text: "loading models…" });
     const t0 = performance.now();
     try {
@@ -267,6 +274,20 @@ function loadSpeechEngine(): Promise<void> {
     }
   });
   return engineLoad;
+}
+
+/** Restarts the speech process after a crash; the dictation in progress, if any, has failed. */
+function speechEngineExited(exited: WhisperProcessEngine, reason: string): void {
+  if (engine !== exited) return; // replaced or shutting down
+  engine = null;
+  engineReady = false;
+  const delay = engineRestarts.crashed(Date.now());
+  if (delay === null) {
+    setStatus({ key: "asr", ok: false, text: `speech engine keeps stopping (${reason}); restart Diktatorn` });
+    return;
+  }
+  setStatus({ key: "asr", ok: false, text: `speech engine stopped (${reason}); restarting…` });
+  setTimeout(() => void loadSpeechEngine(), delay);
 }
 
 /** Starts or stops the cleanup model to match the setting and what is on disk. */
@@ -287,6 +308,7 @@ async function syncCleaner(): Promise<void> {
     return;
   }
   const current = new LlamaCleaner(binary("diktatorn-llm"), models.path(DEFAULT_CLEANUP_MODEL));
+  current.onExit((reason) => cleanerExited(current, reason));
   cleaner = current;
   setStatus({ key: "cleanup", ok: true, text: "rules only while the language model loads…" });
   const t0 = performance.now();
@@ -298,6 +320,20 @@ async function syncCleaner(): Promise<void> {
   } catch (err) {
     if (cleaner === current) setStatus({ key: "cleanup", ok: false, text: `rules only; language model failed: ${String(err)}` });
   }
+}
+
+/** Restarts the language model after a crash; dictations use the rules meanwhile. */
+function cleanerExited(exited: LlamaCleaner, reason: string): void {
+  if (cleaner !== exited) return; // turned off, replaced or shutting down
+  cleaner = null;
+  cleanerReady = false;
+  const delay = cleanerRestarts.crashed(Date.now());
+  if (delay === null) {
+    setStatus({ key: "cleanup", ok: false, text: `rules only; the language model keeps stopping (${reason})` });
+    return;
+  }
+  setStatus({ key: "cleanup", ok: true, text: `rules only; language model stopped (${reason}), restarting…` });
+  setTimeout(() => void syncCleaner(), delay);
 }
 
 /** Applies a settings change to the running app. */
@@ -482,8 +518,12 @@ app.on("window-all-closed", () => {});
 app.on("activate", () => void appWindow.show());
 app.on("will-quit", () => {
   tray?.destroy();
-  engine?.close();
-  cleaner?.close();
+  // Cleared first, so the exits that follow are not treated as crashes.
+  const [e, c] = [engine, cleaner];
+  engine = null;
+  cleaner = null;
+  e?.close();
+  c?.close();
   const h = helper;
   helper = null;
   h?.close();

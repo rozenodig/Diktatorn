@@ -69,6 +69,11 @@ export class WhisperProcessEngine implements SpeechEngine {
     return { text: res.text as string, segments: res.segments as TranscriptSegment[], engineMs: res.ms as number };
   }
 
+  /** Called if the process exits, including after close(). */
+  onExit(cb: (reason: string) => void): void {
+    this.proc.on("exit", (code: number | null, signal: string | null) => cb(`code ${code}, signal ${signal}`));
+  }
+
   close(): void {
     this.proc.close();
   }
