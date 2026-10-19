@@ -125,6 +125,7 @@ async function insert(text: string): Promise<DebugResult["insertion"]> {
   const t0 = performance.now();
   const front = await helper.request("frontmost");
   const bundleId = (front.bundleId as string | null) ?? null;
+  const appName = (front.name as string | null) ?? null;
   const plan = planInsertion(text, bundleId);
   if (!plan) return null;
   const res = await helper.request("insert", { text: plan.text, restoreDelayMs: plan.restoreDelayMs });
@@ -133,6 +134,7 @@ async function insert(text: string): Promise<DebugResult["insertion"]> {
     : { key: "paste", ok: false, text: String(res.note) });
   return {
     app: bundleId,
+    appName,
     kind: plan.kind,
     pasted: res.pasted === true,
     restored: res.restored === true,

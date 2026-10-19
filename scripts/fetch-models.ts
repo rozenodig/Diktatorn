@@ -15,10 +15,12 @@ for (const id of ids) {
     continue;
   }
   let lastPct = -1;
-  await downloadModel(model, path, (got, total) => {
-    const pct = Math.floor((got / total) * 100);
-    if (pct !== lastPct && pct % 5 === 0) process.stdout.write(`\r${id}: ${pct}%`);
-    lastPct = pct;
+  await downloadModel(model, path, {
+    onProgress: (got, total) => {
+      const pct = Math.floor((got / total) * 100);
+      if (pct !== lastPct && pct % 5 === 0) process.stdout.write(`\r${id}: ${pct}%`);
+      lastPct = pct;
+    },
   });
   console.log(`\r${id}: downloaded and verified -> ${path}`);
 }

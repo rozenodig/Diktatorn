@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
-import { applyDictionary, dictionaryPrompt, parseDictionary } from "../src/main/cleanup/dictionary.ts";
+import { applyDictionary, DictionaryFile, dictionaryPrompt, parseDictionary, saveDictionary } from "../src/main/cleanup/dictionary.ts";
 import type { Cleaner, LlmOutput } from "../src/main/cleanup/llm.ts";
 import { cleanUp, unexplainedDeletion } from "../src/main/cleanup/pipeline.ts";
 import { applyRules } from "../src/main/cleanup/rules.ts";
@@ -92,6 +95,25 @@ test("a long deleted run needs a correction phrase unless it is only fillers", (
     check("Write a short reply to Sarah saying the build is green.", "Write a short reply to Sarah saying"),
     "Write a short reply to Sarah saying",
   );
+});
+
+test("a saved dictionary is picked up on the next read; a broken file keeps the last good entries", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "diktatorn-dictionary-"));
+  try {
+    const path = join(dir, "dictionary.json");
+    const file = new DictionaryFile(path);
+    assert.deepEqual(await file.current(), [], "a missing file is an empty dictionary");
+
+    await saveDictionary(path, [{ term: "Rozeno", spoken: ["roseno"] }]);
+    assert.deepEqual(await file.current(), [{ term: "Rozeno", spoken: ["roseno"] }]);
+    await assert.rejects(saveDictionary(path, [{ term: " ", spoken: [] }]), /term/);
+
+    writeFileSync(path, "{ broken");
+    assert.deepEqual(await file.current(), [{ term: "Rozeno", spoken: ["roseno"] }]);
+    assert.match(file.error ?? "", /JSON/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 const fakeCleaner = (reply: (text: string) => Partial<LlmOutput> | Error): Cleaner => ({

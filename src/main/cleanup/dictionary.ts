@@ -2,13 +2,10 @@
 // spoken forms that the recogniser tends to produce instead. Terms also become the
 // recogniser's initial prompt, which biases it towards them in the first place.
 import { readFile, stat } from "node:fs/promises";
+import type { DictionaryEntry } from "../../shared/ipc.ts";
+import { writeFileAtomic } from "../settings.ts";
 
-export interface DictionaryEntry {
-  /** How the term is written, e.g. "GitHub". */
-  term: string;
-  /** What the recogniser writes instead, e.g. ["git hub"]. Matched case-insensitively. */
-  spoken: string[];
-}
+export type { DictionaryEntry };
 
 /** Whisper reads at most about 224 prompt tokens; stay well below that. */
 const MAX_PROMPT_CHARS = 600;
@@ -36,6 +33,13 @@ export async function loadDictionary(path: string): Promise<DictionaryEntry[]> {
     throw err;
   }
   return parseDictionary(JSON.parse(text));
+}
+
+/** Validates and saves a dictionary; the file is replaced atomically. */
+export async function saveDictionary(path: string, entries: DictionaryEntry[]): Promise<DictionaryEntry[]> {
+  const valid = parseDictionary({ entries });
+  await writeFileAtomic(path, `${JSON.stringify({ entries: valid }, null, 2)}\n`);
+  return valid;
 }
 
 /** Re-reads the dictionary file whenever it changes on disk, so edits apply to the next dictation. */

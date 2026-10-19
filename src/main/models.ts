@@ -12,6 +12,8 @@ export type ModelId =
 
 export interface ModelFile {
   id: ModelId;
+  /** Shown in the app. */
+  name: string;
   url: string;
   sha256: string;
   bytes: number;
@@ -24,6 +26,7 @@ const hf = (repo: string, rev: string, file: string) => `https://huggingface.co/
 export const MODELS: Record<ModelId, ModelFile> = {
   "kb-whisper-medium": {
     id: "kb-whisper-medium",
+    name: "KB Whisper medium",
     url: hf("KBLab/kb-whisper-medium", "0abe10b9d7f75d0902656e5c06c5c4d549604dc5", "ggml-model-q5_0.bin"),
     sha256: "7f8762e0ade9e0073674c0d5acae942a0b1ea98add9baa008ee89c94eaba43d0",
     bytes: 539_212_484,
@@ -32,6 +35,7 @@ export const MODELS: Record<ModelId, ModelFile> = {
   },
   "kb-whisper-large": {
     id: "kb-whisper-large",
+    name: "KB Whisper large",
     url: hf("KBLab/kb-whisper-large", "d5d5984b4d8f7c4847a8ea203f1976285fb28300", "ggml-model-q5_0.bin"),
     sha256: "6d2863812d7410322bb7d8647a5c7260761300fa946714c9ed66d22bb30bcb19",
     bytes: 1_081_140_203,
@@ -40,6 +44,7 @@ export const MODELS: Record<ModelId, ModelFile> = {
   },
   "whisper-large-v3-turbo": {
     id: "whisper-large-v3-turbo",
+    name: "Whisper large-v3 turbo",
     url: hf("ggerganov/whisper.cpp", "5359861c739e955e79d9a303bcbc70fb988958b1", "ggml-large-v3-turbo-q5_0.bin"),
     sha256: "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
     bytes: 574_041_195,
@@ -48,6 +53,7 @@ export const MODELS: Record<ModelId, ModelFile> = {
   },
   "silero-vad": {
     id: "silero-vad",
+    name: "Silero voice detection",
     url: hf("ggml-org/whisper-vad", "9ffd54a1e1ee413ddf265af9913beaf518d1639b", "ggml-silero-v6.2.0.bin"),
     sha256: "2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987",
     bytes: 885_098,
@@ -56,6 +62,7 @@ export const MODELS: Record<ModelId, ModelFile> = {
   },
   "gemma-4-e2b-it-qat": {
     id: "gemma-4-e2b-it-qat",
+    name: "Gemma 4 E2B",
     url: hf("google/gemma-4-E2B-it-qat-q4_0-gguf", "675cff42a74c774d6cb76f76d8eacb49b48c9b93", "gemma-4-E2B_q4_0-it.gguf"),
     sha256: "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
     bytes: 3_349_516_256,
