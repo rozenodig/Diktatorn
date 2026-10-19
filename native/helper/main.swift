@@ -9,9 +9,11 @@
 //                                                      parent restarts it with a tap that receives events
 //   out  {"event":"fn","down":true,"t":123456.7}       t = monotonic milliseconds
 //   out  {"event":"chord","t":...}                      another key went down while fn was held
+//   out  {"event":"escape","t":...}                     Esc pressed while recording (swallowed if the tap is active)
 //   out  {"event":"tap","enabled":true,"reason":"..."}  the system disabled the tap; we re-enabled it
 //   out  {"event":"error","message":"..."}
 //   in   {"id":1,"cmd":"frontmost"}                     -> {"bundleId":"com.apple.Terminal","name":"Terminal","pid":1}
+//   in   {"id":3,"cmd":"recording","active":true}       -> {} (Esc is reported/swallowed only while active)
 //   in   {"id":2,"cmd":"insert","text":"…","restoreDelayMs":500}
 //                                                       -> {"pasted":true,"restored":true,"note":""}
 //   in   {"cmd":"shutdown"}
@@ -27,6 +29,9 @@ import Foundation
 
 let exitPermissionGranted: Int32 = 3
 let inserter = Inserter()
+let fnState = FnState()
+let fnTap = FnTap(state: fnState)
+let fnHID = FnHID(state: fnState)
 
 func handle(_ msg: [String: Any]) {
     let id = msg["id"] ?? NSNull()
@@ -41,6 +46,9 @@ func handle(_ msg: [String: Any]) {
         exit(0)
     case "frontmost":
         reply(frontmostApp())
+    case "recording":
+        fnTap.recording = msg["active"] as? Bool ?? false
+        reply([:])
     case "insert":
         guard let text = msg["text"] as? String, !text.isEmpty else {
             emit(["id": id, "ok": false, "error": "missing 'text'"])
@@ -89,11 +97,9 @@ if !CGPreflightListenEventAccess() {
     CFRunLoopRun()
 }
 
-let fnState = FnState()
-let fnTap = FnTap(state: fnState)
-let fnHID = FnHID(state: fnState)
 let tapOK = fnTap.start()
 let hidOK = fnHID.start()
-emit(["event": "ready", "inputMonitoring": true, "accessibility": inserter.accessibilityTrusted, "tap": tapOK, "hid": hidOK])
+emit(["event": "ready", "inputMonitoring": true, "accessibility": inserter.accessibilityTrusted, "tap": tapOK,
+      "tapActive": fnTap.active, "hid": hidOK])
 if !tapOK && !hidOK { emit(["event": "error", "message": "could not open the keyboard (event tap and HID both failed)"]) }
 CFRunLoopRun()  // on total failure, stay alive so the parent shows the error; exit on stdin EOF
