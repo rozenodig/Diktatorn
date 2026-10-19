@@ -1,10 +1,10 @@
-// fn key state machine. Recording starts on the first press so no speech is lost; what the
-// press turns into is decided afterwards:
+// Dictation hotkey state machine (fn or a right-hand modifier). Recording starts on the first
+// press so no speech is lost; what the press turns into is decided afterwards:
 //   hold, then release                  -> push-to-talk: stop and transcribe on release
 //   quick tap, second press in window   -> hands-free: keep recording after release
 //   tap while hands-free                -> stop and transcribe
 //   single quick tap (window expires)   -> discarded
-//   fn + another key, or Esc            -> cancel
+//   hotkey + another key, or Esc        -> cancel
 // The double-tap window is a timer owned by the caller: after "pending" it calls expire().
 export type HotkeyAction = "start" | "pending" | "handsFree" | "stop" | "cancel" | "none";
 
@@ -24,7 +24,7 @@ export class Hotkey {
     this.minHoldMs = opts.minHoldMs;
   }
 
-  fnDown(t: number): HotkeyAction {
+  down(t: number): HotkeyAction {
     switch (this.state.kind) {
       case "idle":
         this.state = { kind: "holding", downAt: t, chorded: false };
@@ -40,7 +40,7 @@ export class Hotkey {
     }
   }
 
-  fnUp(t: number): HotkeyAction {
+  up(t: number): HotkeyAction {
     const s = this.state;
     switch (s.kind) {
       case "holding":
@@ -69,7 +69,7 @@ export class Hotkey {
     }
   }
 
-  /** Another key went down while fn was held. */
+  /** Another key went down while the hotkey was held. */
   chord(): HotkeyAction {
     const s = this.state;
     if (s.kind === "holding" && !s.chorded) {

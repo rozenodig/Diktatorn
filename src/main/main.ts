@@ -264,8 +264,8 @@ function startHelper(): void {
       case "debug":
         console.log(`[helper] debug ${JSON.stringify(msg)}`);
         break;
-      case "fn":
-        act(msg.down ? hotkey.fnDown(msg.t) : hotkey.fnUp(msg.t));
+      case "hotkey":
+        act(msg.down ? hotkey.down(msg.t) : hotkey.up(msg.t));
         break;
       case "chord":
         act(hotkey.chord());
@@ -299,7 +299,7 @@ ipcMain.on(IPC.captureError, (e, message: string) => {
   if (from(captureWin, e)) setStatus({ key: "mic", ok: false, text: message });
 });
 ipcMain.on(IPC.debugRecord, (e, down: boolean) => {
-  if (from(debugWin, e)) act(down ? hotkey.fnDown(performance.now()) : hotkey.fnUp(performance.now()));
+  if (from(debugWin, e)) act(down ? hotkey.down(performance.now()) : hotkey.up(performance.now()));
 });
 
 app.whenReady().then(async () => {

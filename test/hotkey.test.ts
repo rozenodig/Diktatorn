@@ -7,8 +7,8 @@ type Step = ["down" | "up" | "chord" | "expire" | "escape", number];
 function run(steps: Step[]) {
   const hk = new Hotkey({ minHoldMs: 150 });
   return steps.map(([e, t]) => {
-    if (e === "down") return hk.fnDown(t);
-    if (e === "up") return hk.fnUp(t);
+    if (e === "down") return hk.down(t);
+    if (e === "up") return hk.up(t);
     if (e === "chord") return hk.chord();
     if (e === "expire") return hk.expire();
     return hk.escape();
@@ -34,11 +34,11 @@ test("a stale expiry after entering hands-free does nothing", () => {
   assert.deepEqual(run([["down", 0], ["up", 80], ["down", 200], ["expire", 400]]), ["start", "pending", "handsFree", "none"]);
 });
 
-test("fn used as a modifier cancels push-to-talk", () => {
+test("the hotkey used as a modifier cancels push-to-talk", () => {
   assert.deepEqual(run([["down", 0], ["chord", 300], ["up", 900]]), ["start", "cancel", "none"]);
 });
 
-test("fn used as a modifier during hands-free does not stop it", () => {
+test("the hotkey used as a modifier during hands-free does not stop it", () => {
   const steps: Step[] = [["down", 0], ["up", 80], ["down", 200], ["up", 280], ["down", 3000], ["chord", 3050], ["up", 3200]];
   assert.deepEqual(run(steps), ["start", "pending", "handsFree", "none", "none", "none", "none"]);
 });
