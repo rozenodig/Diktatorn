@@ -1,10 +1,10 @@
 // Electron main process: wires the macOS helper, microphone capture and the speech engine
 // together, inserts each transcript into the frontmost app, and shows every utterance in
 // the debug window.
-import { app, BrowserWindow, ipcMain, session, systemPreferences, type IpcMainEvent } from "electron";
+import { app, BrowserWindow, ipcMain, screen, session, systemPreferences, type IpcMainEvent } from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { IPC, type DebugResult, type StatusUpdate } from "../shared/ipc.ts";
+import { IPC, type DebugResult, type OverlayState, type StatusUpdate } from "../shared/ipc.ts";
 import { planInsertion } from "./apps.ts";
 import { transcribeUtterance } from "./dictation.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
@@ -18,6 +18,7 @@ const SETTINGS = { languageMode: "auto", primaryLanguage: "sv" } as const;
 const MIN_HOLD_MS = 150;
 /** A second fn press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
+const OVERLAY_SIZE = { width: 300, height: 56 };
 /** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
 const HELPER_EXIT_PERMISSION_GRANTED = 3;
 
@@ -27,6 +28,8 @@ const preload = join(import.meta.dirname, "..", "preload", "preload.cjs");
 
 let debugWin: BrowserWindow | null = null;
 let captureWin: BrowserWindow | null = null;
+let overlayWin: BrowserWindow | null = null;
+let overlayHideTimer: NodeJS.Timeout | null = null;
 let doubleTapTimer: NodeJS.Timeout | null = null;
 let engine: WhisperProcessEngine | null = null;
 let engineReady = false;
@@ -44,6 +47,29 @@ function setStatus(update: StatusUpdate): void {
   debugWin?.webContents.send(IPC.debugStatus, update);
 }
 
+/** Shows the overlay without activating the app, so the target text field keeps focus. */
+function showOverlay(state: OverlayState, text: string, hideAfterMs?: number): void {
+  if (!overlayWin) return;
+  if (overlayHideTimer) clearTimeout(overlayHideTimer);
+  overlayHideTimer = hideAfterMs === undefined ? null : setTimeout(hideOverlay, hideAfterMs);
+  overlayWin.webContents.send(IPC.overlayState, { state, text });
+  if (!overlayWin.isVisible()) {
+    const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea;
+    overlayWin.setBounds({
+      x: Math.round(area.x + (area.width - OVERLAY_SIZE.width) / 2),
+      y: Math.round(area.y + area.height - OVERLAY_SIZE.height - 24),
+      ...OVERLAY_SIZE,
+    });
+    overlayWin.showInactive();
+  }
+}
+
+function hideOverlay(): void {
+  if (overlayHideTimer) clearTimeout(overlayHideTimer);
+  overlayHideTimer = null;
+  overlayWin?.hide();
+}
+
 /** Tells the helper whether Esc should currently cancel (and be swallowed). */
 function setRecording(active: boolean): void {
   helper?.request("recording", { active }).catch(() => {});
@@ -58,22 +84,26 @@ function act(action: HotkeyAction): void {
       micStartMs = null;
       captureWin?.webContents.send(IPC.captureStart);
       setRecording(true);
+      showOverlay("listening", "Listening");
       setStatus({ key: "recording", ok: true, text: "recording…" });
       break;
     case "pending":
       doubleTapTimer = setTimeout(() => act(hotkey.expire()), DOUBLE_TAP_MS);
       break;
     case "handsFree":
+      showOverlay("handsFree", "Hands-free · tap fn to finish");
       setStatus({ key: "recording", ok: true, text: "recording hands-free…" });
       break;
     case "stop":
       captureWin?.webContents.send(IPC.captureStop);
       setRecording(false);
+      showOverlay("processing", "Transcribing");
       setStatus({ key: "recording", ok: true, text: "transcribing…" });
       break;
     case "cancel":
       captureWin?.webContents.send(IPC.captureCancel);
       setRecording(false);
+      hideOverlay();
       setStatus({ key: "recording", ok: true, text: "cancelled" });
       break;
   }
@@ -129,6 +159,14 @@ async function handleAudio(samples: Float32Array): Promise<void> {
   console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms (audio ${Math.round(r.audioMs)} ms, mic start ${mic}): ${result.text || "(no speech)"}${where}`);
   debugWin?.webContents.send(IPC.debugResult, result);
   setStatus({ key: "recording", ok: true, text: "idle" });
+  if (!r.text) hideOverlay();
+  else if (insertion?.pasted) showOverlay("done", "Inserted", 700);
+  else showOverlay("done", "Copied to clipboard", 1500);
+}
+
+function fail(err: unknown): void {
+  setStatus({ key: "asr", ok: false, text: String(err) });
+  showOverlay("error", "Something went wrong", 2500);
 }
 
 async function ensureMicrophone(): Promise<void> {
@@ -214,7 +252,7 @@ ipcMain.on(IPC.captureStarted, (e, ms: number) => {
 });
 ipcMain.on(IPC.captureAudio, (e, samples: Float32Array) => {
   if (!from(captureWin, e)) return;
-  queue = queue.then(() => handleAudio(samples)).catch((err) => setStatus({ key: "asr", ok: false, text: String(err) }));
+  queue = queue.then(() => handleAudio(samples)).catch(fail);
 });
 ipcMain.on(IPC.captureError, (e, message: string) => {
   if (from(captureWin, e)) setStatus({ key: "mic", ok: false, text: message });
@@ -238,6 +276,27 @@ app.whenReady().then(async () => {
     webPreferences: { ...webPreferences, backgroundThrottling: false, autoplayPolicy: "no-user-gesture-required" },
   });
   await captureWin.loadFile(renderer("capture.html"));
+
+  // A non-activating panel that ignores the mouse: it can never take focus from the text field
+  // the user is dictating into, so the paste lands where they were typing.
+  overlayWin = new BrowserWindow({
+    ...OVERLAY_SIZE,
+    type: "panel",
+    show: false,
+    frame: false,
+    transparent: true,
+    hasShadow: false,
+    resizable: false,
+    movable: false,
+    focusable: false,
+    alwaysOnTop: true,
+    hiddenInMissionControl: true,
+    webPreferences,
+  });
+  overlayWin.setAlwaysOnTop(true, "screen-saver");
+  overlayWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  overlayWin.setIgnoreMouseEvents(true);
+  await overlayWin.loadFile(renderer("overlay.html"));
 
   setStatus({ key: "recording", ok: true, text: "idle" });
   // A pending permission prompt must not hold up the helpers, so none of these block each other.

@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld("diktatorn", {
     audio: (samples: Float32Array) => ipcRenderer.send("capture:audio", samples),
     error: (message: string) => ipcRenderer.send("capture:error", message),
   },
+  overlay: {
+    onState: (cb: (update: unknown) => void) => on("overlay:state", cb),
+  },
   debug: {
     onStatus: (cb: (status: unknown) => void) => on("debug:status", cb),
     onResult: (cb: (result: unknown) => void) => on("debug:result", cb),

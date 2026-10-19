@@ -1,5 +1,5 @@
 // Shape of the API that preload.cts exposes on window.diktatorn.
-import type { DebugResult, StatusUpdate } from "../shared/ipc.ts";
+import type { DebugResult, OverlayUpdate, StatusUpdate } from "../shared/ipc.ts";
 
 declare global {
   interface Window {
@@ -11,6 +11,9 @@ declare global {
         started(micStartMs: number): void;
         audio(samples: Float32Array): void;
         error(message: string): void;
+      };
+      overlay: {
+        onState(cb: (update: OverlayUpdate) => void): void;
       };
       debug: {
         onStatus(cb: (status: StatusUpdate) => void): void;

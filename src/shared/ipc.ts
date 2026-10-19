@@ -9,7 +9,15 @@ export const IPC = {
   debugStatus: "debug:status",
   debugResult: "debug:result",
   debugRecord: "debug:record",
+  overlayState: "overlay:state",
 } as const;
+
+export type OverlayState = "listening" | "handsFree" | "processing" | "done" | "error";
+
+export interface OverlayUpdate {
+  state: OverlayState;
+  text: string;
+}
 
 export interface StatusUpdate {
   key: "keys" | "paste" | "asr" | "mic" | "recording";
