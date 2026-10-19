@@ -1,9 +1,14 @@
-// Speech model manifest. Every file is pinned to a Hugging Face commit and verified by
+// Model manifest (speech and cleanup). Every file is pinned to a Hugging Face commit and verified by
 // SHA-256 and exact size after download.
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-export type ModelId = "kb-whisper-medium" | "kb-whisper-large" | "whisper-large-v3-turbo" | "silero-vad";
+export type ModelId =
+  | "kb-whisper-medium"
+  | "kb-whisper-large"
+  | "whisper-large-v3-turbo"
+  | "silero-vad"
+  | "gemma-4-e2b-it-qat";
 
 export interface ModelFile {
   id: ModelId;
@@ -49,10 +54,20 @@ export const MODELS: Record<ModelId, ModelFile> = {
     file: "silero-v6.2.0.bin",
     license: "MIT",
   },
+  "gemma-4-e2b-it-qat": {
+    id: "gemma-4-e2b-it-qat",
+    url: hf("google/gemma-4-E2B-it-qat-q4_0-gguf", "675cff42a74c774d6cb76f76d8eacb49b48c9b93", "gemma-4-E2B_q4_0-it.gguf"),
+    sha256: "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+    bytes: 3_349_516_256,
+    file: "gemma-4-e2b-it-qat-q4_0.gguf",
+    license: "Apache-2.0",
+  },
 };
 
 /** Models used when the user has not chosen otherwise. */
 export const DEFAULT_MODELS = { sv: "kb-whisper-medium", en: "whisper-large-v3-turbo", vad: "silero-vad" } as const;
+/** The optional language model for smart cleanup, downloaded separately from the speech models. */
+export const DEFAULT_CLEANUP_MODEL = "gemma-4-e2b-it-qat" satisfies ModelId;
 
 /** Matches Electron's app.getPath("userData") for productName "Diktatorn". */
 export function defaultUserDataDir(): string {

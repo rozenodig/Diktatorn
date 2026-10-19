@@ -1,5 +1,5 @@
 // Development helper: downloads the default speech models (or the ids given as arguments)
-// into the app's model directory. Usage: npm run fetch-models [-- kb-whisper-large]
+// into the app's model directory. Usage: npm run fetch-models [-- gemma-4-e2b-it-qat]
 import { downloadModel, isModelPresent } from "../src/main/download.ts";
 import { DEFAULT_MODELS, MODELS, modelPath, type ModelId } from "../src/main/models.ts";
 
