@@ -10,12 +10,14 @@ import { transcribeUtterance } from "./dictation.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
 import type { Lang } from "./language.ts";
 import { DEFAULT_MODELS, modelPath } from "./models.ts";
-import { PushToTalk, type PttAction } from "./ptt.ts";
+import { Hotkey, type HotkeyAction } from "./hotkey.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
 // Hard-coded until the settings window exists.
 const SETTINGS = { languageMode: "auto", primaryLanguage: "sv" } as const;
 const MIN_HOLD_MS = 150;
+/** A second fn press within this window after a quick tap turns on hands-free mode. */
+const DOUBLE_TAP_MS = 300;
 /** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
 const HELPER_EXIT_PERMISSION_GRANTED = 3;
 
@@ -25,11 +27,12 @@ const preload = join(import.meta.dirname, "..", "preload", "preload.cjs");
 
 let debugWin: BrowserWindow | null = null;
 let captureWin: BrowserWindow | null = null;
+let doubleTapTimer: NodeJS.Timeout | null = null;
 let engine: WhisperProcessEngine | null = null;
 let engineReady = false;
 let helper: JsonLinesProcess | null = null;
 
-const ptt = new PushToTalk({ minHoldMs: MIN_HOLD_MS });
+const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const statuses = new Map<string, StatusUpdate>();
 let previousLanguage: Lang | null = null;
 let micStartMs: number | null = null;
@@ -41,12 +44,39 @@ function setStatus(update: StatusUpdate): void {
   debugWin?.webContents.send(IPC.debugStatus, update);
 }
 
-function act(action: PttAction): void {
+/** Tells the helper whether Esc should currently cancel (and be swallowed). */
+function setRecording(active: boolean): void {
+  helper?.request("recording", { active }).catch(() => {});
+}
+
+function act(action: HotkeyAction): void {
   if (action === "none") return;
-  const channel = { start: IPC.captureStart, stop: IPC.captureStop, cancel: IPC.captureCancel }[action];
-  if (action === "start") micStartMs = null;
-  captureWin?.webContents.send(channel);
-  setStatus({ key: "recording", ok: true, text: action === "start" ? "recording…" : action === "stop" ? "transcribing…" : "cancelled" });
+  if (doubleTapTimer) clearTimeout(doubleTapTimer);
+  doubleTapTimer = null;
+  switch (action) {
+    case "start":
+      micStartMs = null;
+      captureWin?.webContents.send(IPC.captureStart);
+      setRecording(true);
+      setStatus({ key: "recording", ok: true, text: "recording…" });
+      break;
+    case "pending":
+      doubleTapTimer = setTimeout(() => act(hotkey.expire()), DOUBLE_TAP_MS);
+      break;
+    case "handsFree":
+      setStatus({ key: "recording", ok: true, text: "recording hands-free…" });
+      break;
+    case "stop":
+      captureWin?.webContents.send(IPC.captureStop);
+      setRecording(false);
+      setStatus({ key: "recording", ok: true, text: "transcribing…" });
+      break;
+    case "cancel":
+      captureWin?.webContents.send(IPC.captureCancel);
+      setRecording(false);
+      setStatus({ key: "recording", ok: true, text: "cancelled" });
+      break;
+  }
 }
 
 /** Only accept IPC from the window that is supposed to send it. */
@@ -137,13 +167,13 @@ function startHelper(): void {
   helper = proc;
   type HelperEvent = {
     event: string; down?: boolean; t: number; inputMonitoring?: boolean; accessibility?: boolean;
-    tap?: boolean; hid?: boolean; message?: string; reason?: string;
+    tap?: boolean; tapActive?: boolean; hid?: boolean; message?: string; reason?: string;
   };
   proc.on("event", (msg: HelperEvent) => {
     switch (msg.event) {
       case "ready":
         setStatus(msg.inputMonitoring
-          ? { key: "keys", ok: true, text: `hold fn to dictate (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tap ? "on" : "off"})` }
+          ? { key: "keys", ok: true, text: `hold fn to dictate, double-tap for hands-free (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tapActive ? "active" : msg.tap ? "listen-only, Esc not swallowed" : "off"})` }
           : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; fn starts working as soon as it is on.` });
         setStatus(msg.accessibility
           ? { key: "paste", ok: true, text: "pastes into the frontmost app" }
@@ -156,10 +186,13 @@ function startHelper(): void {
         console.log(`[helper] debug ${JSON.stringify(msg)}`);
         break;
       case "fn":
-        act(msg.down ? ptt.fnDown(msg.t) : ptt.fnUp(msg.t));
+        act(msg.down ? hotkey.fnDown(msg.t) : hotkey.fnUp(msg.t));
         break;
       case "chord":
-        act(ptt.chord(msg.t));
+        act(hotkey.chord());
+        break;
+      case "escape":
+        act(hotkey.escape());
         break;
       case "tap":
         console.warn(`[helper] event tap re-enabled after ${msg.reason}`);
@@ -187,7 +220,7 @@ ipcMain.on(IPC.captureError, (e, message: string) => {
   if (from(captureWin, e)) setStatus({ key: "mic", ok: false, text: message });
 });
 ipcMain.on(IPC.debugRecord, (e, down: boolean) => {
-  if (from(debugWin, e)) act(down ? ptt.fnDown(performance.now()) : ptt.fnUp(performance.now()));
+  if (from(debugWin, e)) act(down ? hotkey.fnDown(performance.now()) : hotkey.fnUp(performance.now()));
 });
 
 app.whenReady().then(async () => {
