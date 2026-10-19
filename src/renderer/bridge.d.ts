@@ -1,5 +1,5 @@
 // Shape of the API that preload.cts exposes on window.diktatorn.
-import type { AppState, DebugResult, DictionaryEntry, OverlayUpdate, Settings, StatusUpdate } from "../shared/ipc.ts";
+import type { AppState, BenchCommand, BenchState, DebugResult, DictionaryEntry, OverlayUpdate, Settings, StatusUpdate } from "../shared/ipc.ts";
 
 declare global {
   interface Window {
@@ -29,6 +29,8 @@ declare global {
         onStatus(cb: (status: StatusUpdate) => void): void;
         onResult(cb: (result: DebugResult) => void): void;
         record(down: boolean): void;
+        bench(command: BenchCommand): void;
+        onBench(cb: (state: BenchState | null) => void): void;
       };
     };
   }

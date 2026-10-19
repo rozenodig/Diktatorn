@@ -10,6 +10,8 @@ export const IPC = {
   debugStatus: "debug:status",
   debugResult: "debug:result",
   debugRecord: "debug:record",
+  debugBench: "debug:bench",
+  debugBenchState: "debug:bench-state",
   overlayState: "overlay:state",
   appState: "app:state",
   appGetState: "app:get-state",
@@ -104,4 +106,15 @@ export interface DebugResult {
   timings: { vadMs: number; detectMs: number; transcribeMs: number; totalMs: number };
   cleanup: { ms: number; llm: { status: string; ms: number; detail: string } | null } | null;
   insertion: { app: string | null; appName: string | null; kind: string; pasted: boolean; restored: boolean; note: string; ms: number } | null;
+}
+
+export type BenchCommand = "start" | "stop" | "previous" | "next";
+
+/** The benchmark recorder in the debug window (development only). */
+export interface BenchState {
+  active: boolean;
+  index: number;
+  total: number;
+  recorded: number;
+  sentence: { id: string; language: string; term: string; text: string; recorded: boolean } | null;
 }

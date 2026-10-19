@@ -11,14 +11,19 @@ export function concatChunks(chunks: Float32Array[]): Float32Array {
   return out;
 }
 
-/** Float samples in [-1, 1] to base64 16-bit little-endian PCM (the speech process wire format). */
-export function pcmToBase64(samples: Float32Array): string {
+/** Float samples in [-1, 1] to 16-bit little-endian PCM. */
+export function toPcm16(samples: Float32Array): Buffer {
   const buf = Buffer.alloc(samples.length * 2);
   for (let i = 0; i < samples.length; i++) {
     const s = Math.max(-1, Math.min(1, samples[i] ?? 0));
     buf.writeInt16LE(s < 0 ? Math.round(s * 32768) : Math.round(s * 32767), i * 2);
   }
-  return buf.toString("base64");
+  return buf;
+}
+
+/** Float samples to base64 16-bit PCM (the speech process wire format). */
+export function pcmToBase64(samples: Float32Array): string {
+  return toPcm16(samples).toString("base64");
 }
 
 export interface Trimmed {

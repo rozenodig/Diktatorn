@@ -1,6 +1,6 @@
 // Debug window: helper/model/mic status and every transcript with its language decision,
-// cleanup and timings.
-import type { DebugResult, StatusUpdate } from "../shared/ipc.ts";
+// cleanup and timings, plus the benchmark recorder in development.
+import type { BenchState, DebugResult, StatusUpdate } from "../shared/ipc.ts";
 
 const api = window.diktatorn.debug;
 const statusEl = document.getElementById("status")!;
@@ -61,3 +61,30 @@ api.onResult((r: DebugResult) => {
 recordBtn.addEventListener("pointerdown", () => api.record(true));
 recordBtn.addEventListener("pointerup", () => api.record(false));
 recordBtn.addEventListener("pointerleave", (e) => e.buttons && api.record(false));
+
+const bench = {
+  section: document.getElementById("bench")!,
+  card: document.getElementById("bench-card")!,
+  progress: document.getElementById("bench-progress")!,
+  text: document.getElementById("bench-text")!,
+  toggle: document.getElementById("bench-toggle")!,
+};
+let benchActive = false;
+
+api.onBench((state: BenchState | null) => {
+  bench.section.hidden = state === null;
+  if (!state) return;
+  benchActive = state.active;
+  bench.card.hidden = !state.active;
+  bench.toggle.textContent = state.active ? "Stop benchmark recording" : "Start benchmark recording";
+  const s = state.sentence;
+  if (!s) return;
+  bench.progress.textContent =
+    `${state.index + 1} / ${state.total} · ${s.id} · ${s.recorded ? "recorded, record again to replace" : "not recorded yet"}` +
+    ` · ${state.recorded} of ${state.total} done`;
+  bench.text.textContent = s.text;
+});
+
+bench.toggle.addEventListener("click", () => api.bench(benchActive ? "stop" : "start"));
+document.getElementById("bench-previous")!.addEventListener("click", () => api.bench("previous"));
+document.getElementById("bench-next")!.addEventListener("click", () => api.bench("next"));

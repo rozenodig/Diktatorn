@@ -15,12 +15,28 @@
       .text { font-size: 15px; margin: 2px 0 4px; white-space: pre-wrap; }
       .raw { color: #888; text-decoration: line-through; text-decoration-color: #8886; margin-bottom: 4px; white-space: pre-wrap; }
       .meta { color: #888; font-variant-numeric: tabular-nums; }
+      #bench { border: 1px solid #8884; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+      #bench h2 { font-size: 13px; margin: 0 0 4px; }
+      #bench p { margin: 0 0 8px; }
+      #bench-text { font-size: 22px; line-height: 1.35; margin: 8px 0 12px; }
+      #bench button { margin: 0 6px 0 0; }
     </style>
   </head>
   <body>
     <h1>Diktatorn — debug</h1>
     <div id="status"></div>
     <button id="record" title="Hold to record without the fn key">Hold to record</button>
+    <section id="bench" hidden>
+      <h2>Benchmark recording</h2>
+      <p class="meta">Hold the dictation key, read the sentence as you normally speak, and release. The take is saved instead of inserted, and the next sentence appears. Closing this window turns recording off.</p>
+      <div id="bench-card" hidden>
+        <div id="bench-progress" class="meta"></div>
+        <div id="bench-text"></div>
+        <button id="bench-previous">Previous</button>
+        <button id="bench-next">Next</button>
+      </div>
+      <button id="bench-toggle">Start benchmark recording</button>
+    </section>
     <div id="results"></div>
     <script type="module" src="./debug.js"></script>
   </body>

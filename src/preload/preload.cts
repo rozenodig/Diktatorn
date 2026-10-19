@@ -32,5 +32,7 @@ contextBridge.exposeInMainWorld("diktatorn", {
     onStatus: (cb: (status: unknown) => void) => on("debug:status", cb),
     onResult: (cb: (result: unknown) => void) => on("debug:result", cb),
     record: (down: boolean) => ipcRenderer.send("debug:record", down),
+    bench: (command: string) => ipcRenderer.send("debug:bench", command),
+    onBench: (cb: (state: unknown) => void) => on("debug:bench-state", cb),
   },
 });

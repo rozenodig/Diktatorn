@@ -16,6 +16,8 @@ export interface LanguageChoice {
   reason: "override" | "detected" | "short-clip" | "ambiguous";
 }
 
+/** Short or ambiguous dictations fall back to this language when there is no previous one. */
+export const PRIMARY_LANGUAGE: Lang = "sv";
 /** Below this much detected speech, detection is too unreliable to trust. */
 export const MIN_DETECT_SPEECH_MS = 1200;
 /** sv share of (sv + en) must be outside [1 - x, x] to count as confident. */

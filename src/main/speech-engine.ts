@@ -24,7 +24,11 @@ export interface SpeechEngine {
   /** Speech segments as [start, end] in centiseconds; empty when there is no speech. */
   speechSegments(pcm: Float32Array): Promise<number[][]>;
   detectLanguage(pcm: Float32Array, candidates: Lang[]): Promise<Record<Lang, number>>;
-  transcribe(pcm: Float32Array, opts: { language: Lang; prompt?: string }): Promise<Transcript>;
+  /**
+   * Transcribes with the language's own model. "auto" lets the multilingual model detect the
+   * language among every language it knows, as stock Whisper does (the benchmark baseline).
+   */
+  transcribe(pcm: Float32Array, opts: { language: Lang | "auto"; prompt?: string }): Promise<Transcript>;
   close(): void;
 }
 
@@ -59,10 +63,10 @@ export class WhisperProcessEngine implements SpeechEngine {
     return res.probs as Record<Lang, number>;
   }
 
-  async transcribe(pcm: Float32Array, opts: { language: Lang; prompt?: string }): Promise<Transcript> {
+  async transcribe(pcm: Float32Array, opts: { language: Lang | "auto"; prompt?: string }): Promise<Transcript> {
     const res = await this.proc.request("transcribe", {
       pcm: pcmToBase64(pcm),
-      model: opts.language,
+      model: opts.language === "auto" ? DETECTION_MODEL : opts.language,
       language: opts.language,
       prompt: opts.prompt ?? "",
     });

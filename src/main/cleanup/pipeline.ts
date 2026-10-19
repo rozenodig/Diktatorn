@@ -7,6 +7,8 @@ import type { Cleaner } from "./llm.ts";
 import { applyRules, isHesitation } from "./rules.ts";
 import { bareWord, joinKept, keptWords, splitWords } from "./words.ts";
 
+/** After this, the language-model pass is abandoned and the rule output is used. */
+export const LLM_TIMEOUT_MS = 1500;
 /** Shorter transcripts rarely contain a self-correction, and the pass would only add latency. */
 const MIN_LLM_WORDS = 4;
 /** A cleanup that deletes more than this share of a longer transcript is assumed to be wrong. */

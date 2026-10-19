@@ -20,6 +20,7 @@ import {
   FIRST_RUN_MODELS,
   IPC,
   type AppState,
+  type BenchCommand,
   type DebugResult,
   type DictionaryEntry,
   type RecentDictation,
@@ -28,13 +29,14 @@ import {
 } from "../shared/ipc.ts";
 import { AppWindow, createTray } from "./app-window.ts";
 import { planInsertion } from "./apps.ts";
+import { BenchRecorder } from "./bench.ts";
 import { DictionaryFile, dictionaryPrompt, saveDictionary } from "./cleanup/dictionary.ts";
 import { LlamaCleaner } from "./cleanup/llm.ts";
-import { cleanUp } from "./cleanup/pipeline.ts";
+import { cleanUp, LLM_TIMEOUT_MS } from "./cleanup/pipeline.ts";
 import { transcribeUtterance } from "./dictation.ts";
 import { Hotkey, type HotkeyAction } from "./hotkey.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
-import type { Lang } from "./language.ts";
+import { PRIMARY_LANGUAGE, type Lang } from "./language.ts";
 import { ModelStore } from "./model-store.ts";
 import { DEFAULT_CLEANUP_MODEL, DEFAULT_MODELS, MODELS, type ModelId } from "./models.ts";
 import { Overlay } from "./overlay.ts";
@@ -42,15 +44,11 @@ import { RestartPolicy } from "./restart.ts";
 import { SettingsStore } from "./settings.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
-/** After this, the language-model pass is abandoned and the rule-based cleanup is inserted. */
-const LLM_TIMEOUT_MS = 1500;
 const MIN_HOLD_MS = 150;
 /** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
 /** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
 const HELPER_EXIT_PERMISSION_GRANTED = 3;
-/** Short or ambiguous dictations fall back to this language. */
-const PRIMARY_LANGUAGE: Lang = "sv";
 const MAX_RECENT = 20;
 const KEY_NAMES: Record<Settings["hotkey"], string> = {
   fn: "fn",
@@ -69,6 +67,9 @@ const settings = new SettingsStore(join(userData, "settings.json"));
 const models = new ModelStore(userData);
 const dictionaryFile = new DictionaryFile(join(userData, "dictionary.json"));
 const appWindow = new AppWindow(renderer("app.html"), webPreferences);
+/** Development only: records the benchmark sentences from the debug window. */
+const benchDir = join(app.getAppPath(), "bench");
+const bench = BenchRecorder.available(benchDir) ? new BenchRecorder(benchDir) : null;
 
 let debugWin: BrowserWindow | null = null;
 let captureWin: BrowserWindow | null = null;
@@ -183,6 +184,7 @@ async function refreshDictionary(): Promise<DictionaryEntry[]> {
 }
 
 async function handleAudio(samples: Float32Array): Promise<void> {
+  if (bench?.active) return saveBenchTake(bench, samples);
   if (!engine || !engineReady) {
     setStatus({ key: "asr", ok: false, text: "speech engine not ready; dictation dropped" });
     overlay?.show("error", "Still getting ready", 2000);
@@ -231,6 +233,26 @@ async function handleAudio(samples: Float32Array): Promise<void> {
   if (!text) overlay?.hide();
   else if (insertion?.pasted) overlay?.show("done", "Inserted", 700);
   else overlay?.show("done", "Copied to clipboard", 1500);
+}
+
+/** While benchmark recording is on, a take is saved for the benchmark instead of transcribed. */
+async function saveBenchTake(recorder: BenchRecorder, samples: Float32Array): Promise<void> {
+  const id = await recorder.save(samples);
+  sendBenchState();
+  setStatus({ key: "recording", ok: true, text: `saved benchmark take ${id}` });
+  overlay?.show("done", `Saved ${id}`, 700);
+}
+
+function sendBenchState(): void {
+  debugWin?.webContents.send(IPC.debugBenchState, bench?.state() ?? null);
+}
+
+async function runBenchCommand(recorder: BenchRecorder, command: BenchCommand): Promise<void> {
+  if (command === "start") await recorder.start();
+  else if (command === "stop") recorder.stop();
+  else if (command === "previous") recorder.move(-1);
+  else if (command === "next") recorder.move(1);
+  sendBenchState();
 }
 
 function fail(err: unknown): void {
@@ -418,8 +440,14 @@ async function openDebugWindow(): Promise<void> {
   }
   await app.dock?.show();
   debugWin = new BrowserWindow({ width: 760, height: 640, title: "Diktatorn — debug", webPreferences });
-  debugWin.webContents.on("did-finish-load", () => statuses.forEach((s) => debugWin?.webContents.send(IPC.debugStatus, s)));
-  debugWin.on("closed", () => (debugWin = null));
+  debugWin.webContents.on("did-finish-load", () => {
+    statuses.forEach((s) => debugWin?.webContents.send(IPC.debugStatus, s));
+    sendBenchState();
+  });
+  debugWin.on("closed", () => {
+    debugWin = null;
+    bench?.stop(); // dictation goes back to inserting text
+  });
   await debugWin.loadFile(renderer("debug.html"));
 }
 
@@ -435,6 +463,13 @@ ipcMain.on(IPC.captureError, (e, message: string) => {
 });
 ipcMain.on(IPC.debugRecord, (e, down: boolean) => {
   if (from(debugWin, e)) act(down ? hotkey.down(performance.now()) : hotkey.up(performance.now()));
+});
+
+ipcMain.on(IPC.debugBench, (e, command: BenchCommand) => {
+  if (!from(debugWin, e) || !bench) return;
+  runBenchCommand(bench, command).catch((err) =>
+    setStatus({ key: "recording", ok: false, text: `benchmark: ${(err as Error).message}` }),
+  );
 });
 
 ipcMain.handle(IPC.appGetState, (e) => {

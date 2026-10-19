@@ -14,8 +14,9 @@
     "build": "tsc -p . && tsc -p src/renderer && mkdir -p dist/renderer && cp src/renderer/*.html src/renderer/*.css dist/renderer/",
     "build:native": "scripts/build-native.sh",
     "fetch-models": "node scripts/fetch-models.ts",
+    "bench": "node bench/run.ts",
     "start": "npm run build && scripts/dev.sh",
-    "typecheck": "tsc -p . --noEmit && tsc -p src/renderer --noEmit",
+    "typecheck": "tsc -p . --noEmit && tsc -p src/renderer --noEmit && tsc -p bench",
     "test": "node --test test/*.test.ts"
   },
   "devDependencies": {
