@@ -9,6 +9,8 @@ const SPEECH_PAD_MS = 200;
 export interface UtteranceSettings {
   languageMode: LanguageMode;
   primaryLanguage: Lang;
+  /** Recognition bias, e.g. dictionary terms. */
+  prompt?: string;
 }
 
 export interface UtteranceResult {
@@ -54,7 +56,7 @@ export async function transcribeUtterance(
   });
 
   const t = performance.now();
-  const transcript = await engine.transcribe(trimmed.samples, { language: language.language });
+  const transcript = await engine.transcribe(trimmed.samples, { language: language.language, prompt: settings.prompt });
   timings.transcribeMs = performance.now() - t;
   timings.totalMs = performance.now() - t0;
   return { text: transcript.text, speech: true, language, probs, audioMs, speechMs: trimmed.speechMs, timings };

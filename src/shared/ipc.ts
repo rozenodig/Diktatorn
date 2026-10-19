@@ -20,14 +20,17 @@ export interface OverlayUpdate {
 }
 
 export interface StatusUpdate {
-  key: "keys" | "paste" | "asr" | "mic" | "recording";
+  key: "keys" | "paste" | "asr" | "cleanup" | "mic" | "recording";
   ok: boolean;
   text: string;
 }
 
 export interface DebugResult {
   at: string;
+  /** What was inserted: the transcript after cleanup. */
   text: string;
+  /** The transcript as recognised. */
+  raw: string;
   speech: boolean;
   language: string | null;
   reason: string | null;
@@ -36,5 +39,6 @@ export interface DebugResult {
   speechMs: number;
   micStartMs: number | null;
   timings: { vadMs: number; detectMs: number; transcribeMs: number; totalMs: number };
+  cleanup: { ms: number; llm: { status: string; ms: number; detail: string } | null } | null;
   insertion: { app: string | null; kind: string; pasted: boolean; restored: boolean; note: string; ms: number } | null;
 }

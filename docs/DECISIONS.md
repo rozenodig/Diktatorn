@@ -52,7 +52,9 @@ Each entry records the choice, the alternatives that were considered, and why. R
 2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used.
 3. Dictionary replacements and snippets are applied deterministically at the end.
 
-**Alternatives considered:** rules only; LLM only.
+Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is downloaded separately from the speech models.
+
+**Alternatives considered:** rules only; LLM only. For the runtime: node-llama-cpp in a utility process; Ollama. For enforcing deletion-only output: a grammar that only allows subsequences of the input during decoding.
 **Rationale:** _TODO_
 
 ## 7. Insertion

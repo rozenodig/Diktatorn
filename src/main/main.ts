@@ -1,20 +1,25 @@
-// Electron main process: wires the macOS helper, microphone capture and the speech engine
-// together, inserts each transcript into the frontmost app, and shows every utterance in
-// the debug window.
+// Electron main process: wires the macOS helper, microphone capture, the speech engine and
+// text cleanup together, inserts each transcript into the frontmost app, and shows every
+// utterance in the debug window.
 import { app, BrowserWindow, ipcMain, screen, session, systemPreferences, type IpcMainEvent } from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { IPC, type DebugResult, type OverlayState, type StatusUpdate } from "../shared/ipc.ts";
 import { planInsertion } from "./apps.ts";
+import { DictionaryFile, dictionaryPrompt } from "./cleanup/dictionary.ts";
+import { LlamaCleaner } from "./cleanup/llm.ts";
+import { cleanUp } from "./cleanup/pipeline.ts";
 import { transcribeUtterance } from "./dictation.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
 import type { Lang } from "./language.ts";
-import { DEFAULT_MODELS, modelPath } from "./models.ts";
+import { DEFAULT_CLEANUP_MODEL, DEFAULT_MODELS, modelPath } from "./models.ts";
 import { Hotkey, type HotkeyAction } from "./hotkey.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
 // Hard-coded until the settings window exists.
-const SETTINGS = { languageMode: "auto", primaryLanguage: "sv" } as const;
+const SETTINGS = { languageMode: "auto", primaryLanguage: "sv", smartCleanup: true } as const;
+/** After this, the language-model pass is abandoned and the rule-based cleanup is inserted. */
+const LLM_TIMEOUT_MS = 1500;
 const MIN_HOLD_MS = 150;
 /** A second fn press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
@@ -34,6 +39,9 @@ let doubleTapTimer: NodeJS.Timeout | null = null;
 let engine: WhisperProcessEngine | null = null;
 let engineReady = false;
 let helper: JsonLinesProcess | null = null;
+let cleaner: LlamaCleaner | null = null;
+let cleanerReady = false;
+let dictionary: DictionaryFile | null = null;
 
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const statuses = new Map<string, StatusUpdate>();
@@ -138,12 +146,19 @@ async function handleAudio(samples: Float32Array): Promise<void> {
     setStatus({ key: "asr", ok: false, text: "speech engine not ready; utterance dropped" });
     return;
   }
-  const r = await transcribeUtterance(engine, samples, SETTINGS, previousLanguage);
+  const entries = (await dictionary?.current()) ?? [];
+  if (dictionary?.error) setStatus({ key: "cleanup", ok: false, text: `dictionary not loaded: ${dictionary.error}` });
+  const r = await transcribeUtterance(engine, samples, { ...SETTINGS, prompt: dictionaryPrompt(entries) }, previousLanguage);
   if (r.language) previousLanguage = r.language.language;
-  const insertion = r.text ? await insert(r.text) : null;
+  const cleanup = r.text
+    ? await cleanUp(r.text, { dictionary: entries, llm: cleanerReady ? cleaner : null, llmTimeoutMs: LLM_TIMEOUT_MS })
+    : null;
+  const text = cleanup?.text ?? "";
+  const insertion = text ? await insert(text) : null;
   const result: DebugResult = {
     at: new Date().toLocaleTimeString("sv-SE"),
-    text: r.text,
+    text,
+    raw: r.text,
     speech: r.speech,
     language: r.language?.language ?? null,
     reason: r.language?.reason ?? null,
@@ -152,14 +167,17 @@ async function handleAudio(samples: Float32Array): Promise<void> {
     speechMs: r.speechMs,
     micStartMs,
     timings: r.timings,
+    cleanup: cleanup && { ms: cleanup.ms, llm: cleanup.llm },
     insertion,
   };
   const mic = micStartMs === null ? "-" : `${Math.round(micStartMs)} ms`;
   const where = insertion ? ` -> ${insertion.app ?? "?"} (${insertion.pasted ? "pasted" : "not pasted"}, ${insertion.restored ? "restored" : insertion.note || "not restored"})` : "";
   console.log(`[result] ${result.language ?? "-"} ${Math.round(r.timings.totalMs)} ms (audio ${Math.round(r.audioMs)} ms, mic start ${mic}): ${result.text || "(no speech)"}${where}`);
+  if (cleanup && text !== r.text) console.log(`[cleanup] ${Math.round(cleanup.ms)} ms, llm ${cleanup.llm?.status ?? "off"}: ${r.text} => ${text}`);
+  else if (cleanup?.llm && cleanup.llm.status !== "unchanged") console.log(`[cleanup] llm ${cleanup.llm.status}: ${cleanup.llm.detail}`);
   debugWin?.webContents.send(IPC.debugResult, result);
   setStatus({ key: "recording", ok: true, text: "idle" });
-  if (!r.text) hideOverlay();
+  if (!text) hideOverlay();
   else if (insertion?.pasted) showOverlay("done", "Inserted", 700);
   else showOverlay("done", "Copied to clipboard", 1500);
 }
@@ -191,6 +209,29 @@ async function startSpeechEngine(): Promise<void> {
     setStatus({ key: "asr", ok: true, text: `ready (${DEFAULT_MODELS.sv} + ${DEFAULT_MODELS.en}, loaded in ${Math.round(performance.now() - t0)} ms)` });
   } catch (err) {
     setStatus({ key: "asr", ok: false, text: String(err) });
+  }
+}
+
+async function startCleaner(): Promise<void> {
+  if (!SETTINGS.smartCleanup) {
+    setStatus({ key: "cleanup", ok: true, text: "rules only (smart cleanup is off)" });
+    return;
+  }
+  const model = modelPath(DEFAULT_CLEANUP_MODEL);
+  const missing = [binary("diktatorn-llm"), model].filter((p) => !existsSync(p));
+  if (missing.length > 0) {
+    setStatus({ key: "cleanup", ok: false, text: `rules only; missing ${missing.join(", ")}; run npm run build:native and npm run fetch-models -- ${DEFAULT_CLEANUP_MODEL}` });
+    return;
+  }
+  cleaner = new LlamaCleaner(binary("diktatorn-llm"), model);
+  setStatus({ key: "cleanup", ok: true, text: "rules only while the language model loads…" });
+  const t0 = performance.now();
+  try {
+    await cleaner.ready;
+    cleanerReady = true;
+    setStatus({ key: "cleanup", ok: true, text: `rules + ${DEFAULT_CLEANUP_MODEL} (ready in ${Math.round(performance.now() - t0)} ms)` });
+  } catch (err) {
+    setStatus({ key: "cleanup", ok: false, text: `rules only; language model failed: ${String(err)}` });
   }
 }
 
@@ -298,16 +339,19 @@ app.whenReady().then(async () => {
   overlayWin.setIgnoreMouseEvents(true);
   await overlayWin.loadFile(renderer("overlay.html"));
 
+  dictionary = new DictionaryFile(join(app.getPath("userData"), "dictionary.json"));
   setStatus({ key: "recording", ok: true, text: "idle" });
   // A pending permission prompt must not hold up the helpers, so none of these block each other.
   startHelper();
   void startSpeechEngine();
+  void startCleaner();
   void ensureMicrophone();
 });
 
 app.on("window-all-closed", () => app.quit());
 app.on("will-quit", () => {
   engine?.close();
+  cleaner?.close();
   const h = helper;
   helper = null;
   h?.close();
