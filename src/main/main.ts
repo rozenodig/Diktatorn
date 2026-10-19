@@ -1,81 +1,109 @@
-// Electron main process: wires the macOS helper, microphone capture, the speech engine and
-// text cleanup together, inserts each transcript into the frontmost app, and shows every
-// utterance in the debug window.
-import { app, BrowserWindow, ipcMain, screen, session, systemPreferences, type IpcMainEvent } from "electron";
+// Electron main process: wires the macOS helper, microphone capture, the speech engine, text
+// cleanup, settings and model downloads together, inserts each transcript into the frontmost
+// app, and owns the app window, menu bar icon, overlay and debug window.
+import {
+  app,
+  BrowserWindow,
+  clipboard,
+  ipcMain,
+  Menu,
+  nativeTheme,
+  session,
+  systemPreferences,
+  type IpcMainEvent,
+  type IpcMainInvokeEvent,
+  type Tray,
+} from "electron";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { IPC, type DebugResult, type OverlayState, type StatusUpdate } from "../shared/ipc.ts";
+import {
+  FIRST_RUN_MODELS,
+  IPC,
+  type AppState,
+  type DebugResult,
+  type DictionaryEntry,
+  type RecentDictation,
+  type Settings,
+  type StatusUpdate,
+} from "../shared/ipc.ts";
+import { AppWindow, createTray } from "./app-window.ts";
 import { planInsertion } from "./apps.ts";
-import { DictionaryFile, dictionaryPrompt } from "./cleanup/dictionary.ts";
+import { DictionaryFile, dictionaryPrompt, saveDictionary } from "./cleanup/dictionary.ts";
 import { LlamaCleaner } from "./cleanup/llm.ts";
 import { cleanUp } from "./cleanup/pipeline.ts";
 import { transcribeUtterance } from "./dictation.ts";
+import { Hotkey, type HotkeyAction } from "./hotkey.ts";
 import { JsonLinesProcess } from "./json-lines.ts";
 import type { Lang } from "./language.ts";
-import { DEFAULT_CLEANUP_MODEL, DEFAULT_MODELS, modelPath } from "./models.ts";
-import { Hotkey, type HotkeyAction } from "./hotkey.ts";
+import { ModelStore } from "./model-store.ts";
+import { DEFAULT_CLEANUP_MODEL, DEFAULT_MODELS, MODELS, type ModelId } from "./models.ts";
+import { Overlay } from "./overlay.ts";
+import { SettingsStore } from "./settings.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
-// Hard-coded until the settings window exists.
-const SETTINGS = { languageMode: "auto", primaryLanguage: "sv", smartCleanup: true } as const;
 /** After this, the language-model pass is abandoned and the rule-based cleanup is inserted. */
 const LLM_TIMEOUT_MS = 1500;
 const MIN_HOLD_MS = 150;
-/** A second fn press within this window after a quick tap turns on hands-free mode. */
+/** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
-const OVERLAY_SIZE = { width: 300, height: 56 };
 /** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
 const HELPER_EXIT_PERMISSION_GRANTED = 3;
+/** Short or ambiguous dictations fall back to this language. */
+const PRIMARY_LANGUAGE: Lang = "sv";
+const MAX_RECENT = 20;
+const KEY_NAMES: Record<Settings["hotkey"], string> = {
+  fn: "fn",
+  rightOption: "right ⌥",
+  rightCommand: "right ⌘",
+  rightControl: "right ⌃",
+};
 
 const binary = (name: string) => join(app.getAppPath(), "build", "bin", name);
 const renderer = (file: string) => join(import.meta.dirname, "..", "renderer", file);
 const preload = join(import.meta.dirname, "..", "preload", "preload.cjs");
+const webPreferences = { preload, sandbox: true, contextIsolation: true, nodeIntegration: false };
+
+const userData = app.getPath("userData");
+const settings = new SettingsStore(join(userData, "settings.json"));
+const models = new ModelStore(userData);
+const dictionaryFile = new DictionaryFile(join(userData, "dictionary.json"));
+const appWindow = new AppWindow(renderer("app.html"), webPreferences);
 
 let debugWin: BrowserWindow | null = null;
 let captureWin: BrowserWindow | null = null;
-let overlayWin: BrowserWindow | null = null;
-let overlayHideTimer: NodeJS.Timeout | null = null;
+let overlay: Overlay | null = null;
+let tray: Tray | null = null;
 let doubleTapTimer: NodeJS.Timeout | null = null;
 let engine: WhisperProcessEngine | null = null;
 let engineReady = false;
+let engineLoad: Promise<void> = Promise.resolve();
 let helper: JsonLinesProcess | null = null;
 let cleaner: LlamaCleaner | null = null;
 let cleanerReady = false;
-let dictionary: DictionaryFile | null = null;
+let dictionary: DictionaryEntry[] = [];
+/** True until every first-run model is on disk. */
+let setup = false;
 
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const statuses = new Map<string, StatusUpdate>();
+const recent: RecentDictation[] = [];
 let previousLanguage: Lang | null = null;
 let micStartMs: number | null = null;
 let queue: Promise<void> = Promise.resolve();
+
+function appState(): AppState {
+  return { settings: settings.current, statuses: [...statuses.values()], models: models.info(), recent, dictionary, setup };
+}
+
+function pushState(): void {
+  appWindow.send(IPC.appState, appState());
+}
 
 function setStatus(update: StatusUpdate): void {
   console.log(`[status] ${update.key}: ${update.text}`);
   statuses.set(update.key, update);
   debugWin?.webContents.send(IPC.debugStatus, update);
-}
-
-/** Shows the overlay without activating the app, so the target text field keeps focus. */
-function showOverlay(state: OverlayState, text: string, hideAfterMs?: number): void {
-  if (!overlayWin) return;
-  if (overlayHideTimer) clearTimeout(overlayHideTimer);
-  overlayHideTimer = hideAfterMs === undefined ? null : setTimeout(hideOverlay, hideAfterMs);
-  overlayWin.webContents.send(IPC.overlayState, { state, text });
-  if (!overlayWin.isVisible()) {
-    const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea;
-    overlayWin.setBounds({
-      x: Math.round(area.x + (area.width - OVERLAY_SIZE.width) / 2),
-      y: Math.round(area.y + area.height - OVERLAY_SIZE.height - 24),
-      ...OVERLAY_SIZE,
-    });
-    overlayWin.showInactive();
-  }
-}
-
-function hideOverlay(): void {
-  if (overlayHideTimer) clearTimeout(overlayHideTimer);
-  overlayHideTimer = null;
-  overlayWin?.hide();
+  pushState();
 }
 
 /** Tells the helper whether Esc should currently cancel (and be swallowed). */
@@ -92,33 +120,35 @@ function act(action: HotkeyAction): void {
       micStartMs = null;
       captureWin?.webContents.send(IPC.captureStart);
       setRecording(true);
-      showOverlay("listening", "Listening");
+      overlay?.show("listening", "Listening");
       setStatus({ key: "recording", ok: true, text: "recording…" });
       break;
     case "pending":
       doubleTapTimer = setTimeout(() => act(hotkey.expire()), DOUBLE_TAP_MS);
       break;
     case "handsFree":
-      showOverlay("handsFree", "Hands-free · tap fn to finish");
+      overlay?.show("handsFree", `Hands-free · tap ${KEY_NAMES[settings.current.hotkey]} to finish`);
       setStatus({ key: "recording", ok: true, text: "recording hands-free…" });
       break;
     case "stop":
       captureWin?.webContents.send(IPC.captureStop);
       setRecording(false);
-      showOverlay("processing", "Transcribing");
+      overlay?.show("processing", "Transcribing");
       setStatus({ key: "recording", ok: true, text: "transcribing…" });
       break;
     case "cancel":
       captureWin?.webContents.send(IPC.captureCancel);
       setRecording(false);
-      hideOverlay();
+      overlay?.hide();
       setStatus({ key: "recording", ok: true, text: "cancelled" });
       break;
   }
 }
 
 /** Only accept IPC from the window that is supposed to send it. */
-const from = (win: BrowserWindow | null, e: IpcMainEvent) => win !== null && e.sender === win.webContents;
+const from = (win: { webContents: Electron.WebContents } | null, e: IpcMainEvent | IpcMainInvokeEvent) =>
+  win !== null && e.sender === win.webContents;
+const fromApp = (e: IpcMainEvent | IpcMainInvokeEvent) => appWindow.webContents !== null && e.sender === appWindow.webContents;
 
 async function insert(text: string): Promise<DebugResult["insertion"]> {
   if (!helper) return null;
@@ -143,22 +173,34 @@ async function insert(text: string): Promise<DebugResult["insertion"]> {
   };
 }
 
+async function refreshDictionary(): Promise<DictionaryEntry[]> {
+  dictionary = await dictionaryFile.current();
+  if (dictionaryFile.error) setStatus({ key: "cleanup", ok: false, text: `dictionary not loaded: ${dictionaryFile.error}` });
+  return dictionary;
+}
+
 async function handleAudio(samples: Float32Array): Promise<void> {
   if (!engine || !engineReady) {
-    setStatus({ key: "asr", ok: false, text: "speech engine not ready; utterance dropped" });
+    setStatus({ key: "asr", ok: false, text: "speech engine not ready; dictation dropped" });
+    overlay?.show("error", "Still getting ready", 2000);
     return;
   }
-  const entries = (await dictionary?.current()) ?? [];
-  if (dictionary?.error) setStatus({ key: "cleanup", ok: false, text: `dictionary not loaded: ${dictionary.error}` });
-  const r = await transcribeUtterance(engine, samples, { ...SETTINGS, prompt: dictionaryPrompt(entries) }, previousLanguage);
+  const entries = await refreshDictionary();
+  const utterance = {
+    languageMode: settings.current.languageMode,
+    primaryLanguage: PRIMARY_LANGUAGE,
+    prompt: dictionaryPrompt(entries),
+  };
+  const r = await transcribeUtterance(engine, samples, utterance, previousLanguage);
   if (r.language) previousLanguage = r.language.language;
   const cleanup = r.text
     ? await cleanUp(r.text, { dictionary: entries, llm: cleanerReady ? cleaner : null, llmTimeoutMs: LLM_TIMEOUT_MS })
     : null;
   const text = cleanup?.text ?? "";
   const insertion = text ? await insert(text) : null;
+  const at = new Date().toLocaleTimeString("sv-SE");
   const result: DebugResult = {
-    at: new Date().toLocaleTimeString("sv-SE"),
+    at,
     text,
     raw: r.text,
     speech: r.speech,
@@ -178,15 +220,19 @@ async function handleAudio(samples: Float32Array): Promise<void> {
   if (cleanup && text !== r.text) console.log(`[cleanup] ${Math.round(cleanup.ms)} ms, llm ${cleanup.llm?.status ?? "off"}: ${r.text} => ${text}`);
   else if (cleanup?.llm && cleanup.llm.status !== "unchanged") console.log(`[cleanup] llm ${cleanup.llm.status}: ${cleanup.llm.detail}`);
   debugWin?.webContents.send(IPC.debugResult, result);
+  if (text) {
+    recent.unshift({ at: at.slice(0, 5), text, app: insertion?.appName ?? insertion?.app ?? null });
+    recent.length = Math.min(recent.length, MAX_RECENT);
+  }
   setStatus({ key: "recording", ok: true, text: "idle" });
-  if (!text) hideOverlay();
-  else if (insertion?.pasted) showOverlay("done", "Inserted", 700);
-  else showOverlay("done", "Copied to clipboard", 1500);
+  if (!text) overlay?.hide();
+  else if (insertion?.pasted) overlay?.show("done", "Inserted", 700);
+  else overlay?.show("done", "Copied to clipboard", 1500);
 }
 
 function fail(err: unknown): void {
   setStatus({ key: "asr", ok: false, text: String(err) });
-  showOverlay("error", "Something went wrong", 2500);
+  overlay?.show("error", "Something went wrong", 2500);
 }
 
 async function ensureMicrophone(): Promise<void> {
@@ -195,45 +241,81 @@ async function ensureMicrophone(): Promise<void> {
   setStatus({ key: "mic", ok: granted, text: granted ? "access granted" : `access ${before}; allow in System Settings → Privacy → Microphone` });
 }
 
-async function startSpeechEngine(): Promise<void> {
-  const paths = { sv: modelPath(DEFAULT_MODELS.sv), en: modelPath(DEFAULT_MODELS.en), vad: modelPath(DEFAULT_MODELS.vad) };
-  const missing = [binary("diktatorn-asr"), ...Object.values(paths)].filter((p) => !existsSync(p));
-  if (missing.length > 0) {
-    setStatus({ key: "asr", ok: false, text: `missing ${missing.join(", ")}; run npm run build:native and npm run fetch-models` });
-    return;
-  }
-  engine = new WhisperProcessEngine(binary("diktatorn-asr"));
-  setStatus({ key: "asr", ok: true, text: "loading models…" });
-  const t0 = performance.now();
-  try {
-    await engine.ensureLoaded({ sv: paths.sv, en: paths.en }, paths.vad);
-    engineReady = true;
-    setStatus({ key: "asr", ok: true, text: `ready (${DEFAULT_MODELS.sv} + ${DEFAULT_MODELS.en}, loaded in ${Math.round(performance.now() - t0)} ms)` });
-  } catch (err) {
-    setStatus({ key: "asr", ok: false, text: String(err) });
-  }
+/** (Re)loads the speech models, once they are on disk. Calls are serialised. */
+function loadSpeechEngine(): Promise<void> {
+  engineLoad = engineLoad.then(async () => {
+    if (!existsSync(binary("diktatorn-asr"))) {
+      setStatus({ key: "asr", ok: false, text: "missing speech engine; run npm run build:native" });
+      return;
+    }
+    // Use the chosen Swedish model once it is downloaded, the default one until then.
+    const sv: ModelId = models.isReady(settings.current.swedishModel) ? settings.current.swedishModel : DEFAULT_MODELS.sv;
+    const needed: ModelId[] = [sv, DEFAULT_MODELS.en, DEFAULT_MODELS.vad];
+    if (!needed.every((id) => models.isReady(id))) {
+      setStatus({ key: "asr", ok: true, text: "waiting for the speech models to download…" });
+      return;
+    }
+    engine ??= new WhisperProcessEngine(binary("diktatorn-asr"));
+    if (!engineReady) setStatus({ key: "asr", ok: true, text: "loading models…" });
+    const t0 = performance.now();
+    try {
+      await engine.ensureLoaded({ sv: models.path(sv), en: models.path(DEFAULT_MODELS.en) }, models.path(DEFAULT_MODELS.vad));
+      engineReady = true;
+      setStatus({ key: "asr", ok: true, text: `ready (${MODELS[sv].name} + ${MODELS[DEFAULT_MODELS.en].name}, ${Math.round(performance.now() - t0)} ms)` });
+    } catch (err) {
+      setStatus({ key: "asr", ok: false, text: String(err) });
+    }
+  });
+  return engineLoad;
 }
 
-async function startCleaner(): Promise<void> {
-  if (!SETTINGS.smartCleanup) {
-    setStatus({ key: "cleanup", ok: true, text: "rules only (smart cleanup is off)" });
+/** Starts or stops the cleanup model to match the setting and what is on disk. */
+async function syncCleaner(): Promise<void> {
+  const wanted = settings.current.smartCleanup;
+  if (!wanted || !models.isReady(DEFAULT_CLEANUP_MODEL)) {
+    cleaner?.close();
+    cleaner = null;
+    cleanerReady = false;
+    setStatus(wanted
+      ? { key: "cleanup", ok: true, text: `rules only until ${MODELS[DEFAULT_CLEANUP_MODEL].name} is downloaded` }
+      : { key: "cleanup", ok: true, text: "rules only (smart cleanup is off)" });
     return;
   }
-  const model = modelPath(DEFAULT_CLEANUP_MODEL);
-  const missing = [binary("diktatorn-llm"), model].filter((p) => !existsSync(p));
-  if (missing.length > 0) {
-    setStatus({ key: "cleanup", ok: false, text: `rules only; missing ${missing.join(", ")}; run npm run build:native and npm run fetch-models -- ${DEFAULT_CLEANUP_MODEL}` });
+  if (cleaner) return;
+  if (!existsSync(binary("diktatorn-llm"))) {
+    setStatus({ key: "cleanup", ok: false, text: "rules only; missing language-model process, run npm run build:native" });
     return;
   }
-  cleaner = new LlamaCleaner(binary("diktatorn-llm"), model);
+  const current = new LlamaCleaner(binary("diktatorn-llm"), models.path(DEFAULT_CLEANUP_MODEL));
+  cleaner = current;
   setStatus({ key: "cleanup", ok: true, text: "rules only while the language model loads…" });
   const t0 = performance.now();
   try {
-    await cleaner.ready;
+    await current.ready;
+    if (cleaner !== current) return; // turned off while loading
     cleanerReady = true;
-    setStatus({ key: "cleanup", ok: true, text: `rules + ${DEFAULT_CLEANUP_MODEL} (ready in ${Math.round(performance.now() - t0)} ms)` });
+    setStatus({ key: "cleanup", ok: true, text: `rules + ${MODELS[DEFAULT_CLEANUP_MODEL].name} (ready in ${Math.round(performance.now() - t0)} ms)` });
   } catch (err) {
-    setStatus({ key: "cleanup", ok: false, text: `rules only; language model failed: ${String(err)}` });
+    if (cleaner === current) setStatus({ key: "cleanup", ok: false, text: `rules only; language model failed: ${String(err)}` });
+  }
+}
+
+/** Applies a settings change to the running app. */
+function applySettings(before: Settings, after: Settings): void {
+  if (after.hotkey !== before.hotkey) {
+    helper?.request("hotkey", { key: after.hotkey }).catch(() => {});
+    const keys = statuses.get("keys");
+    if (keys?.ok) setStatus({ key: "keys", ok: true, text: `hold ${KEY_NAMES[after.hotkey]} to dictate, double-tap for hands-free` });
+  }
+  if (after.microphoneId !== before.microphoneId) captureWin?.webContents.send(IPC.captureDevice, after.microphoneId);
+  if (after.appearance !== before.appearance) nativeTheme.themeSource = after.appearance;
+  if (after.swedishModel !== before.swedishModel) {
+    models.download([after.swedishModel]);
+    void loadSpeechEngine();
+  }
+  if (after.smartCleanup !== before.smartCleanup) {
+    if (after.smartCleanup) models.download([DEFAULT_CLEANUP_MODEL]);
+    void syncCleaner();
   }
 }
 
@@ -252,14 +334,17 @@ function startHelper(): void {
   };
   proc.on("event", (msg: HelperEvent) => {
     switch (msg.event) {
-      case "ready":
+      case "ready": {
+        proc.request("hotkey", { key: settings.current.hotkey }).catch(() => {});
+        const key = KEY_NAMES[settings.current.hotkey];
         setStatus(msg.inputMonitoring
-          ? { key: "keys", ok: true, text: `hold fn to dictate, double-tap for hands-free (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tapActive ? "active" : msg.tap ? "listen-only, Esc not swallowed" : "off"})` }
-          : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; fn starts working as soon as it is on.` });
+          ? { key: "keys", ok: true, text: `hold ${key} to dictate, double-tap for hands-free (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tapActive ? "active" : msg.tap ? "listen-only, Esc not swallowed" : "off"})` }
+          : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; the dictation key starts working as soon as it is on.` });
         setStatus(msg.accessibility
           ? { key: "paste", ok: true, text: "pastes into the frontmost app" }
           : { key: "paste", ok: false, text: `Accessibility not granted; transcripts are left on the clipboard. Allow ${PERMISSION_HINT} → Accessibility.` });
         break;
+      }
       case "permission":
         setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting helper…" });
         break;
@@ -290,6 +375,18 @@ function startHelper(): void {
   });
 }
 
+async function openDebugWindow(): Promise<void> {
+  if (debugWin) {
+    debugWin.show();
+    return;
+  }
+  await app.dock?.show();
+  debugWin = new BrowserWindow({ width: 760, height: 640, title: "Diktatorn — debug", webPreferences });
+  debugWin.webContents.on("did-finish-load", () => statuses.forEach((s) => debugWin?.webContents.send(IPC.debugStatus, s)));
+  debugWin.on("closed", () => (debugWin = null));
+  await debugWin.loadFile(renderer("debug.html"));
+}
+
 ipcMain.on(IPC.captureStarted, (e, ms: number) => {
   if (from(captureWin, e)) micStartMs = ms;
 });
@@ -304,54 +401,87 @@ ipcMain.on(IPC.debugRecord, (e, down: boolean) => {
   if (from(debugWin, e)) act(down ? hotkey.down(performance.now()) : hotkey.up(performance.now()));
 });
 
+ipcMain.handle(IPC.appGetState, (e) => {
+  if (!fromApp(e)) throw new Error("not allowed");
+  return appState();
+});
+ipcMain.handle(IPC.appSetSettings, async (e, patch: Partial<Settings>) => {
+  if (!fromApp(e)) throw new Error("not allowed");
+  const before = settings.current;
+  const after = await settings.update(patch);
+  applySettings(before, after);
+  pushState();
+  return after;
+});
+ipcMain.handle(IPC.appSetDictionary, async (e, entries: DictionaryEntry[]) => {
+  if (!fromApp(e)) throw new Error("not allowed");
+  try {
+    await saveDictionary(dictionaryFile.path, entries);
+    await refreshDictionary();
+    pushState();
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: (err as Error).message };
+  }
+});
+ipcMain.on(IPC.appDownload, (e, ids: unknown) => {
+  if (!fromApp(e) || !Array.isArray(ids)) return;
+  models.download(ids.filter((id): id is ModelId => typeof id === "string" && id in MODELS));
+});
+ipcMain.on(IPC.appCancelDownload, (e) => {
+  if (fromApp(e)) models.cancel();
+});
+ipcMain.on(IPC.appCopy, (e, text: unknown) => {
+  if (fromApp(e) && typeof text === "string") clipboard.writeText(text);
+});
+
+models.on("change", () => {
+  if (setup && FIRST_RUN_MODELS.every((id) => models.isReady(id))) setup = false;
+  pushState();
+});
+models.on("ready", (id: ModelId) => {
+  if (id === DEFAULT_CLEANUP_MODEL) void syncCleaner();
+  else void loadSpeechEngine();
+});
+
 app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "media"));
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === "media");
+  Menu.setApplicationMenu(Menu.buildFromTemplate([{ role: "appMenu" }, { role: "editMenu" }, { role: "windowMenu" }]));
 
-  const webPreferences = { preload, sandbox: true, contextIsolation: true, nodeIntegration: false };
-  debugWin = new BrowserWindow({ width: 760, height: 640, title: "Diktatorn — debug", webPreferences });
-  debugWin.webContents.on("did-finish-load", () => statuses.forEach((s) => debugWin?.webContents.send(IPC.debugStatus, s)));
-  debugWin.on("closed", () => (debugWin = null));
-  await debugWin.loadFile(renderer("debug.html"));
+  await settings.load();
+  nativeTheme.themeSource = settings.current.appearance;
+  await refreshDictionary();
+  const missing = FIRST_RUN_MODELS.filter((id) => !models.isReady(id));
+  setup = missing.length > 0;
 
   captureWin = new BrowserWindow({
     show: false,
     webPreferences: { ...webPreferences, backgroundThrottling: false, autoplayPolicy: "no-user-gesture-required" },
   });
   await captureWin.loadFile(renderer("capture.html"));
-
-  // A non-activating panel that ignores the mouse: it can never take focus from the text field
-  // the user is dictating into, so the paste lands where they were typing.
-  overlayWin = new BrowserWindow({
-    ...OVERLAY_SIZE,
-    type: "panel",
-    show: false,
-    frame: false,
-    transparent: true,
-    hasShadow: false,
-    resizable: false,
-    movable: false,
-    focusable: false,
-    alwaysOnTop: true,
-    hiddenInMissionControl: true,
-    webPreferences,
+  captureWin.webContents.send(IPC.captureDevice, settings.current.microphoneId);
+  overlay = await Overlay.create(renderer("overlay.html"), webPreferences);
+  tray = createTray(join(app.getAppPath(), "assets", "trayTemplate.png"), {
+    open: () => void appWindow.show(),
+    debug: () => void openDebugWindow(),
   });
-  overlayWin.setAlwaysOnTop(true, "screen-saver");
-  overlayWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  overlayWin.setIgnoreMouseEvents(true);
-  await overlayWin.loadFile(renderer("overlay.html"));
+  void appWindow.show();
 
-  dictionary = new DictionaryFile(join(app.getPath("userData"), "dictionary.json"));
   setStatus({ key: "recording", ok: true, text: "idle" });
+  if (missing.length > 0) models.download(missing);
   // A pending permission prompt must not hold up the helpers, so none of these block each other.
   startHelper();
-  void startSpeechEngine();
-  void startCleaner();
+  void loadSpeechEngine();
+  void syncCleaner();
   void ensureMicrophone();
 });
 
-app.on("window-all-closed", () => app.quit());
+// Dictation works without any window, so closing them does not quit the app.
+app.on("window-all-closed", () => {});
+app.on("activate", () => void appWindow.show());
 app.on("will-quit", () => {
+  tray?.destroy();
   engine?.close();
   cleaner?.close();
   const h = helper;

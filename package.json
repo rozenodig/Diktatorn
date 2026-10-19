@@ -11,7 +11,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "tsc -p . && tsc -p src/renderer && mkdir -p dist/renderer && cp src/renderer/*.html dist/renderer/",
+    "build": "tsc -p . && tsc -p src/renderer && mkdir -p dist/renderer && cp src/renderer/*.html src/renderer/*.css dist/renderer/",
     "build:native": "scripts/build-native.sh",
     "fetch-models": "node scripts/fetch-models.ts",
     "start": "npm run build && scripts/dev.sh",

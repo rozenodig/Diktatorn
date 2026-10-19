@@ -7,13 +7,31 @@ const ctx = new AudioContext({ sampleRate: 16_000 });
 const workletReady = ctx.audioWorklet.addModule("./worklet.js");
 let session: { stream: MediaStream; node: AudioWorkletNode; chunks: Float32Array[] } | null = null;
 let starting: Promise<void> = Promise.resolve();
+/** The chosen microphone, or null for the system default. */
+let deviceId: string | null = null;
+
+const constraints = (device: string | null): MediaTrackConstraints => ({
+  channelCount: 1,
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+  ...(device ? { deviceId: { exact: device } } : {}),
+});
+
+/** Opens the chosen microphone, falling back to the default if it has been unplugged. */
+async function openMicrophone(): Promise<MediaStream> {
+  try {
+    return await navigator.mediaDevices.getUserMedia({ audio: constraints(deviceId) });
+  } catch (err) {
+    if (!deviceId || (err as Error).name !== "OverconstrainedError") throw err;
+    return navigator.mediaDevices.getUserMedia({ audio: constraints(null) });
+  }
+}
 
 async function start(): Promise<void> {
   const t0 = performance.now();
   await workletReady;
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-  });
+  const stream = await openMicrophone();
   const node = new AudioWorkletNode(ctx, "pcm-tap");
   const chunks: Float32Array[] = [];
   let first = true;
@@ -58,3 +76,4 @@ api.onStart(() => {
 });
 api.onStop(() => void finish(true).catch(report));
 api.onCancel(() => void finish(false).catch(report));
+api.onDevice((id) => (deviceId = id));
