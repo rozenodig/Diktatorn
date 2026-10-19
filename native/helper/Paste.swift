@@ -45,7 +45,13 @@ func frontmostApp() -> [String: Any] {
 
 final class Inserter {
     private var promptedForAccessibility = false
-    private let heldModifiers: CGEventFlags = [.maskCommand, .maskAlternate, .maskControl, .maskShift, .maskSecondaryFn]
+    /// fn is not among these: arrow and function keys carry the fn flag in their events, so the
+    /// session's flag state can report fn long after the last arrow key. The key itself is
+    /// tracked by FnState instead.
+    private let heldModifiers: CGEventFlags = [.maskCommand, .maskAlternate, .maskControl, .maskShift]
+    private let fnIsDown: () -> Bool
+
+    init(fnIsDown: @escaping () -> Bool) { self.fnIsDown = fnIsDown }
 
     var accessibilityTrusted: Bool { AXIsProcessTrusted() }
 
@@ -84,7 +90,7 @@ final class Inserter {
     /// A still-held hotkey modifier would turn Cmd+V into another shortcut, so wait it out.
     private func waitForModifierRelease(until deadline: Double, then body: @escaping () -> Void) {
         let flags = CGEventSource.flagsState(.combinedSessionState)
-        if flags.intersection(heldModifiers).isEmpty || nowMs() >= deadline {
+        if (flags.intersection(heldModifiers).isEmpty && !fnIsDown()) || nowMs() >= deadline {
             body()
             return
         }

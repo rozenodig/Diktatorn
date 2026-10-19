@@ -28,8 +28,8 @@ import ApplicationServices
 import Foundation
 
 let exitPermissionGranted: Int32 = 3
-let inserter = Inserter()
 let fnState = FnState()
+let inserter = Inserter(fnIsDown: { fnState.down })
 let fnTap = FnTap(state: fnState)
 let fnHID = FnHID(state: fnState)
 
