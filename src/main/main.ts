@@ -235,7 +235,7 @@ async function startCleaner(): Promise<void> {
   }
 }
 
-const PERMISSION_HINT = 'Diktatorn ("Electron" when started with npm start) in System Settings → Privacy & Security';
+const PERMISSION_HINT = "Diktatorn in System Settings → Privacy & Security";
 
 function startHelper(): void {
   if (!existsSync(binary("diktatorn-helper"))) {

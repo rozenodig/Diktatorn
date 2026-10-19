@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Starts the unpackaged app through LaunchServices instead of as a child of the terminal.
 # macOS attributes privacy permissions (Microphone, Input Monitoring, Accessibility) to the
-# app that launched a process, so this makes them apply to Electron.app only rather than to
-# the terminal and everything run in it. Logs are streamed from dist/dev.log.
+# app that launched a process, so this makes them apply to build/Diktatorn.app only rather
+# than to the terminal and everything run in it. Logs are streamed from dist/dev.log.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP="$ROOT/node_modules/electron/dist/Electron.app"
+APP="$ROOT/build/Diktatorn.app"
 LOG="$ROOT/dist/dev.log"
 
+"$ROOT/scripts/dev-bundle.sh"
 : >"$LOG"
 tail -f "$LOG" &
 TAIL_PID=$!
