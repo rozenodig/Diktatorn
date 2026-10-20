@@ -7,19 +7,19 @@
 //               the clip sent to KB-Whisper medium or Whisper large-v3 turbo. No cleanup.
 //   diktatorn   Diktatorn as installed: routing, then cleanup (rules and the local language model),
 //               with an empty dictionary. The pass criteria are judged on this system.
-//   dictionary  Diktatorn with the benchmark terms in its dictionary (terms only, no spoken forms),
+//   dictionary  Diktatorn with the set's terms in its dictionary (terms only, no spoken forms),
 //               like a user who has added the words they use.
 //   kbLarge     Diktatorn as installed with KB-Whisper large, when that model is downloaded.
 //
 // Usage: npm run bench [-- --sentences <file> --recordings <dir> --out <dir>]. Record first: menu
 // bar icon → Record Benchmark. Writes RESULTS.md and results.json to bench/ (or --out).
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { SAMPLE_RATE } from "../src/main/audio.ts";
 import { BENCH_LANGUAGES, loadBenchSentences, type BenchLanguage, type BenchSentence } from "../src/main/bench.ts";
-import { dictionaryPrompt, loadDictionary, type DictionaryEntry } from "../src/main/cleanup/dictionary.ts";
+import { dictionaryPrompt, type DictionaryEntry } from "../src/main/cleanup/dictionary.ts";
 import { LlamaCleaner } from "../src/main/cleanup/llm.ts";
 import { cleanUp, LLM_TIMEOUT_MS } from "../src/main/cleanup/pipeline.ts";
 import { transcribeUtterance } from "../src/main/dictation.ts";
@@ -73,7 +73,8 @@ const binary = (name: string) => join(BENCH, "..", "build", "bin", name);
 const isReady = (id: ModelId) => existsSync(modelPath(id)) && statSync(modelPath(id)).size === MODELS[id].bytes;
 
 const sentences = await loadBenchSentences(resolve(args.sentences));
-const dictionary = await loadDictionary(join(BENCH, "dictionary.json"));
+// The "dictionary" system's user has added the terms they use: every term in this sentence set.
+const dictionary: DictionaryEntry[] = [...new Set(sentences.flatMap((s) => (s.term ? [s.term] : [])))].map((term) => ({ term, spoken: [] }));
 const clips: Clip[] = sentences.flatMap((sentence) => {
   const path = join(recordingsDir, `${sentence.id}.wav`);
   if (!existsSync(path)) return [];
@@ -240,6 +241,7 @@ const md: string[] = [
     }),
   "",
 ];
+mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "RESULTS.md"), md.join("\n"));
 
 const json = {
