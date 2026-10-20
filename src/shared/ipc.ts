@@ -116,5 +116,5 @@ export interface BenchState {
   index: number;
   total: number;
   recorded: number;
-  sentence: { id: string; language: string; term: string; text: string; recorded: boolean } | null;
+  sentence: { id: string; language: string; term?: string; text: string; recorded: boolean } | null;
 }

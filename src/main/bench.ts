@@ -1,6 +1,8 @@
 // Benchmark sentences, and a development tool that records them through the normal dictation
 // path: the same key handling, microphone and capture code as a real dictation, so the
 // benchmark hears exactly what dictation hears. Each take is saved as recordings/<id>.wav.
+// The recorder covers every sentence file: the benchmark itself, then the held-out set used to
+// check tuning decisions on sentences they were not tuned on.
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -8,13 +10,14 @@ import type { BenchState } from "../shared/ipc.ts";
 import { encodeWav } from "./wav.ts";
 
 export const BENCH_LANGUAGES = ["sv", "en", "mixed"] as const;
+export const BENCH_FILES = ["sentences.json", "heldout.json"] as const;
 export type BenchLanguage = (typeof BENCH_LANGUAGES)[number];
 
 export interface BenchSentence {
   id: string;
   language: BenchLanguage;
-  /** The technical term the sentence contains, spelled as it should be written. */
-  term: string;
+  /** The technical term the sentence contains, spelled as it should be written, if any. */
+  term?: string;
   text: string;
 }
 
@@ -26,8 +29,8 @@ export async function loadBenchSentences(path: string): Promise<BenchSentence[]>
     const ok =
       typeof s.id === "string" && /^[\w-]+$/.test(s.id) &&
       BENCH_LANGUAGES.includes(s.language as BenchLanguage) &&
-      typeof s.term === "string" && typeof s.text === "string" && s.text.includes(s.term);
-    if (!ok) throw new Error(`${path}: sentence ${i} needs an id, a language (sv, en, mixed), a text and a term it contains`);
+      typeof s.text === "string" && (s.term === undefined || (typeof s.term === "string" && s.text.includes(s.term)));
+    if (!ok) throw new Error(`${path}: sentence ${i} needs an id, a language (sv, en, mixed) and a text containing its term, if it has one`);
     return s as unknown as BenchSentence;
   });
 }
@@ -49,7 +52,8 @@ export class BenchRecorder {
 
   /** Starts at the first sentence that has no recording yet. */
   async start(): Promise<void> {
-    this.sentences = await loadBenchSentences(join(this.dir, "sentences.json"));
+    const files = BENCH_FILES.map((f) => join(this.dir, f)).filter((f) => existsSync(f));
+    this.sentences = (await Promise.all(files.map(loadBenchSentences))).flat();
     const next = this.sentences.findIndex((s) => !existsSync(this.recording(s)));
     this.index = next === -1 ? 0 : next;
     this.active = true;

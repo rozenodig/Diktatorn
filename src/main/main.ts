@@ -252,7 +252,19 @@ async function runBenchCommand(recorder: BenchRecorder, command: BenchCommand): 
   else if (command === "stop") recorder.stop();
   else if (command === "previous") recorder.move(-1);
   else if (command === "next") recorder.move(1);
+  const { active, index, total, recorded } = recorder.state();
+  console.log(`[bench] ${command}: ${active ? "recording" : "off"}, sentence ${index + 1}/${total}, ${recorded} recorded`);
   sendBenchState();
+}
+
+function benchFailed(err: unknown): void {
+  setStatus({ key: "recording", ok: false, text: `benchmark: ${(err as Error).message}` });
+}
+
+/** Opens the debug window with benchmark recording already on. */
+async function recordBenchmark(recorder: BenchRecorder): Promise<void> {
+  await openDebugWindow();
+  await runBenchCommand(recorder, "start");
 }
 
 function fail(err: unknown): void {
@@ -467,9 +479,7 @@ ipcMain.on(IPC.debugRecord, (e, down: boolean) => {
 
 ipcMain.on(IPC.debugBench, (e, command: BenchCommand) => {
   if (!from(debugWin, e) || !bench) return;
-  runBenchCommand(bench, command).catch((err) =>
-    setStatus({ key: "recording", ok: false, text: `benchmark: ${(err as Error).message}` }),
-  );
+  runBenchCommand(bench, command).catch(benchFailed);
 });
 
 ipcMain.handle(IPC.appGetState, (e) => {
@@ -536,6 +546,7 @@ app.whenReady().then(async () => {
   tray = createTray(join(app.getAppPath(), "assets", "trayTemplate.png"), {
     open: () => void appWindow.show(),
     debug: () => void openDebugWindow(),
+    benchmark: bench ? () => void recordBenchmark(bench).catch(benchFailed) : undefined,
   });
   void appWindow.show();
 

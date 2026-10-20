@@ -1,0 +1,100 @@
+{
+  "sentences": [
+    {
+      "id": "hs-01",
+      "language": "sv",
+      "text": "Kan du köpa mjölk och bröd på vägen hem från jobbet?"
+    },
+    {
+      "id": "hs-02",
+      "language": "sv",
+      "text": "Jag blir tyvärr lite sen till mötet, börja gärna utan mig."
+    },
+    {
+      "id": "hs-03",
+      "language": "sv",
+      "text": "Tack för senast, det var verkligen trevligt att ses igen."
+    },
+    {
+      "id": "hs-04",
+      "language": "sv",
+      "text": "Vi behöver boka ett större rum till utbildningen nästa vecka."
+    },
+    {
+      "id": "hs-05",
+      "language": "sv",
+      "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag."
+    },
+    {
+      "id": "hs-06",
+      "language": "sv",
+      "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden."
+    },
+    {
+      "id": "hs-07",
+      "language": "sv",
+      "text": "Det regnade hela helgen, så vi stannade inne och spelade sällskapsspel."
+    },
+    {
+      "id": "hs-08",
+      "language": "sv",
+      "text": "Kan du skicka över protokollet från styrelsemötet när du har tid?"
+    },
+    {
+      "id": "hs-09",
+      "language": "sv",
+      "text": "Barnen ska på kalas på lördag, så vi får hämta dem lite senare."
+    },
+    {
+      "id": "hs-10",
+      "language": "sv",
+      "text": "Vi måste bestämma budgeten för hösten innan semestern börjar."
+    },
+    {
+      "id": "hs-11",
+      "language": "sv",
+      "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet."
+    },
+    {
+      "id": "hs-12",
+      "language": "sv",
+      "text": "Jag tycker att förslaget är bra, men tidsplanen känns lite för snäv."
+    },
+    {
+      "id": "hm-01",
+      "language": "mixed",
+      "term": "GitLab",
+      "text": "Kan du kolla pull requesten i GitLab? I left some comments on the tests."
+    },
+    {
+      "id": "hm-02",
+      "language": "mixed",
+      "term": "Heroku",
+      "text": "Vi kör demon på fredag, so make sure Heroku is not down again."
+    },
+    {
+      "id": "hm-03",
+      "language": "mixed",
+      "term": "Webflow",
+      "text": "The new onboarding in Webflow looks great, men texterna behöver ses över."
+    },
+    {
+      "id": "hm-04",
+      "language": "mixed",
+      "term": "Confluence",
+      "text": "Jag har uppdaterat dokumentationen i Confluence, could you take a look before lunch?"
+    },
+    {
+      "id": "hm-05",
+      "language": "mixed",
+      "term": "AWS",
+      "text": "Our AWS bill doubled last month, så vi måste se över vilka tjänster vi kör."
+    },
+    {
+      "id": "hm-06",
+      "language": "mixed",
+      "term": "Zoom",
+      "text": "Kan du dela din skärm i Zoom? I want to see the error message."
+    }
+  ]
+}

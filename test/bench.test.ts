@@ -64,8 +64,15 @@ test("the recorder starts at the first unrecorded sentence and saves each take a
     await again.start();
     assert.equal(again.state().sentence?.id, "en-01");
 
+    // The held-out set follows the benchmark; its sentences need not contain a term.
+    writeFileSync(join(dir, "heldout.json"), JSON.stringify({ sentences: [{ id: "hs-01", language: "sv", text: "Tack för senast." }] }));
+    const withHeldOut = new BenchRecorder(dir);
+    await withHeldOut.start();
+    await withHeldOut.save(new Float32Array(1600));
+    assert.deepEqual([withHeldOut.state().sentence?.id, withHeldOut.state().total], ["hs-01", 3]);
+
     writeFileSync(join(dir, "sentences.json"), JSON.stringify({ sentences: [{ ...sentences[0], term: "Teams" }] }));
-    await assert.rejects(loadBenchSentences(join(dir, "sentences.json")), /term it contains/);
+    await assert.rejects(loadBenchSentences(join(dir, "sentences.json")), /containing its term/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

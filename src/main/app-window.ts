@@ -55,13 +55,15 @@ export class AppWindow {
   }
 }
 
-export function createTray(iconPath: string, actions: { open: () => void; debug: () => void }): Tray {
+/** `benchmark` adds a development-only item that opens the benchmark recorder. */
+export function createTray(iconPath: string, actions: { open: () => void; debug: () => void; benchmark?: () => void }): Tray {
   const tray = new Tray(nativeImage.createFromPath(iconPath));
   tray.setToolTip("Diktatorn");
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: "Open Diktatorn", click: actions.open },
       { label: "Debug Window", click: actions.debug },
+      ...(actions.benchmark ? [{ label: "Record Benchmark", click: actions.benchmark }] : []),
       { type: "separator" },
       { label: "Quit Diktatorn", role: "quit" },
     ]),

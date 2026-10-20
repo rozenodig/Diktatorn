@@ -11,8 +11,8 @@
 //               like a user who has added the words they use.
 //   kbLarge     Diktatorn as installed with KB-Whisper large, when that model is downloaded.
 //
-// Usage: npm run bench [-- --recordings <dir> --out <dir>]. Record first, in the debug window
-// under "Benchmark recording". Writes RESULTS.md and results.json to bench/ (or --out).
+// Usage: npm run bench [-- --sentences <file> --recordings <dir> --out <dir>]. Record first: menu
+// bar icon → Record Benchmark. Writes RESULTS.md and results.json to bench/ (or --out).
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -44,7 +44,8 @@ interface Run {
   /** From the end of the recording to the final text. */
   ms: number;
   errors: WordErrors;
-  term: boolean;
+  /** Whether the sentence's term is spelled exactly right; null when it has none. */
+  term: boolean | null;
   /** Which model the clip was sent to and why (Diktatorn systems only). */
   route?: { language: Lang; reason: string; svShare: number | null } | null;
   /** What the language-model cleanup did (Diktatorn systems with cleanup only). */
@@ -60,14 +61,18 @@ interface Clip {
 
 const BENCH = import.meta.dirname;
 const { values: args } = parseArgs({
-  options: { recordings: { type: "string", default: join(BENCH, "recordings") }, out: { type: "string", default: BENCH } },
+  options: {
+    sentences: { type: "string", default: join(BENCH, "sentences.json") },
+    recordings: { type: "string", default: join(BENCH, "recordings") },
+    out: { type: "string", default: BENCH },
+  },
 });
 const recordingsDir = resolve(args.recordings);
 const outDir = resolve(args.out);
 const binary = (name: string) => join(BENCH, "..", "build", "bin", name);
 const isReady = (id: ModelId) => existsSync(modelPath(id)) && statSync(modelPath(id)).size === MODELS[id].bytes;
 
-const sentences = await loadBenchSentences(join(BENCH, "sentences.json"));
+const sentences = await loadBenchSentences(resolve(args.sentences));
 const dictionary = await loadDictionary(join(BENCH, "dictionary.json"));
 const clips: Clip[] = sentences.flatMap((sentence) => {
   const path = join(recordingsDir, `${sentence.id}.wav`);
@@ -76,7 +81,7 @@ const clips: Clip[] = sentences.flatMap((sentence) => {
   return [{ sentence, pcm, audioMs: (pcm.length / SAMPLE_RATE) * 1000, runs: {} }];
 });
 if (clips.length === 0) {
-  throw new Error(`no recordings in ${recordingsDir}. Record them first: debug window → Benchmark recording.`);
+  throw new Error(`no recordings in ${recordingsDir}. Record them first: menu bar icon → Record Benchmark.`);
 }
 if (clips.length < sentences.length) console.warn(`only ${clips.length} of ${sentences.length} sentences are recorded`);
 
@@ -92,7 +97,8 @@ const cleaner = new LlamaCleaner(binary("diktatorn-llm"), modelPath(DEFAULT_CLEA
 const speechModels = (sv: ModelId) => ({ sv: modelPath(sv), en: modelPath(DEFAULT_MODELS.en) });
 
 function score(sentence: BenchSentence, text: string, ms: number, extra: Partial<Run> = {}): Run {
-  return { text, ms, errors: wordErrors(sentence.text, text), term: hasTerm(text, sentence.term), ...extra };
+  const term = sentence.term === undefined ? null : hasTerm(text, sentence.term);
+  return { text, ms, errors: wordErrors(sentence.text, text), term, ...extra };
 }
 
 async function runStock(clip: Clip): Promise<Run> {
@@ -201,8 +207,9 @@ const md: string[] = [
   `|---|${languages.map(() => "---:").join("|")}|---:|---:|---:|`,
   ...systems.map((id) => {
     const runs = runsOf(id);
-    const terms = runs.filter((r) => r.term).length;
-    return `| ${SYSTEMS[id]} | ${languages.map((l) => pct(werOf(id, l))).join(" | ")} | ${pct(werOf(id))} | ${terms}/${runs.length} | ${Math.round(median(runs.map((r) => r.ms)))} ms |`;
+    const withTerm = runs.filter((r) => r.term !== null);
+    const terms = withTerm.length ? `${withTerm.filter((r) => r.term).length}/${withTerm.length}` : "–";
+    return `| ${SYSTEMS[id]} | ${languages.map((l) => pct(werOf(id, l))).join(" | ")} | ${pct(werOf(id))} | ${terms} | ${Math.round(median(runs.map((r) => r.ms)))} ms |`;
   }),
   "",
   "## Pass criteria (Diktatorn vs stock Whisper)",
