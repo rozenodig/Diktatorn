@@ -51,8 +51,8 @@ There's no packaged release yet; Diktatorn runs from source.
 - CMake.
 
 ```sh
-git clone --recurse-submodules <repository-url> diktatorn
-cd diktatorn
+git clone --recurse-submodules https://github.com/rozenodig/Diktatorn.git
+cd Diktatorn
 npm install
 npm run build:native   # whisper.cpp, llama.cpp and the three Swift helpers
 npm start
