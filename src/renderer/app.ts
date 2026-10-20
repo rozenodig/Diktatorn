@@ -271,7 +271,7 @@ function renderModels(): void {
     });
   $("models-speech").replaceChildren(
     swedish("kb-whisper-medium", "Fast. Recommended for most Macs."),
-    swedish("kb-whisper-large", "More accurate, about twice as slow."),
+    swedish("kb-whisper-large", "More accurate, about a third slower."),
     modelRow(model("whisper-large-v3-turbo"), `English · ${model("whisper-large-v3-turbo").name}`),
     modelRow(model("silero-vad"), model("silero-vad").name, "Skips silence before transcribing."),
   );
