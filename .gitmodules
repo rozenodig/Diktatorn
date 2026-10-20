@@ -1,0 +1,8 @@
+[submodule "native/vendor/whisper.cpp"]
+	path = native/vendor/whisper.cpp
+	url = https://github.com/ggml-org/whisper.cpp.git
+	shallow = true
+[submodule "native/vendor/llama.cpp"]
+	path = native/vendor/llama.cpp
+	url = https://github.com/ggml-org/llama.cpp.git
+	shallow = true

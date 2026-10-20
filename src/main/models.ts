@@ -1,0 +1,86 @@
+// Model manifest (speech and cleanup). Every file is pinned to a Hugging Face commit and verified by
+// SHA-256 and exact size after download.
+import { homedir } from "node:os";
+import { join } from "node:path";
+
+export type ModelId =
+  | "kb-whisper-medium"
+  | "kb-whisper-large"
+  | "whisper-large-v3-turbo"
+  | "silero-vad"
+  | "gemma-4-e2b-it-qat";
+
+export interface ModelFile {
+  id: ModelId;
+  /** Shown in the app. */
+  name: string;
+  url: string;
+  sha256: string;
+  bytes: number;
+  file: string;
+  license: string;
+}
+
+const hf = (repo: string, rev: string, file: string) => `https://huggingface.co/${repo}/resolve/${rev}/${file}`;
+
+export const MODELS: Record<ModelId, ModelFile> = {
+  "kb-whisper-medium": {
+    id: "kb-whisper-medium",
+    name: "KB Whisper medium",
+    url: hf("KBLab/kb-whisper-medium", "0abe10b9d7f75d0902656e5c06c5c4d549604dc5", "ggml-model-q5_0.bin"),
+    sha256: "7f8762e0ade9e0073674c0d5acae942a0b1ea98add9baa008ee89c94eaba43d0",
+    bytes: 539_212_484,
+    file: "kb-whisper-medium-q5_0.bin",
+    license: "Apache-2.0",
+  },
+  "kb-whisper-large": {
+    id: "kb-whisper-large",
+    name: "KB Whisper large",
+    url: hf("KBLab/kb-whisper-large", "d5d5984b4d8f7c4847a8ea203f1976285fb28300", "ggml-model-q5_0.bin"),
+    sha256: "6d2863812d7410322bb7d8647a5c7260761300fa946714c9ed66d22bb30bcb19",
+    bytes: 1_081_140_203,
+    file: "kb-whisper-large-q5_0.bin",
+    license: "Apache-2.0",
+  },
+  "whisper-large-v3-turbo": {
+    id: "whisper-large-v3-turbo",
+    name: "Whisper large-v3 turbo",
+    url: hf("ggerganov/whisper.cpp", "5359861c739e955e79d9a303bcbc70fb988958b1", "ggml-large-v3-turbo-q5_0.bin"),
+    sha256: "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+    bytes: 574_041_195,
+    file: "whisper-large-v3-turbo-q5_0.bin",
+    license: "MIT",
+  },
+  "silero-vad": {
+    id: "silero-vad",
+    name: "Silero voice detection",
+    url: hf("ggml-org/whisper-vad", "9ffd54a1e1ee413ddf265af9913beaf518d1639b", "ggml-silero-v6.2.0.bin"),
+    sha256: "2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987",
+    bytes: 885_098,
+    file: "silero-v6.2.0.bin",
+    license: "MIT",
+  },
+  "gemma-4-e2b-it-qat": {
+    id: "gemma-4-e2b-it-qat",
+    name: "Gemma 4 E2B",
+    url: hf("google/gemma-4-E2B-it-qat-q4_0-gguf", "675cff42a74c774d6cb76f76d8eacb49b48c9b93", "gemma-4-E2B_q4_0-it.gguf"),
+    sha256: "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+    bytes: 3_349_516_256,
+    file: "gemma-4-e2b-it-qat-q4_0.gguf",
+    license: "Apache-2.0",
+  },
+};
+
+/** Models used when the user has not chosen otherwise. */
+export const DEFAULT_MODELS = { sv: "kb-whisper-medium", en: "whisper-large-v3-turbo", vad: "silero-vad" } as const;
+/** The optional language model for smart cleanup, downloaded separately from the speech models. */
+export const DEFAULT_CLEANUP_MODEL = "gemma-4-e2b-it-qat" satisfies ModelId;
+
+/** Matches Electron's app.getPath("userData") for productName "Diktatorn". */
+export function defaultUserDataDir(): string {
+  return join(homedir(), "Library", "Application Support", "Diktatorn");
+}
+
+export function modelPath(id: ModelId, userDataDir = defaultUserDataDir()): string {
+  return join(userDataDir, "models", MODELS[id].file);
+}

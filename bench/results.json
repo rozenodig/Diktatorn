@@ -1,0 +1,3166 @@
+{
+  "date": "2026-10-20",
+  "hardware": {
+    "chip": "Apple M1 Max",
+    "memoryGB": 64,
+    "macOS": "14.7.2"
+  },
+  "systems": {
+    "stock": "Stock Whisper large-v3 turbo",
+    "routing": "Diktatorn, recognition only",
+    "diktatorn": "Diktatorn",
+    "dictionary": "Diktatorn + dictionary",
+    "kbLarge": "Diktatorn with KB-Whisper large"
+  },
+  "criteria": [
+    {
+      "text": "English WER no higher than stock Whisper",
+      "result": "1.3% vs 1.3%",
+      "pass": true
+    },
+    {
+      "text": "Swedish WER lower than stock Whisper",
+      "result": "7.8% vs 2.1%",
+      "pass": false
+    },
+    {
+      "text": "Mixed WER lower than stock Whisper",
+      "result": "22.0% vs 42.1%",
+      "pass": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "sv-01",
+      "language": "sv",
+      "term": "GitHub Actions",
+      "text": "Kan du kolla varför bygget i GitHub Actions misslyckades under natten?",
+      "audioMs": 5680,
+      "runs": {
+        "stock": {
+          "text": "Kan du kolla varför bygget i GitHub-Actions misslyckades under natten?",
+          "ms": 907.1847910000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "kan du kolla varför bygget i GitHub Actions misslyckades under natten.",
+          "ms": 880.1990829999995,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9978808487933127
+          }
+        },
+        "diktatorn": {
+          "text": "kan du kolla varför bygget i GitHub Actions misslyckades under natten.",
+          "ms": 1231.2836250000037,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9978808487933127
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "kan du kolla varför bygget i GitHub Actions misslyckades under natten.",
+          "ms": 1162.5782079999917,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9978808487933127
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kan du kolla varför bygget i GitHub Actions misslyckades under natten?",
+          "ms": 1547.9177490000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9978808487933127
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-02",
+      "language": "sv",
+      "term": "PostgreSQL",
+      "text": "Vi borde flytta databasen till PostgreSQL innan vi lanserar nästa version.",
+      "audioMs": 7240,
+      "runs": {
+        "stock": {
+          "text": "Vi borde flytta databasen till PostgreSQL innan vi lanserar nästa version.",
+          "ms": 909.488542,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Vi borde flytta databasen till Postgress QL innan vi lanserar nästa version",
+          "ms": 939.5902080000014,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990264154563888
+          }
+        },
+        "diktatorn": {
+          "text": "Vi borde flytta databasen till Postgress QL innan vi lanserar nästa version",
+          "ms": 1195.9677079999965,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990264154563888
+          },
+          "llm": "rejected"
+        },
+        "dictionary": {
+          "text": "Vi borde flytta databasen till PostgressQL innan vi lanserar nästa version",
+          "ms": 1179.840417000014,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990264154563888
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Vi borde flytta databasen till Postgress QL innan vi lanserar nästa version.",
+          "ms": 1613.4593749999913,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990264154563888
+          },
+          "llm": "rejected"
+        }
+      }
+    },
+    {
+      "id": "sv-03",
+      "language": "sv",
+      "term": "TypeScript",
+      "text": "Jag har skrivit om hela komponenten i TypeScript, så nu är typerna strikta.",
+      "audioMs": 5544,
+      "runs": {
+        "stock": {
+          "text": "Jag har skrivit om hela komponenten i TypeScript så nu är typen att strikta.",
+          "ms": 902.9953329999994,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Jag har skrivit om hela komponenten i Type Shript så nu är typerna strikta.",
+          "ms": 895.2492500000008,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9986754986928795
+          }
+        },
+        "diktatorn": {
+          "text": "Jag har skrivit om hela komponenten i Type Shript så nu är typerna strikta.",
+          "ms": 1142.3595419999983,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9986754986928795
+          },
+          "llm": "rejected"
+        },
+        "dictionary": {
+          "text": "Jag har skrivit om hela komponenten i Type Shrimpt. Nu är typerna strikta.",
+          "ms": 1201.7537080000038,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9986754986928795
+          },
+          "llm": "accepted"
+        },
+        "kbLarge": {
+          "text": "Jag har skrivit om hela komponenten i TypeScript så nu är typerna strikta.",
+          "ms": 1603.6727089999913,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9986754986928795
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-04",
+      "language": "sv",
+      "term": "Vercel",
+      "text": "Glöm inte att lägga till den nya miljövariabeln i Vercel också.",
+      "audioMs": 5240,
+      "runs": {
+        "stock": {
+          "text": "Glöm inte att lägga till den nya miljövariabeln i Vercel också.",
+          "ms": 900.3032920000005,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Glöm inte att lägga till den nya miljövariabeln i Versel också.",
+          "ms": 872.5919159999976,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993683322597623
+          }
+        },
+        "diktatorn": {
+          "text": "Glöm inte att lägga till den nya miljövariabeln i Versel också.",
+          "ms": 1111.7523319999964,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993683322597623
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Glöm inte att lägga till den nya miljövariabeln i Vercell också.",
+          "ms": 1127.9150420000078,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993683322597623
+          },
+          "llm": "rejected"
+        },
+        "kbLarge": {
+          "text": "Glöm inte att lägga till den nya miljövariabeln i Versell också.",
+          "ms": 1449.5322489999962,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993683322597623
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-05",
+      "language": "sv",
+      "term": "Stripe",
+      "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+      "audioMs": 4768,
+      "runs": {
+        "stock": {
+          "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+          "ms": 892.6590000000006,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+          "ms": 850.455833,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994014470393895
+          }
+        },
+        "diktatorn": {
+          "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+          "ms": 1115.3397909999985,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994014470393895
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+          "ms": 1143.1648340000102,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994014470393895
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad.",
+          "ms": 1571.7205419999955,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994014470393895
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-06",
+      "language": "sv",
+      "term": "Hugging Face",
+      "text": "Vi laddar ner modellerna från Hugging Face första gången appen startar.",
+      "audioMs": 4808,
+      "runs": {
+        "stock": {
+          "text": "Vi laddar ner modellerna från Hugging Face första gången appen startar.",
+          "ms": 894.2108749999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Vi laddar ner modellerna från Huggingface första gången appen startar.",
+          "ms": 854.4065410000039,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.998563846365347
+          }
+        },
+        "diktatorn": {
+          "text": "Vi laddar ner modellerna från Huggingface första gången appen startar.",
+          "ms": 1100.9815820000003,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.998563846365347
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Vi laddar ner modellerna från Hugging Face första gången appen startar.",
+          "ms": 1110.9164590000146,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.998563846365347
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Vi laddar ner modellerna från Hugging Face första gången appen startar.",
+          "ms": 1416.3763739999995,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.998563846365347
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-07",
+      "language": "sv",
+      "term": "Slack",
+      "text": "Kan du sätta upp en ny kanal i Slack för projektet med kunden?",
+      "audioMs": 4864,
+      "runs": {
+        "stock": {
+          "text": "Kan du sätta upp en ny kanal i Slack för projektet med kunden?",
+          "ms": 900.5671249999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "kan du sätta upp en ny kanal i Slack för projektet med kunden.",
+          "ms": 844.3502499999959,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992356405788942
+          }
+        },
+        "diktatorn": {
+          "text": "kan du sätta upp en ny kanal i Slack för projektet med kunden.",
+          "ms": 1070.729333999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992356405788942
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "kan du sätta upp en ny kanal i Slack för projektet med kunden.",
+          "ms": 1094.3271249999962,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992356405788942
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "kan du sätta upp en ny kanal i Slack för projektet med kunden.",
+          "ms": 1510.2824159999873,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992356405788942
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-08",
+      "language": "sv",
+      "term": "macOS",
+      "text": "Appen kraschar bara på macOS när man byter mikrofon mitt i en inspelning.",
+      "audioMs": 6784,
+      "runs": {
+        "stock": {
+          "text": "Appen kraschar bara på macOS när man byter mikrofon mitt i en inspelning.",
+          "ms": 904.1766670000006,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Appen kraschar bara på MacOS när man byter mikrofon mitt i en inspelning.",
+          "ms": 911.5381669999988,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990815981814242
+          }
+        },
+        "diktatorn": {
+          "text": "Appen kraschar bara på MacOS när man byter mikrofon mitt i en inspelning.",
+          "ms": 1178.4768760000006,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990815981814242
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Appen kraschar bara på macOS när man byter mikrofon mitt i en inspelning.",
+          "ms": 1186.5027079999854,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990815981814242
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Appen kraschar bara på MacOS när man byter mikrofon mitt i en inspelning.",
+          "ms": 1599.9653749999852,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990815981814242
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-09",
+      "language": "sv",
+      "term": "Supabase",
+      "text": "Jag tycker att vi ska använda Supabase för inloggningen, det sparar mycket tid.",
+      "audioMs": 5808,
+      "runs": {
+        "stock": {
+          "text": "Jag tycker att vi ska använda Superbase för inloggningen. Det sparar mycket tid.",
+          "ms": 896.6847909999997,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "Jag tycker att vi ska använda Superbase för inloggningen - det sparar mycket tid.",
+          "ms": 871.6333749999976,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993618285029082
+          }
+        },
+        "diktatorn": {
+          "text": "Jag tycker att vi ska använda Superbase för inloggningen det sparar mycket tid.",
+          "ms": 1130.0969579999946,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993618285029082
+          },
+          "llm": "accepted"
+        },
+        "dictionary": {
+          "text": "Jag tycker att vi ska använda Superbase för inloggningen. Det sparar mycket tid.",
+          "ms": 1146.7081670000189,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993618285029082
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Jag tycker att vi ska använda Superbase för inloggningen. Det sparar mycket tid.",
+          "ms": 1592.1214990000153,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993618285029082
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-10",
+      "language": "sv",
+      "term": "Figma",
+      "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+      "audioMs": 5288,
+      "runs": {
+        "stock": {
+          "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+          "ms": 893.5912919999992,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+          "ms": 863.0433339999945,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9924576609566389
+          }
+        },
+        "diktatorn": {
+          "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+          "ms": 1095.5975429999962,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9924576609566389
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+          "ms": 1129.6989170000015,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9924576609566389
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre.",
+          "ms": 1433.9462910000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9924576609566389
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-11",
+      "language": "sv",
+      "term": "Docker",
+      "text": "Servern svarar långsamt eftersom Docker-containern får för lite minne.",
+      "audioMs": 4744,
+      "runs": {
+        "stock": {
+          "text": "Servern svarar långsamt eftersom Docker-containern får för lite minne.",
+          "ms": 895.200667000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Serven svarar långsamt eftersom dockercontainern får för lite minne.",
+          "ms": 845.7220410000009,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.996267136240259
+          }
+        },
+        "diktatorn": {
+          "text": "Serven svarar långsamt eftersom dockercontainern får för lite minne.",
+          "ms": 1077.9134579999954,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.996267136240259
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Servern svarar långsamt eftersom dockercontainern får för lite minne.",
+          "ms": 1100.6147499999934,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.996267136240259
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Servern svarar långsamt eftersom dockor-containern får för lite minne.",
+          "ms": 1554.569708999974,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.996267136240259
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "sv-12",
+      "language": "sv",
+      "term": "API",
+      "text": "Skicka över API-nyckeln i ett krypterat meddelande, inte i chatten.",
+      "audioMs": 5144,
+      "runs": {
+        "stock": {
+          "text": "Skicka över API-nyckeln i ett krypterat meddelande, inte i chatten.",
+          "ms": 920.8642920000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Skicka över API-nyckeln i ett krypterat meddelande. Inte i chatten.",
+          "ms": 877.0888330000016,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9987993033859266
+          }
+        },
+        "diktatorn": {
+          "text": "Skicka över API-nyckeln i ett krypterat meddelande. Inte i chatten.",
+          "ms": 1156.8404999999984,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9987993033859266
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Skicka över API-nyckeln i ett krypterat meddelande. Inte i chatten.",
+          "ms": 1196.8803749999788,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9987993033859266
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Skicka över API-nyckeln i ett krypterat meddelande, inte i chatten.",
+          "ms": 1503.6915409999492,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9987993033859266
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-01",
+      "language": "en",
+      "term": "pull request",
+      "text": "Can you review my pull request before the meeting tomorrow morning?",
+      "audioMs": 4536,
+      "runs": {
+        "stock": {
+          "text": "Can you review my pull request before the meeting tomorrow morning?",
+          "ms": 882.2394160000003,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Can you review my pull request before the meeting tomorrow morning?",
+          "ms": 905.2972080000036,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0027604299112355324
+          }
+        },
+        "diktatorn": {
+          "text": "Can you review my pull request before the meeting tomorrow morning?",
+          "ms": 1073.2218740000026,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0027604299112355324
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Can you review my pull request before the meeting tomorrow morning?",
+          "ms": 1103.3880409999983,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0027604299112355324
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Can you review my pull request before the meeting tomorrow morning?",
+          "ms": 1098.92295800001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0027604299112355324
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-02",
+      "language": "en",
+      "term": "webhook",
+      "text": "The webhook keeps timing out on the staging server since the last deploy.",
+      "audioMs": 4312,
+      "runs": {
+        "stock": {
+          "text": "The webhook keeps timing out on the staging server since the last deploy.",
+          "ms": 886.1547499999997,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "The webhook keeps timing out on the staging server since the last deploy.",
+          "ms": 918.7401250000039,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00015248266728619202
+          }
+        },
+        "diktatorn": {
+          "text": "The webhook keeps timing out on the staging server since the last deploy.",
+          "ms": 1116.439959000003,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00015248266728619202
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "The webhook keeps timing out on the staging server since the last deploy.",
+          "ms": 1130.587875000012,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00015248266728619202
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "The webhook keeps timing out on the staging server since the last deploy.",
+          "ms": 1100.131040999986,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00015248266728619202
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-03",
+      "language": "en",
+      "term": "Next.js",
+      "text": "We should migrate the frontend to Next.js before we build the new dashboard.",
+      "audioMs": 6088,
+      "runs": {
+        "stock": {
+          "text": "We should migrate the frontend to next.js before we build a new dashboard.",
+          "ms": 887.4002920000003,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "We should migrate the frontend to next.js before we build a new dashboard.",
+          "ms": 922.0801670000001,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00020235448038898168
+          }
+        },
+        "diktatorn": {
+          "text": "We should migrate the frontend to next.js before we build a new dashboard.",
+          "ms": 1136.8171250000014,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00020235448038898168
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "We should migrate the frontend to Next.js before we build a new dashboard.",
+          "ms": 1145.4803340000071,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00020235448038898168
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "We should migrate the frontend to next.js before we build a new dashboard.",
+          "ms": 1147.5752920000232,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00020235448038898168
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-04",
+      "language": "en",
+      "term": "rebase",
+      "text": "Please rebase your branch on main and resolve the merge conflicts first.",
+      "audioMs": 5648,
+      "runs": {
+        "stock": {
+          "text": "Please rebase your branch on main and resolve the merged conflicts first.",
+          "ms": 884.9529590000002,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Please rebase your branch on main and resolve the merged conflicts first.",
+          "ms": 924.5360409999994,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000901152526798936
+          }
+        },
+        "diktatorn": {
+          "text": "Please rebase your branch on main and resolve the merged conflicts first.",
+          "ms": 1119.018833000002,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000901152526798936
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Please rebase your branch on main and resolve the merged conflicts first.",
+          "ms": 1117.42279099999,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000901152526798936
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Please rebase your branch on main and resolve the merged conflicts first.",
+          "ms": 1104.4232079999929,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000901152526798936
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-05",
+      "language": "en",
+      "term": "Kubernetes",
+      "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+      "audioMs": 7040,
+      "runs": {
+        "stock": {
+          "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+          "ms": 887.9794170000005,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+          "ms": 932.5942089999953,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000234365651246624
+          }
+        },
+        "diktatorn": {
+          "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+          "ms": 1127.5029169999907,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000234365651246624
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+          "ms": 1139.1929579999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000234365651246624
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "The Kubernetes cluster ran out of memory again during the nightly batch job.",
+          "ms": 1117.2373329999973,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000234365651246624
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-06",
+      "language": "en",
+      "term": "Redis",
+      "text": "I pushed a fix to the Redis cache, so the login page should be faster now.",
+      "audioMs": 7656,
+      "runs": {
+        "stock": {
+          "text": "I pushed a fix to the Redis cache, so the login page should be faster now.",
+          "ms": 894.541250000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "I pushed a fix to the Redis cache so the login page should be faster now.",
+          "ms": 932.7837500000023,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000163073943816478
+          }
+        },
+        "diktatorn": {
+          "text": "I pushed a fix to the Redis cache so the login page should be faster now.",
+          "ms": 1152.6176669999986,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000163073943816478
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "I pushed a fix to the Redis cache, so the login page should be faster now.",
+          "ms": 1212.6084580000024,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000163073943816478
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "I pushed a fix to the Redis cache so the login page should be faster now.",
+          "ms": 1147.950125000003,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000163073943816478
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-07",
+      "language": "en",
+      "term": "JSON",
+      "text": "We should store the settings as JSON so people can edit them by hand.",
+      "audioMs": 6152,
+      "runs": {
+        "stock": {
+          "text": "We should store the settings as JSON so people can edit them by hand.",
+          "ms": 886.1292079999985,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "We should store the settings as JSON so people can edit them by hand.",
+          "ms": 922.3595829999977,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000700000821559874
+          }
+        },
+        "diktatorn": {
+          "text": "We should store the settings as JSON so people can edit them by hand.",
+          "ms": 1126.5043749999968,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000700000821559874
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "We should store the settings as JSON so people can edit them by hand.",
+          "ms": 1140.1291670000064,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000700000821559874
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "We should store the settings as JSON so people can edit them by hand.",
+          "ms": 1149.3030000000144,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0000700000821559874
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-08",
+      "language": "en",
+      "term": "GPU",
+      "text": "The model runs on the GPU, which keeps the latency low enough for dictation.",
+      "audioMs": 5688,
+      "runs": {
+        "stock": {
+          "text": "The model runs on the GPU which keeps the latency low enough for dictation.",
+          "ms": 892.421875,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "The model runs on the GPU which keeps the latency low enough for dictation.",
+          "ms": 916.3065410000054,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000191595840649914
+          }
+        },
+        "diktatorn": {
+          "text": "The model runs on the GPU which keeps the latency low enough for dictation.",
+          "ms": 1125.4174160000039,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000191595840649914
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "The model runs on the GPU which keeps the latency low enough for dictation.",
+          "ms": 1147.1625829999975,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000191595840649914
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "The model runs on the GPU which keeps the latency low enough for dictation.",
+          "ms": 1144.7385000000068,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.000191595840649914
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-09",
+      "language": "en",
+      "term": "OAuth",
+      "text": "Could you add OAuth so people can sign in with their Google accounts?",
+      "audioMs": 4960,
+      "runs": {
+        "stock": {
+          "text": "Could you add OAuth so people can sign in with their Google accounts?",
+          "ms": 895.8196670000034,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Could you add OAuth so people can sign in with their Google accounts?",
+          "ms": 926.2302080000009,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0008682092613555557
+          }
+        },
+        "diktatorn": {
+          "text": "Could you add OAuth so people can sign in with their Google accounts?",
+          "ms": 1123.953125,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0008682092613555557
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Could you add OAuth so people can sign in with their Google accounts?",
+          "ms": 1123.0919999999896,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0008682092613555557
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Could you add OAuth so people can sign in with their Google accounts?",
+          "ms": 1105.4793340000033,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0008682092613555557
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-10",
+      "language": "en",
+      "term": "GraphQL",
+      "text": "Our GraphQL schema is getting messy, so we should split it into modules.",
+      "audioMs": 7112,
+      "runs": {
+        "stock": {
+          "text": "Our GraphQL schema is getting messy so we should split it into modules.",
+          "ms": 883.8478329999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Our GraphQL schema is getting messy so we should split it into modules.",
+          "ms": 923.991833,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00008335006251406973
+          }
+        },
+        "diktatorn": {
+          "text": "Our GraphQL schema is getting messy so we should split it into modules.",
+          "ms": 1122.9863750000004,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00008335006251406973
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Our GraphQL schema is getting messy so we should split it into modules.",
+          "ms": 1156.5648329999967,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00008335006251406973
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Our GraphQL schema is getting messy so we should split it into modules.",
+          "ms": 1125.3002500000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.00008335006251406973
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-11",
+      "language": "en",
+      "term": "Linear",
+      "text": "I can open a ticket in Linear and assign it to the design team.",
+      "audioMs": 4736,
+      "runs": {
+        "stock": {
+          "text": "I can open a ticket in linear and assign it to the design team.",
+          "ms": 885.3548750000009,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "I can open a ticket in linear and assign it to the design team.",
+          "ms": 909.5592499999984,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0028312532457530903
+          }
+        },
+        "diktatorn": {
+          "text": "I can open a ticket in linear and assign it to the design team.",
+          "ms": 1110.8974589999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0028312532457530903
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "I can open a ticket in Linear and assign it to the design team.",
+          "ms": 1133.5930419999931,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0028312532457530903
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "I can open a ticket in linear and assign it to the design team.",
+          "ms": 1125.8263330000045,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0028312532457530903
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "en-12",
+      "language": "en",
+      "term": "Xcode",
+      "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+      "audioMs": 6088,
+      "runs": {
+        "stock": {
+          "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+          "ms": 883.6522499999992,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+          "ms": 914.5431250000038,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0002882701372405095
+          }
+        },
+        "diktatorn": {
+          "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+          "ms": 1102.8607080000074,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0002882701372405095
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+          "ms": 1124.2360409999965,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0002882701372405095
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Xcode refuses to sign the build until we renew the developer certificate.",
+          "ms": 1103.3167500000272,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.0002882701372405095
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-01",
+      "language": "mixed",
+      "term": "hotfix",
+      "text": "Jag pushar en hotfix nu, and then we can deploy to production tonight.",
+      "audioMs": 5304,
+      "runs": {
+        "stock": {
+          "text": "Jag pushar en hotfix nu. Och så kan vi deploy till produktion i dag.",
+          "ms": 909.6111659999988,
+          "errors": {
+            "substitutions": 7,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Jag pushar en Hotfix nu och sedan kan vi använda det till produktion ikväll.",
+          "ms": 922.3296669999982,
+          "errors": {
+            "substitutions": 8,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6952653021190893
+          }
+        },
+        "diktatorn": {
+          "text": "Jag pushar en Hotfix nu och sedan kan vi använda det till produktion ikväll.",
+          "ms": 1176.091499999995,
+          "errors": {
+            "substitutions": 8,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6952653021190893
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Jag pushar en Hotfix nu och then we can deploy it to production tonight.",
+          "ms": 1124.5669989999878,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6952653021190893
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Jag pushar en hotfix nu, and then we can deploy to production tonight.",
+          "ms": 1547.1111670000246,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6952653021190893
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-02",
+      "language": "mixed",
+      "term": "React",
+      "text": "Kan du fixa buggen i React-komponenten? It only happens on mobile.",
+      "audioMs": 5568,
+      "runs": {
+        "stock": {
+          "text": "Kan du fixa buggen i React-komponenten? Det sker bara på mobilen.",
+          "ms": 904.1157500000008,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "kan du fixa buggen i React-komponenten. It only happens on mobile.",
+          "ms": 881.7141249999986,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7943017693610721
+          }
+        },
+        "diktatorn": {
+          "text": "kan du fixa buggen i React-komponenten. It only happens on mobile.",
+          "ms": 1107.5216250000012,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7943017693610721
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kan du fixa buggen i React-komponenten? It only happens on mobile.",
+          "ms": 1126.0867499999877,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7943017693610721
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kan du fixa buggen i React-komponenten? It only happens on Mobile.",
+          "ms": 1522.3557089999958,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7943017693610721
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-03",
+      "language": "mixed",
+      "term": "Notion",
+      "text": "Mötet flyttas till fredag, because the client wants to read the spec in Notion first.",
+      "audioMs": 7016,
+      "runs": {
+        "stock": {
+          "text": "Mötet flyttas till fredag, för klienten vill lära spec i Notion först.",
+          "ms": 906.3409169999977,
+          "errors": {
+            "substitutions": 6,
+            "deletions": 3,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "mötet flyttas till fredag because the client wants to read the SPEC in Notion first.",
+          "ms": 913.0461250000008,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7174323656687426
+          }
+        },
+        "diktatorn": {
+          "text": "mötet flyttas till fredag because the client wants to read the SPEC in Notion first.",
+          "ms": 1172.3974579999995,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7174323656687426
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Mötet flyttas till fredag. Because the client wants to read the SPECK in Notion first.",
+          "ms": 1241.4719170000026,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7174323656687426
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Mötet flyttas till fredag because the client wants to read the spec in notion first.",
+          "ms": 1589.6380409999983,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7174323656687426
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-04",
+      "language": "mixed",
+      "term": "Electron",
+      "text": "Det är ett known issue i Electron, so we have to wait for the next release.",
+      "audioMs": 5640,
+      "runs": {
+        "stock": {
+          "text": "Det är ett known issue i Electron, så vi måste växa till nästa utbildning.",
+          "ms": 907.8653749999976,
+          "errors": {
+            "substitutions": 7,
+            "deletions": 2,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Det är ett känt problem i Electron så vi måste vänta på nästa release.",
+          "ms": 902.2532079999946,
+          "errors": {
+            "substitutions": 8,
+            "deletions": 2,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.41210103301934703
+          }
+        },
+        "diktatorn": {
+          "text": "Det är ett känt problem i Electron så vi måste vänta på nästa release.",
+          "ms": 1129.838208000001,
+          "errors": {
+            "substitutions": 8,
+            "deletions": 2,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.41210103301934703
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Det är ett känt problem i Electron så vi måste vänta på nästa release.",
+          "ms": 1141.1217510000133,
+          "errors": {
+            "substitutions": 8,
+            "deletions": 2,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.41210103301934703
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Det är ett known issue i Electron, so we have to wait for the next release.",
+          "ms": 1420.17849999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 16
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.41210103301934703
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-05",
+      "language": "mixed",
+      "term": "npm",
+      "text": "Kör npm install igen, I think something broke when you merged.",
+      "audioMs": 5360,
+      "runs": {
+        "stock": {
+          "text": "Kör NPM install igen. I think something broke when you merged.",
+          "ms": 885.2497500000027,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "Kör NPM install igen. Jag tror något gick sönder när du släppte.",
+          "ms": 868.1732080000074,
+          "errors": {
+            "substitutions": 7,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6377198280424038
+          }
+        },
+        "diktatorn": {
+          "text": "Kör NPM install igen. Jag tror något gick sönder när du släppte.",
+          "ms": 1106.691833000019,
+          "errors": {
+            "substitutions": 7,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6377198280424038
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kör NPM install igen.. Jag tror något gick sönder när du släppte.",
+          "ms": 1132.7879170000087,
+          "errors": {
+            "substitutions": 7,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6377198280424038
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kör NPM install igen. I think something broke when you merged.",
+          "ms": 1458.6587500000023,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6377198280424038
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-06",
+      "language": "mixed",
+      "term": "Tailwind",
+      "text": "Vi använder Tailwind för all styling, it keeps the CSS small and consistent.",
+      "audioMs": 6560,
+      "runs": {
+        "stock": {
+          "text": "We are in the Tailwind for all styling. It keeps the CSS small and consistent.",
+          "ms": 891.1450840000034,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "We use Tailwind for all styling. It keeps the CSS small and consistent.",
+          "ms": 939.2437910000008,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.021831621200975544
+          }
+        },
+        "diktatorn": {
+          "text": "We use Tailwind for all styling. It keeps the CSS small and consistent.",
+          "ms": 1145.9787500000093,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.021831621200975544
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "We use Tailwind for all styling. It keeps the CSS small and consistent.",
+          "ms": 1148.1988739999797,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.021831621200975544
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "We use Tailwind for all styling. It keeps the CSS small and consistent.",
+          "ms": 1129.223708000005,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.021831621200975544
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-07",
+      "language": "mixed",
+      "term": "Redux",
+      "text": "Honestly, jag tror inte att vi behöver Redux, the state is simple enough.",
+      "audioMs": 6032,
+      "runs": {
+        "stock": {
+          "text": "Honest, jag tror inte att vi behöver Redux. The state is simple enough.",
+          "ms": 889.5157080000026,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Honestly, jag tror inte att vi behöver redux, the state is simple enough.",
+          "ms": 869.3215000000055,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7843619596492011
+          }
+        },
+        "diktatorn": {
+          "text": "Honestly, jag tror inte att vi behöver redux, the state is simple enough.",
+          "ms": 1089.4282079999975,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7843619596492011
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Honestly, jag tror inte att vi behöver Redux, the state is simple enough.",
+          "ms": 1134.2837080000027,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7843619596492011
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Honestly, jag tror inte att vi behöver redux, the state is simple enough.",
+          "ms": 1493.9178749999846,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7843619596492011
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-08",
+      "language": "mixed",
+      "term": "Sentry",
+      "text": "Kolla loggarna i Sentry, we have a spike in errors since this morning.",
+      "audioMs": 5848,
+      "runs": {
+        "stock": {
+          "text": "Kolla loggerna i Sentry. Vi har en spik i error sedan den här morgonen.",
+          "ms": 899.4740839999977,
+          "errors": {
+            "substitutions": 10,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Kolla loggena i sentry. We have a spike in errors since this morning.",
+          "ms": 921.8570000000036,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.32526995084648835
+          }
+        },
+        "diktatorn": {
+          "text": "Kolla loggena i sentry. We have a spike in errors since this morning.",
+          "ms": 1162.6347089999908,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.32526995084648835
+          },
+          "llm": "rejected"
+        },
+        "dictionary": {
+          "text": "Kolla loggerna i Sentry. We have a spike in errors since this morning.",
+          "ms": 1179.2337499999994,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.32526995084648835
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kolla loggena i sentry. We have a spike in errors since this morning.",
+          "ms": 1215.3961240000208,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.32526995084648835
+          },
+          "llm": "rejected"
+        }
+      }
+    },
+    {
+      "id": "mx-09",
+      "language": "mixed",
+      "term": "Safari",
+      "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen.",
+      "audioMs": 6128,
+      "runs": {
+        "stock": {
+          "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen.",
+          "ms": 944.1524590000008,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen,",
+          "ms": 895.9330830000108,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7030117391282262
+          }
+        },
+        "diktatorn": {
+          "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen,",
+          "ms": 1170.066250000018,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7030117391282262
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "The deadline is next week men vi kan skippa stödet för Safari i första versionen",
+          "ms": 1191.548582000003,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7030117391282262
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen.",
+          "ms": 1606.6354580000043,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7030117391282262
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-10",
+      "language": "mixed",
+      "term": "Python",
+      "text": "Skriptet är skrivet i Python, but it should be easy to port it to Rust.",
+      "audioMs": 5384,
+      "runs": {
+        "stock": {
+          "text": "Scripted as a scripted as a python, but it should be easy to port it to rust.",
+          "ms": 899.719000000001,
+          "errors": {
+            "substitutions": 4,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 15
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "Scripted as scripted python but it should be easy to port it to rust.",
+          "ms": 938.0235840000096,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.19046258887871415
+          }
+        },
+        "diktatorn": {
+          "text": "Scripted as scripted python but it should be easy to port it to rust.",
+          "ms": 1151.809917999999,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.19046258887871415
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Scripted as scripted a python, but it should be easy to port it to Rust.",
+          "ms": 1180.1994170000107,
+          "errors": {
+            "substitutions": 4,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.19046258887871415
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Scripted as scripted python but it should be easy to port it to rust.",
+          "ms": 1148.2980420000094,
+          "errors": {
+            "substitutions": 3,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": false,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.19046258887871415
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-11",
+      "language": "mixed",
+      "term": "SSH",
+      "text": "Kan du sätta upp SSH-nycklar på servern? I cannot connect from my laptop.",
+      "audioMs": 5392,
+      "runs": {
+        "stock": {
+          "text": "Kan du sätta upp SSH-nyttlar på servern? Jag kan inte kolla från min laptop.",
+          "ms": 903.929624999997,
+          "errors": {
+            "substitutions": 6,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Kan du sätta upp SSH-nycklar på servern? I cannot connect through my laptop!",
+          "ms": 916.9578330000077,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.8268500187098934
+          }
+        },
+        "diktatorn": {
+          "text": "Kan du sätta upp SSH-nycklar på servern? I cannot connect through my laptop!",
+          "ms": 1187.5661669999972,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.8268500187098934
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kan du sätta upp SSH-nycklar på servern? I cannot connect through my laptop!",
+          "ms": 1228.7183740000037,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.8268500187098934
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "kan du sätta upp SSH-nycklar på servern. I cannot connect through my laptop.",
+          "ms": 1577.3670409999904,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.8268500187098934
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "mx-12",
+      "language": "mixed",
+      "term": "ChatGPT",
+      "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT.",
+      "audioMs": 4944,
+      "runs": {
+        "stock": {
+          "text": "Vi behöver prata om pränskap för just nu tappar vi kunder till Kjött GPT.",
+          "ms": 918.385083000001,
+          "errors": {
+            "substitutions": 6,
+            "deletions": 1,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": false
+        },
+        "routing": {
+          "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT,",
+          "ms": 876.9092910000036,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7394284857881049
+          }
+        },
+        "diktatorn": {
+          "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT,",
+          "ms": 1101.7949160000135,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7394284857881049
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT,",
+          "ms": 1117.7165830000013,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7394284857881049
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT.",
+          "ms": 1524.5887920000241,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7394284857881049
+          },
+          "llm": "unchanged"
+        }
+      }
+    }
+  ]
+}

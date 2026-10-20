@@ -1,0 +1,1588 @@
+{
+  "date": "2026-10-20",
+  "hardware": {
+    "chip": "Apple M1 Max",
+    "memoryGB": 64,
+    "macOS": "14.7.2"
+  },
+  "systems": {
+    "stock": "Stock Whisper large-v3 turbo",
+    "routing": "Diktatorn, recognition only",
+    "diktatorn": "Diktatorn",
+    "dictionary": "Diktatorn + dictionary",
+    "kbLarge": "Diktatorn with KB-Whisper large"
+  },
+  "criteria": [
+    {
+      "text": "English WER no higher than stock Whisper",
+      "result": "not measured",
+      "pass": true
+    },
+    {
+      "text": "Swedish WER lower than stock Whisper",
+      "result": "0.8% vs 2.3%",
+      "pass": true
+    },
+    {
+      "text": "Mixed WER lower than stock Whisper",
+      "result": "19.8% vs 16.0%",
+      "pass": false
+    }
+  ],
+  "clips": [
+    {
+      "id": "hs-01",
+      "language": "sv",
+      "text": "Kan du köpa mjölk och bröd på vägen hem från jobbet?",
+      "audioMs": 3792,
+      "runs": {
+        "stock": {
+          "text": "Kan du köpa mjölk och bröd på vägen hem från jobbet?",
+          "ms": 899.0116670000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "kan du köpa mjölk och bröd på vägen hem från jobbet.",
+          "ms": 851.1590419999993,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9976340583983054
+          }
+        },
+        "diktatorn": {
+          "text": "kan du köpa mjölk och bröd på vägen hem från jobbet.",
+          "ms": 1197.575625999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9976340583983054
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kan du köpa mjölk och bröd på vägen hem från jobbet?",
+          "ms": 1258.8410830000066,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9976340583983054
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kan du köpa mjölk och bröd på vägen hem från jobbet?",
+          "ms": 1503.9229160000032,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9976340583983054
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-02",
+      "language": "sv",
+      "text": "Jag blir tyvärr lite sen till mötet, börja gärna utan mig.",
+      "audioMs": 3744,
+      "runs": {
+        "stock": {
+          "text": "Jag blir tyvärr lite sent i mötet. Börja gärna utan mig.",
+          "ms": 892.1048329999999,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Jag blir tyvärr lite sen till mötet börja gärna utan mig",
+          "ms": 832.4445000000014,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9991602656872051
+          }
+        },
+        "diktatorn": {
+          "text": "Jag blir tyvärr lite sen till mötet börja gärna utan mig",
+          "ms": 1064.3557080000028,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9991602656872051
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Jag blir tyvärr lite sen till mötet börja gärna utan mig",
+          "ms": 1070.4621260000058,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9991602656872051
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Jag blir tyvärr lite sen till mötet, börjar gärna utan mig.",
+          "ms": 1368.2909999999974,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9991602656872051
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-03",
+      "language": "sv",
+      "text": "Tack för senast, det var verkligen trevligt att ses igen.",
+      "audioMs": 3160,
+      "runs": {
+        "stock": {
+          "text": "Tack för senast. Det var verkligen trevligt att ses igen.",
+          "ms": 896.7591670000002,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Tack för senast. Det var verkligen trevligt att ses igen.",
+          "ms": 809.812750000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994600267644669
+          }
+        },
+        "diktatorn": {
+          "text": "Tack för senast. Det var verkligen trevligt att ses igen.",
+          "ms": 1028.134915999999,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994600267644669
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Tack för senast. Det var verkligen trevligt att ses igen.",
+          "ms": 1025.2593739999938,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994600267644669
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Tack för senast, det var verkligen trevligt att ses igen.",
+          "ms": 1452.1889999999985,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9994600267644669
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-04",
+      "language": "sv",
+      "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+      "audioMs": 4680,
+      "runs": {
+        "stock": {
+          "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+          "ms": 897.3255829999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+          "ms": 819.0776670000014,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993216909306096
+          }
+        },
+        "diktatorn": {
+          "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+          "ms": 1020.1328329999997,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993216909306096
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+          "ms": 1024.713708000003,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993216909306096
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Vi behöver boka ett större rum till utbildningen nästa vecka.",
+          "ms": 1472.6041259999984,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993216909306096
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-05",
+      "language": "sv",
+      "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+      "audioMs": 3952,
+      "runs": {
+        "stock": {
+          "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+          "ms": 894.4412920000004,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+          "ms": 835.2089170000036,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992154716078825
+          }
+        },
+        "diktatorn": {
+          "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+          "ms": 1064.4021260000045,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992154716078825
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+          "ms": 1076.2544170000037,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992154716078825
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Glöm inte att ringa tandläkaren och flytta tiden till fredag.",
+          "ms": 1525.3573749999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 10
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992154716078825
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-06",
+      "language": "sv",
+      "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+      "audioMs": 4264,
+      "runs": {
+        "stock": {
+          "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+          "ms": 892.8402080000005,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+          "ms": 848.5217919999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.999222188981299
+          }
+        },
+        "diktatorn": {
+          "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+          "ms": 1107.4434580000016,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.999222188981299
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+          "ms": 1105.900333000005,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.999222188981299
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Jag har läst igenom avtalet och har några frågor om uppsägningstiden.",
+          "ms": 1546.7300830000022,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.999222188981299
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-07",
+      "language": "sv",
+      "text": "Det regnade hela helgen, så vi stannade inne och spelade sällskapsspel.",
+      "audioMs": 5008,
+      "runs": {
+        "stock": {
+          "text": "Det regnade hela helgen så vi stannade inne och spelade sällskapsspel.",
+          "ms": 894.2889169999999,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Det regnade hela helgen så vi stannade inne och spelade sällskapsspel.",
+          "ms": 866.4227500000015,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990202685325934
+          }
+        },
+        "diktatorn": {
+          "text": "Det regnade hela helgen så vi stannade inne och spelade sällskapsspel.",
+          "ms": 1133.1469580000012,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990202685325934
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Det regnade hela helgen så vi stannade inne och spelade sällskapsspel.",
+          "ms": 1136.3969990000041,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990202685325934
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Det regnade hela helgen så vi stannade inne och spelade sällskapsspel.",
+          "ms": 1550.1297499999928,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990202685325934
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-08",
+      "language": "sv",
+      "text": "Kan du skicka över protokollet från styrelsemötet när du har tid?",
+      "audioMs": 4424,
+      "runs": {
+        "stock": {
+          "text": "Kan du skicka över protokollet från styrelsemötet när du har tid?",
+          "ms": 895.7850840000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "kan du skicka över protokollet från styrelsemötet när du har tid.",
+          "ms": 859.8104999999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992614599161095
+          }
+        },
+        "diktatorn": {
+          "text": "kan du skicka över protokollet från styrelsemötet när du har tid.",
+          "ms": 1084.4234999999971,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992614599161095
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kan du skicka över protokollet från styrelsemötet när du har tid.",
+          "ms": 1093.2696660000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992614599161095
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "kan du skicka över protokollet från styrelsemötet när du har tid.",
+          "ms": 1484.7074169999978,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9992614599161095
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-09",
+      "language": "sv",
+      "text": "Barnen ska på kalas på lördag, så vi får hämta dem lite senare.",
+      "audioMs": 4872,
+      "runs": {
+        "stock": {
+          "text": "Barnen ska på kalas på lördag så vi får hämta dem lite senare.",
+          "ms": 898.9593749999985,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Barnen ska på kalas på lördag så vi får hämta dem lite senare.",
+          "ms": 859.0604999999996,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9988561195913475
+          }
+        },
+        "diktatorn": {
+          "text": "Barnen ska på kalas på lördag så vi får hämta dem lite senare.",
+          "ms": 1109.3532080000004,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9988561195913475
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Barnen ska på kalas på lördag så vi får hämta dem lite senare.",
+          "ms": 1119.823540999998,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9988561195913475
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Barnen ska på kalas på lördag. Så vi får hämta dem lite senare.",
+          "ms": 1543.3830000000016,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9988561195913475
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-10",
+      "language": "sv",
+      "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+      "audioMs": 5520,
+      "runs": {
+        "stock": {
+          "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+          "ms": 882.6844170000004,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 9
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+          "ms": 830.0282080000034,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 9
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990024964764728
+          }
+        },
+        "diktatorn": {
+          "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+          "ms": 1040.0390830000033,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 9
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990024964764728
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+          "ms": 1059.7692919999972,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 9
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990024964764728
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Vi måste bestämma budgeten för hösten innan semestern börjar.",
+          "ms": 1454.2048749999958,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 9
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9990024964764728
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-11",
+      "language": "sv",
+      "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+      "audioMs": 4592,
+      "runs": {
+        "stock": {
+          "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+          "ms": 893.8672910000005,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+          "ms": 852.2905409999985,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993499985948052
+          }
+        },
+        "diktatorn": {
+          "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+          "ms": 1100.2562909999979,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993499985948052
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+          "ms": 1123.8379579999964,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993499985948052
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Hyresvärden kommer förbi på onsdag förmiddag för att titta på elementet.",
+          "ms": 1553.2300830000167,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 11
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9993499985948052
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hs-12",
+      "language": "sv",
+      "text": "Jag tycker att förslaget är bra, men tidsplanen känns lite för snäv.",
+      "audioMs": 4432,
+      "runs": {
+        "stock": {
+          "text": "Jag tycker förslaget är bra, men tidsplanen känns lite för snäv.",
+          "ms": 887.9549170000009,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": null
+        },
+        "routing": {
+          "text": "Jag tycker förslaget är bra, men tidsplanen känns lite för snäv.",
+          "ms": 844.3498329999966,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9981344275554664
+          }
+        },
+        "diktatorn": {
+          "text": "Jag tycker förslaget är bra, men tidsplanen känns lite för snäv.",
+          "ms": 1095.7236669999947,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9981344275554664
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Jag tycker förslaget är bra, men tidsplanen känns lite för snäv.",
+          "ms": 1100.8564999999944,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9981344275554664
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Jag tycker förslaget är bra men tidsplanen känns lite för snäv.",
+          "ms": 1498.141834000009,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 1,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": null,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.9981344275554664
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-01",
+      "language": "mixed",
+      "term": "GitLab",
+      "text": "Kan du kolla pull requesten i GitLab? I left some comments on the tests.",
+      "audioMs": 5336,
+      "runs": {
+        "stock": {
+          "text": "Can you call a pull request in GitLab? I left some comments on the tests.",
+          "ms": 889.9853750000002,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Can you call a pull request in GitLab? I left some comments on the tests.",
+          "ms": 917.5408339999994,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.050057836797308
+          }
+        },
+        "diktatorn": {
+          "text": "Can you call a pull request in GitLab? I left some comments on the tests.",
+          "ms": 1136.8698750000003,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.050057836797308
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Can you call a pull request in GitLab? I left some comments on the tests.",
+          "ms": 1209.1847909999924,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.050057836797308
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Can you call a pull request in GitLab? I left some comments on the tests.",
+          "ms": 1158.321540999983,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 1,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.050057836797308
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-02",
+      "language": "mixed",
+      "term": "Heroku",
+      "text": "Vi kör demon på fredag, so make sure Heroku is not down again.",
+      "audioMs": 6120,
+      "runs": {
+        "stock": {
+          "text": "We're driving the demo on Friday, so make sure that Heroku is not down again.",
+          "ms": 891.8717089999991,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "We're driving the demon on Friday, so make sure that Heroku is not down again.",
+          "ms": 933.8026669999999,
+          "errors": {
+            "substitutions": 4,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.2093179525065764
+          }
+        },
+        "diktatorn": {
+          "text": "We're driving the demon on Friday, so make sure that Heroku is not down again.",
+          "ms": 1180.1039590000037,
+          "errors": {
+            "substitutions": 4,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.2093179525065764
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "We're playing Demo on Friday, so make sure Heroku is not down again.",
+          "ms": 1155.619749999998,
+          "errors": {
+            "substitutions": 5,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.2093179525065764
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "We're driving the demon on Friday, so make sure that Heroku is not down again.",
+          "ms": 1182.661333000011,
+          "errors": {
+            "substitutions": 4,
+            "deletions": 0,
+            "insertions": 2,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "en",
+            "reason": "detected",
+            "svShare": 0.2093179525065764
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-03",
+      "language": "mixed",
+      "term": "Webflow",
+      "text": "The new onboarding in Webflow looks great, men texterna behöver ses över.",
+      "audioMs": 5832,
+      "runs": {
+        "stock": {
+          "text": "The new onboarding in Webflow looks great, men texterna behöver ses över.",
+          "ms": 884.6855830000004,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "The new onboarding in webflow looks great, men texterna behöver ses över.",
+          "ms": 855.038625000001,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6199207842096854
+          }
+        },
+        "diktatorn": {
+          "text": "The new onboarding in webflow looks great, men texterna behöver ses över.",
+          "ms": 1065.6837499999965,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6199207842096854
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "The new onboarding in webflow looks great, men texterna behöver ses över.",
+          "ms": 1080.7562490000055,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6199207842096854
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "The new onboarding in Webflow looks great, men texterna behöver ses över.",
+          "ms": 1505.8996669999906,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 12
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "ambiguous",
+            "svShare": 0.6199207842096854
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-04",
+      "language": "mixed",
+      "term": "Confluence",
+      "text": "Jag har uppdaterat dokumentationen i Confluence, could you take a look before lunch?",
+      "audioMs": 6680,
+      "runs": {
+        "stock": {
+          "text": "Jag har uppdaterat dokumentationen i Confluence. Could you take a look before lunch?",
+          "ms": 898.5285829999993,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Jag har uppdaterat dokumentationen i Conference. Could you take a look before lounge?",
+          "ms": 872.9507080000039,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.904849339180799
+          }
+        },
+        "diktatorn": {
+          "text": "Jag har uppdaterat dokumentationen i Conference. Could you take a look before lounge?",
+          "ms": 1111.001833000002,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.904849339180799
+          },
+          "llm": "rejected"
+        },
+        "dictionary": {
+          "text": "Jag har uppdaterat dokumentationen i Conference. Could you take a look before lounge?",
+          "ms": 1124.3155830000032,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.904849339180799
+          },
+          "llm": "rejected"
+        },
+        "kbLarge": {
+          "text": "Jag har uppdaterat dokumentationen i Confluence. Could you take a look before lunch?",
+          "ms": 1561.7276659999916,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 13
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.904849339180799
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-05",
+      "language": "mixed",
+      "term": "AWS",
+      "text": "Our AWS bill doubled last month, så vi måste se över vilka tjänster vi kör.",
+      "audioMs": 6888,
+      "runs": {
+        "stock": {
+          "text": "Our AWS-bill doubled last month. Så vi måste se över vilka tjänster vi kör.",
+          "ms": 903.7337500000012,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Our AWS build doubled last month. Så vi måste se över vilka tjänster vi kör.",
+          "ms": 901.2527499999997,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6708580908636763
+          }
+        },
+        "diktatorn": {
+          "text": "Our AWS build doubled last month. Så vi måste se över vilka tjänster vi kör.",
+          "ms": 1142.8362080000006,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6708580908636763
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Our AWS build doubled last month. Så vi måste se över vilka tjänster vi kör.",
+          "ms": 1121.9630830000024,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6708580908636763
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Our AWS built double last month. Så vi måste se över vilka tjänster vi kör.",
+          "ms": 1420.468166000006,
+          "errors": {
+            "substitutions": 2,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 15
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.6708580908636763
+          },
+          "llm": "unchanged"
+        }
+      }
+    },
+    {
+      "id": "hm-06",
+      "language": "mixed",
+      "term": "Zoom",
+      "text": "Kan du dela din skärm i Zoom? I want to see the error message.",
+      "audioMs": 4424,
+      "runs": {
+        "stock": {
+          "text": "Kan du dela din skärm i Zoom? I want to see the error message.",
+          "ms": 888.3230829999993,
+          "errors": {
+            "substitutions": 0,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true
+        },
+        "routing": {
+          "text": "Kan du dela din skärm i zoom? I want to see the ever message.",
+          "ms": 857.5239999999976,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7783223640304786
+          }
+        },
+        "diktatorn": {
+          "text": "Kan du dela din skärm i zoom? I want to see the ever message.",
+          "ms": 1075.044584000003,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7783223640304786
+          },
+          "llm": "unchanged"
+        },
+        "dictionary": {
+          "text": "Kan du dela din skärm i zoom? I want to see the ever message.",
+          "ms": 1077.2656669999924,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": false,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7783223640304786
+          },
+          "llm": "unchanged"
+        },
+        "kbLarge": {
+          "text": "Kan du dela din skärm i Zoom? I want to see the ever message.",
+          "ms": 1485.9918340000004,
+          "errors": {
+            "substitutions": 1,
+            "deletions": 0,
+            "insertions": 0,
+            "words": 14
+          },
+          "term": true,
+          "route": {
+            "language": "sv",
+            "reason": "detected",
+            "svShare": 0.7783223640304786
+          },
+          "llm": "unchanged"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "sentences": [
+    {
+      "id": "sv-01",
+      "language": "sv",
+      "term": "GitHub Actions",
+      "text": "Kan du kolla varför bygget i GitHub Actions misslyckades under natten?"
+    },
+    {
+      "id": "sv-02",
+      "language": "sv",
+      "term": "PostgreSQL",
+      "text": "Vi borde flytta databasen till PostgreSQL innan vi lanserar nästa version."
+    },
+    {
+      "id": "sv-03",
+      "language": "sv",
+      "term": "TypeScript",
+      "text": "Jag har skrivit om hela komponenten i TypeScript, så nu är typerna strikta."
+    },
+    {
+      "id": "sv-04",
+      "language": "sv",
+      "term": "Vercel",
+      "text": "Glöm inte att lägga till den nya miljövariabeln i Vercel också."
+    },
+    {
+      "id": "sv-05",
+      "language": "sv",
+      "term": "Stripe",
+      "text": "Kunden vill att vi skickar fakturan via Stripe från och med nästa månad."
+    },
+    {
+      "id": "sv-06",
+      "language": "sv",
+      "term": "Hugging Face",
+      "text": "Vi laddar ner modellerna från Hugging Face första gången appen startar."
+    },
+    {
+      "id": "sv-07",
+      "language": "sv",
+      "term": "Slack",
+      "text": "Kan du sätta upp en ny kanal i Slack för projektet med kunden?"
+    },
+    {
+      "id": "sv-08",
+      "language": "sv",
+      "term": "macOS",
+      "text": "Appen kraschar bara på macOS när man byter mikrofon mitt i en inspelning."
+    },
+    {
+      "id": "sv-09",
+      "language": "sv",
+      "term": "Supabase",
+      "text": "Jag tycker att vi ska använda Supabase för inloggningen, det sparar mycket tid."
+    },
+    {
+      "id": "sv-10",
+      "language": "sv",
+      "term": "Figma",
+      "text": "Designen ligger i Figma, men knapparna stämmer inte med koden längre."
+    },
+    {
+      "id": "sv-11",
+      "language": "sv",
+      "term": "Docker",
+      "text": "Servern svarar långsamt eftersom Docker-containern får för lite minne."
+    },
+    {
+      "id": "sv-12",
+      "language": "sv",
+      "term": "API",
+      "text": "Skicka över API-nyckeln i ett krypterat meddelande, inte i chatten."
+    },
+    {
+      "id": "en-01",
+      "language": "en",
+      "term": "pull request",
+      "text": "Can you review my pull request before the meeting tomorrow morning?"
+    },
+    {
+      "id": "en-02",
+      "language": "en",
+      "term": "webhook",
+      "text": "The webhook keeps timing out on the staging server since the last deploy."
+    },
+    {
+      "id": "en-03",
+      "language": "en",
+      "term": "Next.js",
+      "text": "We should migrate the frontend to Next.js before we build the new dashboard."
+    },
+    {
+      "id": "en-04",
+      "language": "en",
+      "term": "rebase",
+      "text": "Please rebase your branch on main and resolve the merge conflicts first."
+    },
+    {
+      "id": "en-05",
+      "language": "en",
+      "term": "Kubernetes",
+      "text": "The Kubernetes cluster ran out of memory again during the nightly batch job."
+    },
+    {
+      "id": "en-06",
+      "language": "en",
+      "term": "Redis",
+      "text": "I pushed a fix to the Redis cache, so the login page should be faster now."
+    },
+    {
+      "id": "en-07",
+      "language": "en",
+      "term": "JSON",
+      "text": "We should store the settings as JSON so people can edit them by hand."
+    },
+    {
+      "id": "en-08",
+      "language": "en",
+      "term": "GPU",
+      "text": "The model runs on the GPU, which keeps the latency low enough for dictation."
+    },
+    {
+      "id": "en-09",
+      "language": "en",
+      "term": "OAuth",
+      "text": "Could you add OAuth so people can sign in with their Google accounts?"
+    },
+    {
+      "id": "en-10",
+      "language": "en",
+      "term": "GraphQL",
+      "text": "Our GraphQL schema is getting messy, so we should split it into modules."
+    },
+    {
+      "id": "en-11",
+      "language": "en",
+      "term": "Linear",
+      "text": "I can open a ticket in Linear and assign it to the design team."
+    },
+    {
+      "id": "en-12",
+      "language": "en",
+      "term": "Xcode",
+      "text": "Xcode refuses to sign the build until we renew the developer certificate."
+    },
+    {
+      "id": "mx-01",
+      "language": "mixed",
+      "term": "hotfix",
+      "text": "Jag pushar en hotfix nu, and then we can deploy to production tonight."
+    },
+    {
+      "id": "mx-02",
+      "language": "mixed",
+      "term": "React",
+      "text": "Kan du fixa buggen i React-komponenten? It only happens on mobile."
+    },
+    {
+      "id": "mx-03",
+      "language": "mixed",
+      "term": "Notion",
+      "text": "Mötet flyttas till fredag, because the client wants to read the spec in Notion first."
+    },
+    {
+      "id": "mx-04",
+      "language": "mixed",
+      "term": "Electron",
+      "text": "Det är ett known issue i Electron, so we have to wait for the next release."
+    },
+    {
+      "id": "mx-05",
+      "language": "mixed",
+      "term": "npm",
+      "text": "Kör npm install igen, I think something broke when you merged."
+    },
+    {
+      "id": "mx-06",
+      "language": "mixed",
+      "term": "Tailwind",
+      "text": "Vi använder Tailwind för all styling, it keeps the CSS small and consistent."
+    },
+    {
+      "id": "mx-07",
+      "language": "mixed",
+      "term": "Redux",
+      "text": "Honestly, jag tror inte att vi behöver Redux, the state is simple enough."
+    },
+    {
+      "id": "mx-08",
+      "language": "mixed",
+      "term": "Sentry",
+      "text": "Kolla loggarna i Sentry, we have a spike in errors since this morning."
+    },
+    {
+      "id": "mx-09",
+      "language": "mixed",
+      "term": "Safari",
+      "text": "The deadline is next week, men vi kan skippa stödet för Safari i första versionen."
+    },
+    {
+      "id": "mx-10",
+      "language": "mixed",
+      "term": "Python",
+      "text": "Skriptet är skrivet i Python, but it should be easy to port it to Rust."
+    },
+    {
+      "id": "mx-11",
+      "language": "mixed",
+      "term": "SSH",
+      "text": "Kan du sätta upp SSH-nycklar på servern? I cannot connect from my laptop."
+    },
+    {
+      "id": "mx-12",
+      "language": "mixed",
+      "term": "ChatGPT",
+      "text": "We need to talk about pricing, för just nu tappar vi kunder till ChatGPT."
+    }
+  ]
+}
