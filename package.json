@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Local, Swedish-first dictation for macOS.",
   "author": "Hugo Rosenö <hugo@rozenodigital.com>",
+  "license": "GPL-3.0-only",
   "private": true,
   "type": "module",
   "main": "dist/main/main.js",
