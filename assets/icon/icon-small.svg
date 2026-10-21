@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- The app icon's drawing for the 16 and 32 px slots. The glyph is drawn on the 16 px pixel
+       grid (scaled 64x), with a heavier tail and a square cursor, so its edges land on whole
+       pixels at 16 and 32 px instead of blurring. After editing, run `npm run icons`. -->
+  <defs>
+    <linearGradient id="tile" gradientUnits="userSpaceOnUse" x1="100" y1="924" x2="924" y2="100">
+      <stop offset="0" stop-color="#00C2FF"/>
+      <stop offset="1" stop-color="#00F0B8"/>
+    </linearGradient>
+    <filter id="tile-shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <path fill="url(#tile)" filter="url(#tile-shadow)" d="M383.4 100H640.6C722.2 100 763 100 806.9 113.9C854.9 131.3 892.7 169.1 910.1 217.1C924 261 924 301.8 924 383.4V640.6C924 722.2 924 763 910.1 806.9C892.7 854.9 854.9 892.7 806.9 910.1C763 924 722.2 924 640.6 924H383.4C301.8 924 261 924 217.1 910.1C169.1 892.7 131.3 854.9 113.9 806.9C100 763 100 722.2 100 640.6V383.4C100 301.8 100 261 113.9 217.1C131.3 169.1 169.1 131.3 217.1 113.9C261 100 301.8 100 383.4 100Z"/>
+  <path transform="scale(64)" fill="#0B0F19" fill-rule="evenodd" d="M6.2 4H8.5a3.5 3.5 0 0 1 0 7H7.4L3.8 13.2c-.3.2-.7-.1-.6-.4L5 9.6V5.2A1.2 1.2 0 0 1 6.2 4zM8 6h1v3H8z"/>
+</svg>
