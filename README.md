@@ -1,4 +1,9 @@
-# Diktatorn
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/header-dark.svg">
+    <img src="docs/images/header-light.svg" alt="Diktatorn" width="440">
+  </picture>
+</h1>
 
 Local dictation for macOS that speaks Swedish first and English too. Hold **fn**, talk, release, and the text appears wherever you were typing. Speech recognition, language detection and text cleanup all run on your Mac: no account, no cloud service, and no audio ever leaves the machine.
 
