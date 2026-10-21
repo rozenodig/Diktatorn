@@ -543,6 +543,8 @@ app.whenReady().then(async () => {
   await captureWin.loadFile(renderer("capture.html"));
   captureWin.webContents.send(IPC.captureDevice, settings.current.microphoneId);
   overlay = await Overlay.create(renderer("overlay.html"), webPreferences);
+  // Development builds run inside a copy of Electron's bundle, which carries Electron's icon.
+  app.dock?.setIcon(join(app.getAppPath(), "assets", "icon.png"));
   tray = createTray(join(app.getAppPath(), "assets", "trayTemplate.png"), {
     open: () => void appWindow.show(),
     debug: () => void openDebugWindow(),
