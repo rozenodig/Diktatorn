@@ -43,6 +43,19 @@ function icon(name: string, cls = "icon"): SVGSVGElement {
   return svg;
 }
 
+/**
+ * Replaces a container's rows only when `key` changed. State arrives several times a second
+ * during downloads, and rebuilding each time would drop keyboard focus; when the rows are
+ * rebuilt, focus moves to the same row's control (rows carry `data-row`).
+ */
+function renderRows(container: HTMLElement, key: string, build: () => HTMLElement[]): void {
+  if (container.dataset.key === key) return;
+  container.dataset.key = key;
+  const focused = container.contains(document.activeElement) ? document.activeElement!.closest<HTMLElement>("[data-row]")?.dataset.row : undefined;
+  container.replaceChildren(...build());
+  if (focused) container.querySelector<HTMLElement>(`[data-row="${focused}"]`)?.querySelector<HTMLElement>("input, button")?.focus();
+}
+
 /** Sets a progress bar's fill and value; the fill scales rather than resizing, so nothing reflows. */
 function setProgress(bar: HTMLElement, fraction: number): void {
   bar.querySelector<HTMLElement>("span")!.style.transform = `scaleX(${fraction})`;
@@ -102,6 +115,7 @@ function permissionRow(permission: Permission): HTMLElement {
   const info = PERMISSION_ROWS[permission];
   const allowed = state.permissions[permission];
   const row = h("div", "row permission");
+  row.dataset.row = permission;
   const tile = h("span", "permission-icon");
   tile.append(icon(info.icon));
   if (allowed) tile.dataset.on = "";
@@ -121,12 +135,9 @@ function permissionRow(permission: Permission): HTMLElement {
   return row;
 }
 
-/** Rebuilds the rows only when they change, so a focused button survives the many state updates during downloads. */
 function renderPermissions(container: HTMLElement, permissions: readonly Permission[]): void {
-  const key = JSON.stringify([permissions.map((p) => state.permissions[p]), state.settings.hotkey]);
-  if (container.dataset.key === key) return;
-  container.dataset.key = key;
-  container.replaceChildren(...permissions.map(permissionRow));
+  const key = JSON.stringify([permissions, permissions.map((p) => state.permissions[p]), state.settings.hotkey]);
+  renderRows(container, key, () => permissions.map(permissionRow));
 }
 
 // --- home ---------------------------------------------------------------------------------
@@ -314,7 +325,7 @@ function modelState(m: ModelInfo): HTMLElement {
     case "queued":
       return h("span", "model-state", "Waiting");
     case "downloading":
-      return h("span", "model-state", `${Math.floor((m.received / m.bytes) * 100)}%`);
+      return h("span", "model-state percent", `${Math.floor((m.received / m.bytes) * 100)}%`);
     case "error":
       return button("Retry", () => api.download([m.id]));
     case "missing":
@@ -324,6 +335,7 @@ function modelState(m: ModelInfo): HTMLElement {
 
 function modelRow(m: ModelInfo, label: string, sub = "", radio?: { name: string; checked: boolean; onSelect: () => void }): HTMLElement {
   const row = h("div", "model");
+  row.dataset.row = m.id;
   const line = h("div", "model-line");
   if (radio) {
     const input = document.createElement("input");
@@ -353,23 +365,40 @@ function modelRow(m: ModelInfo, label: string, sub = "", radio?: { name: string;
   return row;
 }
 
+/** Download progress and the chosen model change in place, so bars ease and focus stays put. */
+function updateModelRows(): void {
+  for (const m of state.models) {
+    for (const row of document.querySelectorAll<HTMLElement>(`#models-speech [data-row="${m.id}"], #models-cleanup [data-row="${m.id}"]`)) {
+      const bar = row.querySelector<HTMLElement>(".progress");
+      if (bar) setProgress(bar, m.received / m.bytes);
+      const percent = row.querySelector(".percent");
+      if (percent) percent.textContent = `${Math.floor((m.received / m.bytes) * 100)}%`;
+      const radio = row.querySelector<HTMLInputElement>("input[type=radio]");
+      if (radio) radio.checked = state.settings.swedishModel === m.id;
+    }
+  }
+}
+
 function renderModels(): void {
   const model = (id: string) => state.models.find((m) => m.id === id)!;
+  // Rows are rebuilt only when a status changes; progress and the radio choice update in place.
+  const key = JSON.stringify(state.models.map((m) => [m.status, m.error]));
   const swedish = (id: Settings["swedishModel"], sub: string) =>
     modelRow(model(id), `Svenska · ${model(id).name}`, sub, {
       name: "swedish-model",
       checked: state.settings.swedishModel === id,
       onSelect: () => void api.setSettings({ swedishModel: id }),
     });
-  $("models-speech").replaceChildren(
+  renderRows($("models-speech"), key, () => [
     swedish("kb-whisper-medium", "Fast. Recommended for most Macs."),
     swedish("kb-whisper-large", "More accurate, about a third slower."),
     modelRow(model("whisper-large-v3-turbo"), `English · ${model("whisper-large-v3-turbo").name}`),
     modelRow(model("silero-vad"), model("silero-vad").name, "Skips silence before transcribing."),
-  );
+  ]);
   const toggle = $("cleanup-toggle");
   toggle.setAttribute("aria-checked", String(state.settings.smartCleanup));
-  $("models-cleanup").replaceChildren(modelRow(model("gemma-4-e2b-it-qat"), model("gemma-4-e2b-it-qat").name, "Runs on your Mac."));
+  renderRows($("models-cleanup"), key, () => [modelRow(model("gemma-4-e2b-it-qat"), model("gemma-4-e2b-it-qat").name, "Runs on your Mac.")]);
+  updateModelRows();
 }
 
 $("cleanup-toggle").addEventListener("click", () => void api.setSettings({ smartCleanup: !state.settings.smartCleanup }));
