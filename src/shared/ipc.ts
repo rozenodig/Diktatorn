@@ -7,12 +7,15 @@ export const IPC = {
   captureAudio: "capture:audio",
   captureError: "capture:error",
   captureDevice: "capture:device",
+  captureLevel: "capture:level",
   debugStatus: "debug:status",
   debugResult: "debug:result",
   debugRecord: "debug:record",
   debugBench: "debug:bench",
   debugBenchState: "debug:bench-state",
   overlayState: "overlay:state",
+  overlayHide: "overlay:hide",
+  overlayLevel: "overlay:level",
   appState: "app:state",
   appGetState: "app:get-state",
   appSetSettings: "app:set-settings",
@@ -20,6 +23,7 @@ export const IPC = {
   appDownload: "app:download",
   appCancelDownload: "app:cancel-download",
   appCopy: "app:copy",
+  appOpenSettings: "app:open-settings",
 } as const;
 
 /** Keys that can be the dictation hotkey; none of them types anything by itself. */
@@ -28,6 +32,12 @@ export type HotkeyKey = (typeof HOTKEYS)[number];
 export const SWEDISH_MODELS = ["kb-whisper-medium", "kb-whisper-large"] as const;
 export const LANGUAGE_MODES = ["auto", "sv", "en"] as const;
 export const APPEARANCES = ["system", "light", "dark"] as const;
+
+/** The macOS permissions Diktatorn asks for. */
+export const PERMISSIONS = ["microphone", "inputMonitoring", "accessibility"] as const;
+export type Permission = (typeof PERMISSIONS)[number];
+/** Whether each permission is on; null while it isn't known yet, e.g. while the system is still asking. */
+export type Permissions = Record<Permission, boolean | null>;
 
 export interface Settings {
   hotkey: HotkeyKey;
@@ -73,6 +83,7 @@ export interface AppState {
   models: ModelInfo[];
   recent: RecentDictation[];
   dictionary: DictionaryEntry[];
+  permissions: Permissions;
   /** True until every default model has been downloaded once. */
   setup: boolean;
 }

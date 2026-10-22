@@ -1,0 +1,222 @@
+# Diktatorn design brief
+
+The design decisions every screen follows. The values live in [`src/renderer/tokens.css`](../src/renderer/tokens.css), which every window loads; this file explains how to use them. If the two disagree, fix one of them.
+
+## The product
+
+Diktatorn turns speech into text in any Mac app, locally, with Swedish first. You hold a key, talk and release, and the text appears where you were typing. Most of the interface is barely seen: a pill at the bottom of the screen while you talk, and an icon in the menu bar. The app window is for setting up, checking status and changing settings.
+
+## Personality
+
+Friendly, calm and quick. The name is a joke on "dictator", and the product is the opposite of one: it listens and does what you say.
+
+- **Do:** rounded shapes, plain and warm language, and the bright brand gradient, used sparingly. The lowercase wordmark is for surfaces outside the app, like the README; inside the app the name is set in the system font next to the mark, as macOS apps do.
+- **Don't:** anything that commands or shouts. No megaphones, crowns, uniforms, alarm red, all-caps headings or exclamation marks.
+
+## Principles, in priority order
+
+1. **Out of the way.** Dictation happens in other apps. Diktatorn never takes focus from the text field, never delays the first word and never makes you wait for an animation.
+2. **State you can trust.** Whether it is listening, transcribing, done or stuck is always visible, immediately, in words as well as colour.
+3. **Native first.** The system font and macOS text styles, light and dark mode, the sidebar window layout, full keyboard access, and the accessibility settings: Reduce Motion, Reduce Transparency and Increase Contrast. The colours are Rozeno's, not the system's: the window is the brand's palette on Apple's layout conventions, so there is no vibrancy and no system accent colour.
+4. **Simple, not minimal.** Show the common path first and keep advanced choices one level deeper. Add a line of context when it saves the user a question.
+5. **Craft.** Every value comes from a token. A value that isn't on a scale needs a reason.
+
+## Surfaces
+
+| Surface | How often it's seen | Job | Bar |
+| --- | --- | --- | --- |
+| Overlay pill | Every dictation, 100+ times a day | Shows the dictation state | Highest: instant, and legible on any background |
+| Menu bar icon | Always | Presence and the menu | Template image, crisp at 18 pt |
+| App window | A few times a week | Status, settings, dictionary, models | Apple-quality polish |
+| First run and onboarding | Once | Downloads and permissions | Can carry some delight |
+| Debug window | Developers only | Diagnostics | Tokens for colour and type; no polish bar |
+
+## Colour
+
+The palette is Rozeno Digital's. Don't add colours outside it.
+
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `--bg` | `#F4F7FA` | `#0B0F19` | Window background |
+| `--sidebar` | `#FFFFFF` | `#090D16` | Sidebar |
+| `--card` | `#FFFFFF` | `#0F1421` | Groups, cards, rows |
+| `--surface2` / `--surface3` | `#EEF2F7` / `#E4EAF1` | `#151B2A` / `#1C2333` | Fields and chips / hover and selection |
+| `--text` | `#0B0F19` | `#F2F5FA` | Primary text |
+| `--muted` | `#4F5A6B` | `#9AA4B8` | Secondary text |
+| `--dim` | `#5F6A7D` | `#7A849A` | Section labels, metadata |
+| `--border` / `--hairline` | `#DFE5EE` / `#E9EEF4` | `#1E2536` / `#161C2A` | Outlines / dividers inside a group |
+| `--border-strong` | `#C5CEDB` | `#2E3750` | Replaces `--border` under Increase Contrast |
+| `--control-border` | `#7F8897` | `#656E82` | The outline of fields, the chosen segment and the switch track: `--dim` mixed 80% into `--card` |
+| `--brand` | `#006E9C` | `#00C2FF` | Brand-coloured text and links (AA in both themes) |
+| `--ring` | `#0077A8` | `#00C2FF` | Focus ring |
+| `--ok` / `--warn` / `--err` | `#137636` / `#A44D08` / `#C81E2E` | `#2FD36F` / `#FFB020` / `#FF5C6C` | Status |
+| `--brand-blue` / `--brand-mint` | `#00C2FF` / `#00F0B8` | same | The gradient's two ends; also gradient stops in SVG and the hands-free lock |
+| `--grad` | `--brand-blue` → `--brand-mint` at 45° | same | Brand and "on" states |
+| `--on-grad` | `#0B0F19` | same | Text, glyphs and the radio's centre on the gradient |
+| `--switch-knob` | `#FFFFFF` | same | The switch knob |
+| `--hud-*` | navy at 88%, with text, muted, ok, err, border, track and shadow | same | The overlay pill, which is dark in both themes |
+
+**Rules**
+
+- The gradient marks the brand and things that are on: the icon, primary buttons, switches that are on, progress, and the listening state. Use it on small elements, never as the background of a large area.
+- Text on the gradient is navy (`--on-grad`): 9.3:1 on the blue end and 12.9:1 on the mint end. White fails at 2.1:1 and 1.5:1.
+- Status is never shown by colour alone; a word always goes with it.
+- **Status colours:** `--ok` for allowed or done, `--warn` for something the user needs to do, and `--err` only for something that failed, like a download. Home's dot is the gradient when ready, `--dim` while getting ready and `--warn` when it needs attention; "not done yet" is never red. Usual states stay quiet: "Downloaded" is `--muted` with a check, so colour is left for what needs a look.
+- `--dim` is for text on `--bg`, `--card` and `--surface2`. On dark `--surface3` it drops to 4.2:1, so use `--muted` there.
+- A control whose outline is what identifies it (a text field, a select, the chosen segment, a switch) uses `--control-border`, which is 3:1 against its background. `--border` (about 1.2:1) is for surfaces, and for buttons, whose label identifies them. A switch that is on gets a `--brand` rim, because the gradient alone is 2.1:1 or less on a light card.
+
+**Contrast**, checked with the WCAG formula:
+
+| Pair | Light | Dark |
+| --- | --- | --- |
+| `--text` on `--bg` / `--card` | 17.8 / 19.2 | 17.5 / 16.8 |
+| `--muted` on `--bg` / `--surface3` | 6.5 / 5.8 | 7.6 / 6.3 |
+| `--dim` on `--bg` / `--surface2` | 5.1 / 4.9 | 5.1 / 4.6 |
+| `--brand` on `--bg` | 5.3 | 9.3 |
+| `--ok` / `--warn` / `--err` on `--card` | 5.7 / 5.8 / 5.7 | 9.3 / 10.1 / 6.1 |
+| `--ring` on `--bg` (needs 3:1) | 4.7 | 9.3 |
+| `--control-border` on `--card` / `--bg` (needs 3:1) | 3.6 / 3.3 | 3.6 / 3.7 |
+| `--hud-text` / `--hud-muted` on the pill over white | 12.8 / 5.6 | same |
+
+## Typography
+
+The system font (SF Pro, through `--font-ui`) in the macOS text styles. Weights are 400, 500 and 600 only.
+
+| Style | Token | Size | Weight | Tracking | Use |
+| --- | --- | --- | --- | --- | --- |
+| Large title | `--text-large-title` | 26 px | 600 | −0.016em | Onboarding headline |
+| Title 1 | `--text-title-1` | 22 px | 600 | −0.01em | View titles |
+| Title 3 | `--text-title-3` | 15 px | 500–600 | 0 | Group titles, the app name in the sidebar |
+| Body | `--text-body` | 13 px | 400–500 | 0 | Everything else |
+| Callout | `--text-callout` | 12 px | 400 | 0 | Second lines, notes, chips |
+| Caption | `--text-caption` | 11 px | 400, or 600 uppercase at +0.06em | 0 / `--tracking-label` | Metadata, or section labels |
+
+- Sentence case everywhere. Uppercase only for caption-size section labels.
+- Tracking tightens as text grows: titles are negative, body is 0.
+- Line height is 1.45 for body (`--leading-body`) and 1.2 for titles (`--leading-tight`).
+- Numbers that change or line up (sizes, percentages, times) use `font-variant-numeric: tabular-nums`.
+
+## Spacing and layout
+
+A 4 px grid: `--space-1` (4) to `--space-12` (48).
+
+- Rhythm: 8 px inside controls, 12–16 px inside rows and cards, 24–32 px between sections.
+- 1–2 px values are optical adjustments (insets, borders), not spacing.
+- Layout constants: the window is 780 × 540 px, the sidebar 200 px wide and content at most 620 px wide. A 40 px strip at the top drags the window, and the traffic lights sit at 18, 18.
+- Control sizes are sizes, not spacing: sidebar rows are 32 px tall, icon buttons and permission icon tiles 28 px, radios 16 px, the switch 38 × 22 px, the status dot 12 px, and the model rows' status column 96 px, so sizes line up whatever a row shows. The first-run screen fits the default window without scrolling.
+- Intro text is at most 64 characters wide.
+
+## Shape
+
+| Token | Radius | Use |
+| --- | --- | --- |
+| `--radius-xs` | 4 px | Tiny marks, key caps |
+| `--radius-sm` | 6 px | Items inset 2 px inside an 8 px container |
+| `--radius-md` | 8 px | Buttons, fields, segmented tracks, sidebar items |
+| `--radius-lg` | 10 px | Groups, cards, notices |
+| `--radius-pill` | 999 px | Chips, switches, progress, the overlay pill |
+
+Nested shapes are concentric: inner radius = outer radius − inset. A segmented track at 8 px with a 2 px inset gets 6 px segments.
+
+## Depth and materials
+
+- Surfaces are flat and separated by hairlines (`--border`, `--hairline`), not shadows.
+- Shadows are only for things that float or sit raised: the selected segment (`--shadow-raised`), the switch knob (`--shadow-knob`) and the overlay pill (`--hud-shadow`).
+- The overlay pill is navy at 88% with a light hairline. On a dark wallpaper the fill alone is 1.1:1, so the hairline is what keeps its edge visible.
+- The overlay window (360 × 96 px) is larger than the pill, so the shadow fits inside it instead of ending in a hard edge.
+- Reduce Transparency makes the pill opaque, and Increase Contrast strengthens borders. `tokens.css` handles both.
+- No native sidebar vibrancy. Electron's `sidebar` material would replace the Rozeno sidebar colour with a translucent system one, and the palette comes only from the tokens.
+
+## Motion
+
+Decide by frequency first, then purpose, then curve and duration.
+
+| What | How often | Motion |
+| --- | --- | --- |
+| Overlay appears on the hotkey | 100+ times a day, from the keyboard | None: it appears at full opacity in its first frame. It leaves with a `--duration-quick` fade and a shrink to `--enter-scale`. |
+| Listening | During every dictation | A wave whose height follows the voice. It travels left to right, in reading direction, and only while there is sound, so a still line means silence. |
+| Transcribing, done, error | Every dictation | The indicator crossfades in `--duration-fast`: the wave settles flat and a glint runs along it, then a check or "!" appears, then the pill leaves. |
+| Switching sections in the app window | Tens of times a day | None. Instant. |
+| Press | Constantly | Buttons and segments scale to `--press-scale` over `--duration-quick` with `--ease-out`. Sidebar rows darken instead, like the system's. |
+| Hover, colour | Constantly | `--duration-fast` with `ease` |
+| Switches, segmented controls | Occasionally | `--duration-fast` |
+| Download progress | During downloads | `transform: scaleX()`, linear |
+| First run, onboarding | Once | May enter with a fade and a `--enter-offset` rise, `--stagger` (60 ms) apart |
+| Getting ready | At launch | The status dot pulses three times over `--duration-loop` and then holds, so nothing blinks for more than 5 s |
+
+| Curve | Token | For |
+| --- | --- | --- |
+| Strong ease-out | `--ease-out` | Entering, leaving, press feedback |
+| Strong ease-in-out | `--ease-in-out` | Things moving on screen, repeating fades |
+| `ease` | (built in) | Hover and colour |
+| `linear` | (built in) | Progress, and the transcribing glint that stands in for it |
+
+- Durations come from `--duration-quick` (120 ms), `--duration-fast` (150) and `--duration-slow` (250). Interface motion stays under 300 ms.
+- Repeating indicators are the exception, and slower on purpose so they read as calm: `--duration-sweep` (900 ms) for one pass of the glint, `--duration-loop` (1200 ms) for one breath of a pulse.
+- Never `ease-in`, never `transition: all`, and never start from `scale(0)`.
+- Animate `transform` and `opacity` only. The one exception is the overlay's wave, an SVG path redrawn each frame from the voice; it is 28 × 16 px and costs nothing measurable.
+- Anything driven frame by frame is timed in milliseconds, not frames, so it moves the same on 60 and 120 Hz displays.
+- Use transitions rather than keyframes for anything that can retrigger, so it can be interrupted.
+- **Reduce Motion means gentler, not none.** The movement tokens (`--press-scale`, `--enter-scale`, `--enter-offset`) switch to no movement, while fades and colour changes stay. In the overlay, the wave keeps one shape and the voice changes its brightness instead, and the transcribing glint becomes a slow fade of the whole line.
+
+## Iconography
+
+- **The mark** is the Speaking D (`assets/icon`): a navy glyph on the gradient tile. Wherever the brand appears inside the app, use the mark, not a gradient square.
+- **Interface icons:** SF Symbols can't be drawn in a web view, so icons are hand-drawn SVG in the same spirit: a 16 px grid, 1.5 px strokes, round caps and joins, `currentColor`. They live with the mark in one sprite at the top of `app.html` (microphone, keyboard, accessibility, check, remove).
+- **Menu bar:** a template image, black with alpha, at 18 pt with an @2x version, drawn on the pixel grid so its straight edges land on whole pixels; the bubble's curves are anti-aliased.
+
+## Accessibility
+
+- **Contrast:** text is at least 4.5:1. The focus ring and any boundary that identifies a control are at least 3:1.
+- **Focus:** a 2 px `--ring` outline, offset 2 px, on `:focus-visible`, text fields included.
+- **Focus survives updates.** State arrives several times a second during downloads, so rows are rebuilt only when what they show changes. When a rebuild removes the focused control, focus moves to the same control in the same row, then to the row, then to the view's title; it never falls to the page.
+- **Keyboard:** everything is reachable with Tab, and nothing traps focus. Segmented controls behave as radio groups (arrow keys, one tab stop), and Esc cancels.
+- **Semantics:** native elements first. Custom controls get the right role and state (switch, `aria-checked`, `progressbar` with `aria-valuenow`). Repeated buttons carry the thing they act on in their name ("Download KB Whisper large"), and a control's name is its title, with the second line as its description.
+- **Announcements:** one polite live region says what changed and would otherwise be missed: a permission allowed, a download done or failed, Home's status, "Copied". Progress is never announced.
+- **Language:** pages are `lang="en"`, and Swedish words are marked `lang="sv"`.
+- **Zoom:** View has Actual Size, Zoom In and Zoom Out (⌘0, ⌘+, ⌘−).
+- **Targets:** at least 24 × 24 px (WCAG 2.2 AA).
+- **System settings:** light and dark, Reduce Motion, Reduce Transparency and Increase Contrast are all handled by the tokens.
+
+## Permissions and onboarding
+
+Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the dictation key) and Accessibility (to type the text).
+
+- **First run** shows one screen: the mark, "Welcome to Diktatorn", an "Allow access" group with all three permissions, and one combined download bar for the first-run models. It enters once with a staggered fade and rise. When the downloads finish, the window switches to Home.
+- **Each permission row** has an icon tile, the name, one line on why it's needed, and either "Allowed" with a check or an "Open System Settings" button for that exact pane. The tile turns to the gradient once the permission is on, and the word says it too.
+- **Status is live.** The window updates as soon as a permission is switched on, without a restart or a click: the main process re-checks the microphone every second while it's off, the helper watches Accessibility, and it restarts itself when Input Monitoring comes on.
+- **After first run,** Home shows only the permissions that are missing, in the same rows, and the status reads "Needs your attention".
+- The buttons open fixed System Settings URLs held by the main process; the window can only name which permission.
+
+## The overlay pill
+
+The pill shows one state at a time, always as an indicator plus words:
+
+| State | Indicator | Words (from the main process) |
+| --- | --- | --- |
+| Listening | The wave, in the gradient | "Listening" |
+| Hands-free | A mint lock, then the wave | "Hands-free · tap fn to finish" |
+| Transcribing | A line with a gradient glint | "Transcribing" |
+| Done | A check in `--hud-ok` | "Inserted", "Copied to clipboard" |
+| Error | A circled "!" in `--hud-err` | "Something went wrong", "Still getting ready" |
+
+- The microphone level (0–1, from the loudness in decibels) reaches the overlay 20 times a second while it is shown. The wave smooths between updates, rising quickly (40 ms) and falling gently (130 ms), and travels at most 27 radians a second.
+- The window hides only after the fade has been painted, so the next dictation never shows a frame of the previous one.
+
+## Copy
+
+- **English**, in sentence case.
+- **Short and specific.** Buttons are verbs: "Download", "Retry", "Open System Settings".
+- **Say what happened and what to do:** "Diktatorn needs Input Monitoring to hear the dictation key."
+- **No exclamation marks, no blame,** and no jargon in the app window: no "ASR", "VAD" or "LLM" (the debug window is exempt).
+- **Keys are written as they appear on the keyboard:** fn, ⌥, ⌘, esc.
+
+## Known gaps
+
+Gaps found by audits and reviews are listed here until they are fixed.
+
+- **VoiceOver and the overlay:** the pill announces through a polite live region in a window that never takes focus. Whether VoiceOver reads it there hasn't been tested; if it doesn't, the main process should post the announcement instead.
+- **Status texts:** the texts on Home's issue cards come from the main process and are written for developers ("language model", "npm run build:native"). They need the copy rules above.
+- **Model rows:** the English and voice detection rows start at the group's edge, while the Swedish rows' titles sit after their radio.
+- **Overlay width:** the pill resizes at once when its words change; only the indicator crossfades.
+- **The mark's glyph** is copied into the sprite in `app.html` from `assets/icon`; nothing checks that the two still match.

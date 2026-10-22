@@ -1,5 +1,5 @@
 // Shape of the API that preload.cts exposes on window.diktatorn.
-import type { AppState, BenchCommand, BenchState, DebugResult, DictionaryEntry, OverlayUpdate, Settings, StatusUpdate } from "../shared/ipc.ts";
+import type { AppState, BenchCommand, BenchState, DebugResult, DictionaryEntry, OverlayUpdate, Permission, Settings, StatusUpdate } from "../shared/ipc.ts";
 
 declare global {
   interface Window {
@@ -12,9 +12,14 @@ declare global {
         started(micStartMs: number): void;
         audio(samples: Float32Array): void;
         error(message: string): void;
+        /** How loud the microphone is while recording, 0 (silence) to 1 (loud speech). */
+        level(level: number): void;
       };
       overlay: {
         onState(cb: (update: OverlayUpdate) => void): void;
+        /** The pill should fade out; the window hides once it has. */
+        onHide(cb: () => void): void;
+        onLevel(cb: (level: number) => void): void;
       };
       app: {
         getState(): Promise<AppState>;
@@ -24,6 +29,8 @@ declare global {
         download(ids: string[]): void;
         cancelDownload(): void;
         copy(text: string): void;
+        /** Opens the System Settings pane where the permission is switched on. */
+        openSettings(permission: Permission): void;
       };
       debug: {
         onStatus(cb: (status: StatusUpdate) => void): void;

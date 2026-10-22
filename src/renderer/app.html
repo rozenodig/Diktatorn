@@ -1,43 +1,97 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:" />
     <title>Diktatorn</title>
+    <link rel="stylesheet" href="./tokens.css" />
     <link rel="stylesheet" href="./app.css" />
   </head>
   <body>
-    <div class="titlebar" aria-hidden="true"></div>
+    <!-- The mark (from assets/icon, cropped to the tile) and the interface icons: a 16 px grid, 1.5 px strokes. -->
+    <svg class="sprite" aria-hidden="true">
+      <defs>
+        <linearGradient id="mark-tile" gradientUnits="userSpaceOnUse" x1="100" y1="924" x2="924" y2="100">
+          <stop offset="0" class="stop-blue" />
+          <stop offset="1" class="stop-mint" />
+        </linearGradient>
+        <path id="mark-squircle" fill="url(#mark-tile)" d="M383.4 100H640.6C722.2 100 763 100 806.9 113.9C854.9 131.3 892.7 169.1 910.1 217.1C924 261 924 301.8 924 383.4V640.6C924 722.2 924 763 910.1 806.9C892.7 854.9 854.9 892.7 806.9 910.1C763 924 722.2 924 640.6 924H383.4C301.8 924 261 924 217.1 910.1C169.1 892.7 131.3 854.9 113.9 806.9C100 763 100 722.2 100 640.6V383.4C100 301.8 100 261 113.9 217.1C131.3 169.1 169.1 131.3 217.1 113.9C261 100 301.8 100 383.4 100Z" />
+      </defs>
+      <symbol id="mark" viewBox="100 100 824 824">
+        <use href="#mark-squircle" />
+        <path transform="translate(512 512) scale(5.5) translate(-50 -50)" class="glyph" fill-rule="evenodd" d="M32 13H48a33 33 0 0 1 0 66H44.5Q40 79 36.5 80.9L18.2 90.6c-1.8 1-3.8-.8-3-2.7L20.4 75.7Q22 72 22 67.5V23a10 10 0 0 1 10-10zM46.5 33.5a4.5 4.5 0 0 1 9 0v25a4.5 4.5 0 0 1-9 0z" />
+      </symbol>
+      <symbol id="mark-small" viewBox="100 100 824 824">
+        <use href="#mark-squircle" />
+        <path transform="scale(64)" class="glyph" fill-rule="evenodd" d="M6.2 4H8.5a3.5 3.5 0 0 1 0 7H7.4L3.8 13.2c-.3.2-.7-.1-.6-.4L5 9.6V5.2A1.2 1.2 0 0 1 6.2 4zM8 6h1v3H8z" />
+      </symbol>
+      <symbol id="icon-microphone" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5.75" y="1.75" width="4.5" height="8" rx="2.25" />
+        <path d="M3.25 7.75a4.75 4.75 0 0 0 9.5 0M8 12.5v1.75" />
+      </symbol>
+      <symbol id="icon-keyboard" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1.75" y="3.75" width="12.5" height="8.5" rx="1.75" />
+        <path d="M4.75 6.75h.5M7.75 6.75h.5M10.75 6.75h.5M5.5 9.5h5" />
+      </symbol>
+      <symbol id="icon-accessibility" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="2.75" r="1.5" fill="currentColor" stroke="none" />
+        <path d="M3.25 5.75 8 6.75l4.75-1M8 6.75v3M8 9.75 5.75 14.25M8 9.75l2.25 4.5" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
+      </symbol>
+      <symbol id="icon-remove" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5" />
+      </symbol>
+    </svg>
 
-    <section id="setup" class="setup" hidden aria-labelledby="setup-title">
+    <div class="titlebar" aria-hidden="true"></div>
+    <div id="announcer" class="visually-hidden" role="status" aria-live="polite"></div>
+
+    <main id="setup" class="setup" hidden aria-labelledby="setup-title">
       <div class="setup-card">
-        <div class="mark mark-lg" aria-hidden="true"></div>
-        <h1 id="setup-title">Setting up Diktatorn</h1>
-        <p class="lead">Downloading the models that run on your Mac. Nothing you say ever leaves it.</p>
-        <div id="setup-models" class="setup-models"></div>
-        <p id="setup-note" class="note">You can close this window. Downloads continue in the menu bar.</p>
+        <header class="setup-head">
+          <svg class="mark mark-lg" aria-hidden="true"><use href="#mark" /></svg>
+          <h1 id="setup-title">Welcome to Diktatorn</h1>
+          <p class="lead">Dictation that runs on your Mac. Nothing you say ever leaves it.</p>
+        </header>
+        <div class="setup-step">
+          <h2 id="setup-access-title">Allow access</h2>
+          <div id="setup-permissions" class="group" role="group" aria-labelledby="setup-access-title"></div>
+        </div>
+        <div class="setup-step">
+          <h2 id="setup-download-title">Download</h2>
+          <div class="group">
+            <div class="model">
+              <div class="model-line">
+                <div class="row-title">Speech and cleanup models<span id="setup-download-sub" class="row-sub"></span></div>
+                <span id="setup-download-state" class="model-state"></span>
+              </div>
+              <div id="setup-progress" class="progress" role="progressbar" aria-labelledby="setup-download-title" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </main>
 
     <div id="main" class="layout">
       <nav class="sidebar" aria-label="Sections">
-        <div class="brand"><span class="mark" aria-hidden="true"></span>Diktatorn</div>
+        <div class="brand"><svg class="mark" aria-hidden="true"><use href="#mark-small" /></svg>Diktatorn</div>
         <button class="nav" data-view="home">Home</button>
         <button class="nav" data-view="general">General</button>
         <button class="nav" data-view="dictionary">Dictionary</button>
         <button class="nav" data-view="models">Models</button>
       </nav>
 
-      <main class="content">
+      <main id="content" class="content">
         <section data-panel="home" aria-labelledby="home-title">
           <div class="hero">
             <span id="home-dot" class="dot" aria-hidden="true"></span>
-            <div>
-              <h1 id="home-title">Ready to dictate</h1>
-              <p id="home-hint" class="lead"></p>
-            </div>
+            <h1 id="home-title">Ready to dictate</h1>
+            <p id="home-hint" class="lead"></p>
+            <div id="home-chips" class="chips"></div>
           </div>
-          <div id="home-chips" class="chips"></div>
+          <div id="home-permissions" class="group" role="group" aria-label="Permissions" hidden></div>
           <div id="home-issues" class="issues" role="status" aria-live="polite"></div>
           <h2>Recent</h2>
           <div id="home-recent" class="recent"></div>
@@ -47,7 +101,7 @@
           <h1 id="general-title">General</h1>
           <div class="group">
             <div class="row">
-              <label for="hotkey"><span class="row-title">Dictation key</span><span class="row-sub">Hold to talk, double-tap for hands-free, Esc cancels.</span></label>
+              <label for="hotkey"><span class="row-title">Dictation key</span><span class="row-sub">Hold to talk, double-tap for hands-free, esc cancels.</span></label>
               <select id="hotkey">
                 <option value="fn">fn / Globe</option>
                 <option value="rightOption">Right Option ⌥</option>
@@ -57,19 +111,19 @@
             </div>
             <div class="row">
               <label for="microphone"><span class="row-title">Microphone</span><span class="row-sub">Used for every dictation.</span></label>
-              <select id="microphone"></select>
+              <select id="microphone"><option value="">System default</option></select>
             </div>
             <div class="row">
-              <div id="language-label"><span class="row-title">Language</span><span class="row-sub">Auto picks Swedish or English for each dictation.</span></div>
-              <div class="segmented" role="radiogroup" aria-labelledby="language-label">
+              <div><span id="language-label" class="row-title">Language</span><span id="language-sub" class="row-sub">Auto picks Swedish or English for each dictation.</span></div>
+              <div class="segmented" role="radiogroup" aria-labelledby="language-label" aria-describedby="language-sub">
                 <button role="radio" data-language="auto">Auto</button>
-                <button role="radio" data-language="sv">Svenska</button>
+                <button role="radio" data-language="sv" lang="sv">Svenska</button>
                 <button role="radio" data-language="en">English</button>
               </div>
             </div>
             <div class="row">
-              <div id="appearance-label"><span class="row-title">Appearance</span><span class="row-sub">System follows your Mac's light or dark mode.</span></div>
-              <div class="segmented" role="radiogroup" aria-labelledby="appearance-label">
+              <div><span id="appearance-label" class="row-title">Appearance</span><span id="appearance-sub" class="row-sub">System follows your Mac's light or dark mode.</span></div>
+              <div class="segmented" role="radiogroup" aria-labelledby="appearance-label" aria-describedby="appearance-sub">
                 <button role="radio" data-appearance="system">System</button>
                 <button role="radio" data-appearance="light">Light</button>
                 <button role="radio" data-appearance="dark">Dark</button>
@@ -98,8 +152,8 @@
           <h2>Smart cleanup</h2>
           <div class="group">
             <div class="row">
-              <div id="cleanup-label"><span class="row-title">Smart cleanup</span><span class="row-sub">Removes filler words and self-corrections with a local language model.</span></div>
-              <button id="cleanup-toggle" class="switch" role="switch" aria-labelledby="cleanup-label"><span></span></button>
+              <div><span id="cleanup-label" class="row-title">Smart cleanup</span><span id="cleanup-sub" class="row-sub">Removes filler words and self-corrections with a local language model.</span></div>
+              <button id="cleanup-toggle" class="switch" role="switch" aria-labelledby="cleanup-label" aria-describedby="cleanup-sub"><span></span></button>
             </div>
             <div id="models-cleanup"></div>
           </div>
