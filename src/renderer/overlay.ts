@@ -31,8 +31,8 @@ function drawWave(amplitude: number): void {
   let d = "";
   for (let x = WAVE.from; x <= WAVE.to; x++) {
     const t = (x - WAVE.from) / (WAVE.to - WAVE.from);
-    // One and a half periods, pinched at both ends.
-    const y = WAVE.middle + amplitude * Math.sin(Math.PI * t) * Math.sin(3 * Math.PI * t + phase);
+    // One and a half periods, pinched at both ends, travelling left to right as the phase grows.
+    const y = WAVE.middle + amplitude * Math.sin(Math.PI * t) * Math.sin(3 * Math.PI * t - phase);
     d += `${x === WAVE.from ? "M" : "L"}${x} ${y.toFixed(2)}`;
   }
   wave.setAttribute("d", d);

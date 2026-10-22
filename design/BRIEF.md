@@ -130,7 +130,7 @@ Decide by frequency first, then purpose, then curve and duration.
 | What | How often | Motion |
 | --- | --- | --- |
 | Overlay appears on the hotkey | 100+ times a day, from the keyboard | None: it appears at full opacity in its first frame. It leaves with a `--duration-quick` fade and a shrink to `--enter-scale`. |
-| Listening | During every dictation | A wave whose height follows the voice. It travels only while there is sound, so a still line means silence. |
+| Listening | During every dictation | A wave whose height follows the voice. It travels left to right, in reading direction, and only while there is sound, so a still line means silence. |
 | Transcribing, done, error | Every dictation | The indicator crossfades in `--duration-fast`: the wave settles flat and a glint runs along it, then a check or "!" appears, then the pill leaves. |
 | Switching sections in the app window | Tens of times a day | None. Instant. |
 | Press | Constantly | Buttons and segments scale to `--press-scale` over `--duration-quick` with `--ease-out`. Sidebar rows darken instead, like the system's. |
