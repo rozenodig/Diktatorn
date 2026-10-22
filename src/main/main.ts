@@ -571,7 +571,15 @@ models.on("ready", (id: ModelId) => {
 app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "media"));
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === "media");
-  Menu.setApplicationMenu(Menu.buildFromTemplate([{ role: "appMenu" }, { role: "editMenu" }, { role: "windowMenu" }]));
+  // View has only the zoom items, so text in the app window can be made larger (⌘+, ⌘−, ⌘0).
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      { role: "appMenu" },
+      { role: "editMenu" },
+      { label: "View", submenu: [{ role: "resetZoom" }, { role: "zoomIn" }, { role: "zoomOut" }] },
+      { role: "windowMenu" },
+    ]),
+  );
 
   await settings.load();
   nativeTheme.themeSource = settings.current.appearance;

@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
@@ -46,8 +46,9 @@
     </svg>
 
     <div class="titlebar" aria-hidden="true"></div>
+    <div id="announcer" class="visually-hidden" role="status" aria-live="polite"></div>
 
-    <section id="setup" class="setup" hidden aria-labelledby="setup-title">
+    <main id="setup" class="setup" hidden aria-labelledby="setup-title">
       <div class="setup-card">
         <header class="setup-head">
           <svg class="mark mark-lg" aria-hidden="true"><use href="#mark" /></svg>
@@ -71,7 +72,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </main>
 
     <div id="main" class="layout">
       <nav class="sidebar" aria-label="Sections">
@@ -82,7 +83,7 @@
         <button class="nav" data-view="models">Models</button>
       </nav>
 
-      <main class="content">
+      <main id="content" class="content">
         <section data-panel="home" aria-labelledby="home-title">
           <div class="hero">
             <span id="home-dot" class="dot" aria-hidden="true"></span>
@@ -110,19 +111,19 @@
             </div>
             <div class="row">
               <label for="microphone"><span class="row-title">Microphone</span><span class="row-sub">Used for every dictation.</span></label>
-              <select id="microphone"></select>
+              <select id="microphone"><option value="">System default</option></select>
             </div>
             <div class="row">
-              <div id="language-label"><span class="row-title">Language</span><span class="row-sub">Auto picks Swedish or English for each dictation.</span></div>
-              <div class="segmented" role="radiogroup" aria-labelledby="language-label">
+              <div><span id="language-label" class="row-title">Language</span><span id="language-sub" class="row-sub">Auto picks Swedish or English for each dictation.</span></div>
+              <div class="segmented" role="radiogroup" aria-labelledby="language-label" aria-describedby="language-sub">
                 <button role="radio" data-language="auto">Auto</button>
-                <button role="radio" data-language="sv">Svenska</button>
+                <button role="radio" data-language="sv" lang="sv">Svenska</button>
                 <button role="radio" data-language="en">English</button>
               </div>
             </div>
             <div class="row">
-              <div id="appearance-label"><span class="row-title">Appearance</span><span class="row-sub">System follows your Mac's light or dark mode.</span></div>
-              <div class="segmented" role="radiogroup" aria-labelledby="appearance-label">
+              <div><span id="appearance-label" class="row-title">Appearance</span><span id="appearance-sub" class="row-sub">System follows your Mac's light or dark mode.</span></div>
+              <div class="segmented" role="radiogroup" aria-labelledby="appearance-label" aria-describedby="appearance-sub">
                 <button role="radio" data-appearance="system">System</button>
                 <button role="radio" data-appearance="light">Light</button>
                 <button role="radio" data-appearance="dark">Dark</button>
@@ -151,8 +152,8 @@
           <h2>Smart cleanup</h2>
           <div class="group">
             <div class="row">
-              <div id="cleanup-label"><span class="row-title">Smart cleanup</span><span class="row-sub">Removes filler words and self-corrections with a local language model.</span></div>
-              <button id="cleanup-toggle" class="switch" role="switch" aria-labelledby="cleanup-label"><span></span></button>
+              <div><span id="cleanup-label" class="row-title">Smart cleanup</span><span id="cleanup-sub" class="row-sub">Removes filler words and self-corrections with a local language model.</span></div>
+              <button id="cleanup-toggle" class="switch" role="switch" aria-labelledby="cleanup-label" aria-describedby="cleanup-sub"><span></span></button>
             </div>
             <div id="models-cleanup"></div>
           </div>
