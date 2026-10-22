@@ -55,6 +55,14 @@ final class Inserter {
 
     var accessibilityTrusted: Bool { AXIsProcessTrusted() }
 
+    /// Shows the system's Accessibility prompt, at most once per run. It also lists Diktatorn,
+    /// switched off, under Accessibility in System Settings, so the user can find it there.
+    func promptForAccessibility() {
+        guard !promptedForAccessibility else { return }
+        promptedForAccessibility = true
+        _ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary)
+    }
+
     /// - dryRun: skip the keystroke (tests; needs no Accessibility).
     /// - pasteboardName: tests use a private pasteboard instead of the user's clipboard.
     func insert(text: String, restoreDelayMs: Int, dryRun: Bool, pasteboardName: String?,
@@ -63,10 +71,7 @@ final class Inserter {
         if !dryRun && !accessibilityTrusted {
             // Without permission to send keystrokes, leave the text on the clipboard for a manual paste.
             _ = writeText(pb, text)
-            if !promptedForAccessibility {
-                promptedForAccessibility = true
-                _ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary)
-            }
+            promptForAccessibility()
             completion(["pasted": false, "restored": false, "note": "accessibility not granted; text left on the clipboard"])
             return
         }

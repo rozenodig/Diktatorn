@@ -7,6 +7,7 @@
 //   out  {"event":"ready","inputMonitoring":true,"accessibility":true,"tap":true,"hid":true}
 //   out  {"event":"permission","inputMonitoring":true} granted while running; exits with code 3 so the
 //                                                      parent restarts it with a tap that receives events
+//   out  {"event":"accessibility","accessibility":true} granted while running; pasting works from now on
 //   out  {"event":"hotkey","down":true,"t":123456.7}   t = monotonic milliseconds
 //   out  {"event":"chord","t":...}                      another key went down while the hotkey was held
 //   out  {"event":"escape","t":...}                     Esc pressed while recording (swallowed if the tap is active)
@@ -91,6 +92,17 @@ readCommands()
 if ProcessInfo.processInfo.environment["DIKTATORN_HELPER_NO_KEYS"] != nil {
     emit(["event": "ready", "inputMonitoring": false, "accessibility": inserter.accessibilityTrusted, "keys": false])
     CFRunLoopRun()
+}
+
+// Accessibility can be switched on while the helper runs, and the app window shows it as soon as it is.
+// The parent restarts the helper once Input Monitoring is on; the restarted helper doesn't ask again.
+if !inserter.accessibilityTrusted {
+    if ProcessInfo.processInfo.environment["DIKTATORN_HELPER_RESTARTED"] == nil { inserter.promptForAccessibility() }
+    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+        guard inserter.accessibilityTrusted else { return }
+        timer.invalidate()
+        emit(["event": "accessibility", "accessibility": true])
+    }
 }
 
 if !CGPreflightListenEventAccess() {

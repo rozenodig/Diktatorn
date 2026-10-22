@@ -1,5 +1,5 @@
 // Shape of the API that preload.cts exposes on window.diktatorn.
-import type { AppState, BenchCommand, BenchState, DebugResult, DictionaryEntry, OverlayUpdate, Settings, StatusUpdate } from "../shared/ipc.ts";
+import type { AppState, BenchCommand, BenchState, DebugResult, DictionaryEntry, OverlayUpdate, Permission, Settings, StatusUpdate } from "../shared/ipc.ts";
 
 declare global {
   interface Window {
@@ -24,6 +24,8 @@ declare global {
         download(ids: string[]): void;
         cancelDownload(): void;
         copy(text: string): void;
+        /** Opens the System Settings pane where the permission is switched on. */
+        openSettings(permission: Permission): void;
       };
       debug: {
         onStatus(cb: (status: StatusUpdate) => void): void;

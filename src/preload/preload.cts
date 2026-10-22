@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld("diktatorn", {
     download: (ids: unknown) => ipcRenderer.send("app:download", ids),
     cancelDownload: () => ipcRenderer.send("app:cancel-download"),
     copy: (text: string) => ipcRenderer.send("app:copy", text),
+    openSettings: (permission: string) => ipcRenderer.send("app:open-settings", permission),
   },
   debug: {
     onStatus: (cb: (status: unknown) => void) => on("debug:status", cb),

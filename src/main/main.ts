@@ -9,6 +9,7 @@ import {
   Menu,
   nativeTheme,
   session,
+  shell,
   systemPreferences,
   type IpcMainEvent,
   type IpcMainInvokeEvent,
@@ -23,6 +24,8 @@ import {
   type BenchCommand,
   type DebugResult,
   type DictionaryEntry,
+  type Permission,
+  type Permissions,
   type RecentDictation,
   type Settings,
   type StatusUpdate,
@@ -85,6 +88,9 @@ let cleanerReady = false;
 let dictionary: DictionaryEntry[] = [];
 /** True until every first-run model is on disk. */
 let setup = false;
+/** As the helper last reported them; null until it has started. */
+const helperPermissions: Omit<Permissions, "microphone"> = { inputMonitoring: null, accessibility: null };
+let microphoneWatch: NodeJS.Timeout | null = null;
 
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const engineRestarts = new RestartPolicy();
@@ -96,7 +102,9 @@ let micStartMs: number | null = null;
 let queue: Promise<void> = Promise.resolve();
 
 function appState(): AppState {
-  return { settings: settings.current, statuses: [...statuses.values()], models: models.info(), recent, dictionary, setup };
+  const mic = systemPreferences.getMediaAccessStatus("microphone");
+  const permissions = { microphone: mic === "granted" ? true : mic === "not-determined" ? null : false, ...helperPermissions };
+  return { settings: settings.current, statuses: [...statuses.values()], models: models.info(), recent, dictionary, permissions, setup };
 }
 
 function pushState(): void {
@@ -276,6 +284,18 @@ async function ensureMicrophone(): Promise<void> {
   const before = systemPreferences.getMediaAccessStatus("microphone");
   const granted = before === "granted" || (await systemPreferences.askForMediaAccess("microphone"));
   setStatus({ key: "mic", ok: granted, text: granted ? "access granted" : `access ${before}; allow in System Settings → Privacy → Microphone` });
+  if (!granted) watchMicrophone();
+}
+
+/** Checks every second until the microphone is switched on in System Settings, so the app window updates. */
+function watchMicrophone(): void {
+  if (microphoneWatch) return;
+  microphoneWatch = setInterval(() => {
+    if (systemPreferences.getMediaAccessStatus("microphone") !== "granted") return;
+    clearInterval(microphoneWatch!);
+    microphoneWatch = null;
+    setStatus({ key: "mic", ok: true, text: "access granted" });
+  }, 1000);
 }
 
 /** (Re)loads the speech models, once they are on disk. Calls are serialised. */
@@ -390,13 +410,21 @@ function applySettings(before: Settings, after: Settings): void {
 }
 
 const PERMISSION_HINT = "Diktatorn in System Settings → Privacy & Security";
+/** The System Settings pane for each permission. These fixed URLs are the only ones the app window can open. */
+const SETTINGS_PANES: Record<Permission, string> = {
+  microphone: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
+  inputMonitoring: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
+  accessibility: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+};
 
-function startHelper(): void {
+/** `restarted`: the helper is coming back after Input Monitoring was switched on, so it won't ask for Accessibility again. */
+function startHelper(restarted = false): void {
   if (!existsSync(binary("diktatorn-helper"))) {
     setStatus({ key: "keys", ok: false, text: "missing helper; run npm run build:native" });
     return;
   }
-  const proc = new JsonLinesProcess("helper", binary("diktatorn-helper"));
+  const env = restarted ? { ...process.env, DIKTATORN_HELPER_RESTARTED: "1" } : process.env;
+  const proc = new JsonLinesProcess("helper", binary("diktatorn-helper"), env);
   helper = proc;
   type HelperEvent = {
     event: string; down?: boolean; t: number; inputMonitoring?: boolean; accessibility?: boolean;
@@ -407,6 +435,8 @@ function startHelper(): void {
       case "ready": {
         proc.request("hotkey", { key: settings.current.hotkey }).catch(() => {});
         const key = KEY_NAMES[settings.current.hotkey];
+        helperPermissions.inputMonitoring = msg.inputMonitoring ?? false;
+        helperPermissions.accessibility = msg.accessibility ?? false;
         setStatus(msg.inputMonitoring
           ? { key: "keys", ok: true, text: `hold ${key} to dictate, double-tap for hands-free (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tapActive ? "active" : msg.tap ? "listen-only, Esc not swallowed" : "off"})` }
           : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; the dictation key starts working as soon as it is on.` });
@@ -416,7 +446,12 @@ function startHelper(): void {
         break;
       }
       case "permission":
+        helperPermissions.inputMonitoring = true;
         setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting helper…" });
+        break;
+      case "accessibility":
+        helperPermissions.accessibility = true;
+        setStatus({ key: "paste", ok: true, text: "pastes into the frontmost app" });
         break;
       case "debug":
         console.log(`[helper] debug ${JSON.stringify(msg)}`);
@@ -440,7 +475,7 @@ function startHelper(): void {
   });
   proc.on("exit", (code: number | null) => {
     if (helper !== proc) return; // superseded or shutting down
-    if (code === HELPER_EXIT_PERMISSION_GRANTED) startHelper();
+    if (code === HELPER_EXIT_PERMISSION_GRANTED) startHelper(true);
     else setStatus({ key: "keys", ok: false, text: `helper exited (code ${code})` });
   });
 }
@@ -514,6 +549,11 @@ ipcMain.on(IPC.appCancelDownload, (e) => {
 });
 ipcMain.on(IPC.appCopy, (e, text: unknown) => {
   if (fromApp(e) && typeof text === "string") clipboard.writeText(text);
+});
+ipcMain.on(IPC.appOpenSettings, (e, permission: unknown) => {
+  if (fromApp(e) && typeof permission === "string" && Object.hasOwn(SETTINGS_PANES, permission)) {
+    void shell.openExternal(SETTINGS_PANES[permission as Permission]);
+  }
 });
 
 models.on("change", () => {
