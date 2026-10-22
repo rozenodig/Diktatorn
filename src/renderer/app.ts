@@ -1,7 +1,15 @@
 // App window: status and recent dictations, settings, dictionary and models, plus the
-// first-run setup screen. Everything shown comes from the main process's AppState; changes
-// go back through the bridge and return as a new state.
-import { FIRST_RUN_MODELS, type AppState, type ModelInfo, type Settings, type StatusUpdate } from "../shared/ipc.ts";
+// first-run setup screen with the permissions. Everything shown comes from the main process's
+// AppState; changes go back through the bridge and return as a new state.
+import {
+  FIRST_RUN_MODELS,
+  PERMISSIONS,
+  type AppState,
+  type ModelInfo,
+  type Permission,
+  type Settings,
+  type StatusUpdate,
+} from "../shared/ipc.ts";
 
 const api = window.diktatorn.app;
 type View = "home" | "general" | "dictionary" | "models";
@@ -23,6 +31,24 @@ function button(label: string, onClick: () => void, cls = "button"): HTMLButtonE
   return b;
 }
 
+/** An icon from the sprite in app.html. */
+function icon(name: string, cls = "icon"): SVGSVGElement {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("class", cls);
+  svg.setAttribute("aria-hidden", "true");
+  const use = document.createElementNS(ns, "use");
+  use.setAttribute("href", `#icon-${name}`);
+  svg.append(use);
+  return svg;
+}
+
+/** Sets a progress bar's fill and value; the fill scales rather than resizing, so nothing reflows. */
+function setProgress(bar: HTMLElement, fraction: number): void {
+  bar.querySelector<HTMLElement>("span")!.style.transform = `scaleX(${fraction})`;
+  bar.setAttribute("aria-valuenow", String(Math.floor(fraction * 100)));
+}
+
 const formatBytes = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
 
 // --- navigation ---------------------------------------------------------------------------
@@ -42,6 +68,67 @@ for (const nav of document.querySelectorAll<HTMLElement>(".nav")) {
   nav.addEventListener("click", () => show(nav.dataset.view as View));
 }
 
+// Segmented controls are radio groups: one tab stop (the chosen segment), and the arrow keys
+// move the choice.
+for (const group of document.querySelectorAll<HTMLElement>(".segmented")) {
+  group.addEventListener("keydown", (e) => {
+    const step = ({ ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 } as Record<string, number>)[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const segments = [...group.querySelectorAll<HTMLElement>("[role=radio]")];
+    const next = segments[(segments.indexOf(e.target as HTMLElement) + step + segments.length) % segments.length]!;
+    next.focus();
+    next.click();
+  });
+}
+
+function renderSegments(attribute: string, value: string): void {
+  for (const b of document.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+    const checked = b.getAttribute(attribute) === value;
+    b.setAttribute("aria-checked", String(checked));
+    b.tabIndex = checked ? 0 : -1;
+  }
+}
+
+// --- permissions --------------------------------------------------------------------------
+
+const PERMISSION_ROWS: Record<Permission, { title: string; why: (key: string) => string; icon: string }> = {
+  microphone: { title: "Microphone", why: () => "To hear you while you dictate.", icon: "microphone" },
+  inputMonitoring: { title: "Input Monitoring", why: (key) => `To notice when you hold ${key}, in any app.`, icon: "keyboard" },
+  accessibility: { title: "Accessibility", why: () => "To type the text where you are writing.", icon: "accessibility" },
+};
+
+function permissionRow(permission: Permission): HTMLElement {
+  const info = PERMISSION_ROWS[permission];
+  const allowed = state.permissions[permission];
+  const row = h("div", "row permission");
+  const tile = h("span", "permission-icon");
+  tile.append(icon(info.icon));
+  if (allowed) tile.dataset.on = "";
+  const label = h("div");
+  label.append(h("span", "row-title", info.title), h("span", "row-sub", info.why(KEY_NAMES[state.settings.hotkey])));
+  let status: HTMLElement;
+  if (allowed === null) {
+    status = h("span", "model-state", "Checking…");
+  } else if (allowed) {
+    status = h("span", "allowed");
+    status.append(icon("check"), "Allowed");
+  } else {
+    status = button("Open System Settings", () => api.openSettings(permission));
+    status.setAttribute("aria-label", `Open System Settings for ${info.title}`);
+  }
+  row.append(tile, label, status);
+  return row;
+}
+
+/** Rebuilds the rows only when they change, so a focused button survives the many state updates during downloads. */
+function renderPermissions(container: HTMLElement, permissions: readonly Permission[]): void {
+  const key = JSON.stringify([permissions.map((p) => state.permissions[p]), state.settings.hotkey]);
+  if (container.dataset.key === key) return;
+  container.dataset.key = key;
+  container.replaceChildren(...permissions.map(permissionRow));
+}
+
 // --- home ---------------------------------------------------------------------------------
 
 const KEY_NAMES: Record<Settings["hotkey"], string> = {
@@ -58,12 +145,19 @@ const STATUS_TITLES: Partial<Record<StatusUpdate["key"], string>> = {
   cleanup: "Smart cleanup",
 };
 
+/** Statuses that a missing permission already explains; its row on Home says what to do. */
+function explainedByPermission(s: StatusUpdate): boolean {
+  const { microphone, inputMonitoring, accessibility } = state.permissions;
+  return (s.key === "mic" && microphone === false) || (s.key === "keys" && inputMonitoring === false) || (s.key === "paste" && accessibility === false);
+}
+
 function renderHome(): void {
-  const issues = state.statuses.filter((s) => !s.ok && STATUS_TITLES[s.key]);
+  const missing = PERMISSIONS.filter((p) => state.permissions[p] === false);
+  const issues = state.statuses.filter((s) => !s.ok && STATUS_TITLES[s.key] && !explainedByPermission(s));
   // Dictation is ready once the speech engine is; the optional cleanup model can still be loading.
   const asr = state.statuses.find((s) => s.key === "asr");
   const busy = !asr || (asr.ok && !asr.text.startsWith("ready"));
-  const mode = issues.length > 0 ? "attention" : busy ? "busy" : "ready";
+  const mode = missing.length > 0 || issues.length > 0 ? "attention" : busy ? "busy" : "ready";
   $("home-dot").dataset.state = mode;
   $("home-title").textContent = { ready: "Ready to dictate", busy: "Getting ready…", attention: "Needs your attention" }[mode];
 
@@ -78,6 +172,9 @@ function renderHome(): void {
     h("span", "chip", language),
     h("span", state.settings.smartCleanup ? "chip on" : "chip", state.settings.smartCleanup ? "Smart cleanup" : "Smart cleanup off"),
   );
+
+  $("home-permissions").hidden = missing.length === 0;
+  renderPermissions($("home-permissions"), missing);
 
   $("home-issues").replaceChildren(
     ...issues.map((s) => {
@@ -99,7 +196,7 @@ function renderHome(): void {
         api.copy(r.text);
         copy.textContent = "Copied";
         setTimeout(() => (copy.textContent = "Copy"), 1200);
-      });
+      }, "button plain");
       copy.setAttribute("aria-label", `Copy “${r.text.slice(0, 40)}”`);
       const app = r.app ? ` · ${r.app}` : "";
       item.append(h("p", "", r.text), copy, h("span", "meta", `${r.at}${app}`));
@@ -138,12 +235,8 @@ navigator.mediaDevices.addEventListener("devicechange", () => void refreshMicrop
 function renderGeneral(): void {
   hotkeySelect.value = state.settings.hotkey;
   if (micSelect.options.length > 0) micSelect.value = state.settings.microphoneId ?? "";
-  for (const b of document.querySelectorAll<HTMLElement>("[data-language]")) {
-    b.setAttribute("aria-checked", String(b.dataset.language === state.settings.languageMode));
-  }
-  for (const b of document.querySelectorAll<HTMLElement>("[data-appearance]")) {
-    b.setAttribute("aria-checked", String(b.dataset.appearance === state.settings.appearance));
-  }
+  renderSegments("data-language", state.settings.languageMode);
+  renderSegments("data-appearance", state.settings.appearance);
 }
 
 // --- dictionary ---------------------------------------------------------------------------
@@ -174,11 +267,12 @@ function renderDictionaryRows(focusLast = false): void {
     heard.setAttribute("aria-label", `What ${row.term || "the word"} is heard as`);
     term.addEventListener("input", () => ((row.term = term.value), scheduleSave()));
     heard.addEventListener("input", () => ((row.heard = heard.value), scheduleSave()));
-    const remove = button("✕", () => {
+    const remove = button("", () => {
       draft.splice(i, 1);
       renderDictionaryRows();
       scheduleSave();
     }, "icon-button");
+    remove.append(icon("remove"));
     remove.setAttribute("aria-label", `Remove ${row.term || "row"}`);
     el.append(term, heard, remove);
     return el;
@@ -249,12 +343,10 @@ function modelRow(m: ModelInfo, label: string, sub = "", radio?: { name: string;
   row.append(line);
   if (m.status === "downloading" || m.status === "queued") {
     const bar = h("div", "progress");
-    const fill = h("span");
-    fill.style.width = `${(m.received / m.bytes) * 100}%`;
-    bar.append(fill);
+    bar.append(h("span"));
     bar.setAttribute("role", "progressbar");
     bar.setAttribute("aria-label", `${m.name} download`);
-    bar.setAttribute("aria-valuenow", String(Math.floor((m.received / m.bytes) * 100)));
+    setProgress(bar, m.received / m.bytes);
     row.append(bar);
   }
   if (m.error) row.append(h("p", "model-error", m.error));
@@ -284,18 +376,30 @@ $("cleanup-toggle").addEventListener("click", () => void api.setSettings({ smart
 
 // --- first-run setup ----------------------------------------------------------------------
 
+const formatGB = (n: number) => (n / 1e9).toFixed(2);
+
 function renderSetup(): void {
   $("setup").hidden = !state.setup;
   $("main").hidden = state.setup;
   if (!state.setup) return;
+  renderPermissions($("setup-permissions"), PERMISSIONS);
+
+  // The first-run models download one after another; here they show as a single download.
   const models = FIRST_RUN_MODELS.map((id) => state.models.find((m) => m.id === id)!);
-  $("setup-models").replaceChildren(...models.map((m) => modelRow(m, m.name)));
+  const total = models.reduce((sum, m) => sum + m.bytes, 0);
+  const received = models.reduce((sum, m) => sum + (m.status === "ready" ? m.bytes : m.received), 0);
   const failed = models.some((m) => m.status === "error");
-  const note = $("setup-note");
-  note.replaceChildren(
-    failed ? "A download failed. Check your connection, then " : "You can close this window. Downloads continue in the menu bar.",
-  );
-  if (failed) note.append(button("Retry", () => api.download([...FIRST_RUN_MODELS])));
+  const downloading = models.some((m) => m.status === "downloading");
+  $("setup-download-sub").textContent = failed
+    ? "A download failed. Check your connection, then retry."
+    : "Keeps going in the menu bar if you close this window.";
+  const stateCell = $("setup-download-state");
+  if (failed) {
+    if (!stateCell.querySelector("button")) stateCell.replaceChildren(button("Retry", () => api.download([...FIRST_RUN_MODELS])));
+  } else {
+    stateCell.textContent = downloading || received > 0 ? `${formatGB(received)} of ${formatGB(total)} GB` : "Waiting";
+  }
+  setProgress($("setup-progress"), received / total);
 }
 
 // --- state --------------------------------------------------------------------------------

@@ -65,7 +65,7 @@ npm start
 
 **First launch:**
 - It downloads about 4.5 GB of models from Hugging Face. Each one is pinned to a fixed commit and checked against its SHA-256 before use, and an interrupted download resumes where it stopped.
-- macOS asks for three permissions, each explained under [Privacy](#privacy).
+- macOS asks for three permissions, each explained under [Privacy](#privacy). The first-run screen lists them, with a button that opens the right pane of System Settings, and marks each one as allowed as soon as you switch it on.
 - Development builds run as `build/Diktatorn.app`, so the permission prompts say Diktatorn.
 
 ## Hardware

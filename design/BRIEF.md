@@ -96,6 +96,7 @@ A 4 px grid: `--space-1` (4) to `--space-12` (48).
 - Rhythm: 8 px inside controls, 12–16 px inside rows and cards, 24–32 px between sections.
 - 1–2 px values are optical adjustments (insets, borders), not spacing.
 - Layout constants: the window is 780 × 540 px, the sidebar 200 px wide and content at most 620 px wide. A 40 px strip at the top drags the window, and the traffic lights sit at 18, 18.
+- Control sizes are sizes, not spacing: sidebar rows are 32 px tall, icon buttons and permission icon tiles 28 px, the status dot 12 px. The first-run screen fits the default window without scrolling.
 
 ## Shape
 
@@ -116,7 +117,7 @@ Nested shapes are concentric: inner radius = outer radius − inset. A segmented
 - Shadows are only for things that float or sit raised: the selected segment (`--shadow-raised`), the switch knob (`--shadow-knob`) and the overlay pill (`--hud-shadow`).
 - The overlay pill is navy at 88% with a light hairline. On a dark wallpaper the fill alone is 1.1:1, so the hairline is what keeps its edge visible.
 - Reduce Transparency makes the pill opaque, and Increase Contrast strengthens borders. `tokens.css` handles both.
-- Native sidebar vibrancy (Electron's `sidebar` material, translucent like Finder's) is worth trying in the app window polish, but it replaces the navy sidebar with a system material, so decide with screenshots.
+- No native sidebar vibrancy. Electron's `sidebar` material would replace the Rozeno sidebar colour with a translucent system one, and the palette comes only from the tokens.
 
 ## Motion
 
@@ -128,7 +129,7 @@ Decide by frequency first, then purpose, then curve and duration.
 | Listening | During every dictation | Continuous feedback tied to the voice level, not a decorative loop |
 | Transcribing, done, error | Every dictation | A clear state change, then the pill leaves |
 | Switching sections in the app window | Tens of times a day | None. Instant. |
-| Press | Constantly | Scale to `--press-scale` over `--duration-quick` with `--ease-out` |
+| Press | Constantly | Buttons and segments scale to `--press-scale` over `--duration-quick` with `--ease-out`. Sidebar rows darken instead, like the system's. |
 | Hover, colour | Constantly | `--duration-fast` with `ease` |
 | Switches, segmented controls | Occasionally | `--duration-fast` |
 | Download progress | During downloads | `transform: scaleX()`, linear |
@@ -150,7 +151,7 @@ Decide by frequency first, then purpose, then curve and duration.
 ## Iconography
 
 - **The mark** is the Speaking D (`assets/icon`): a navy glyph on the gradient tile. Wherever the brand appears inside the app, use the mark, not a gradient square.
-- **Interface icons:** SF Symbols can't be drawn in a web view, so icons are hand-drawn SVG in the same spirit: a 16 px grid, 1.5 px strokes, round caps and joins, `currentColor`.
+- **Interface icons:** SF Symbols can't be drawn in a web view, so icons are hand-drawn SVG in the same spirit: a 16 px grid, 1.5 px strokes, round caps and joins, `currentColor`. They live with the mark in one sprite at the top of `app.html` (microphone, keyboard, accessibility, check, remove).
 - **Menu bar:** a template image, black with alpha, at 18 pt with an @2x version, with straight edges on whole pixels.
 
 ## Accessibility
@@ -161,6 +162,16 @@ Decide by frequency first, then purpose, then curve and duration.
 - **Semantics:** native elements first. Custom controls get the right role and state (switch, `aria-checked`, `progressbar` with `aria-valuenow`), and status changes are announced politely (`aria-live`).
 - **Targets:** at least 24 × 24 px (WCAG 2.2 AA).
 - **System settings:** light and dark, Reduce Motion, Reduce Transparency and Increase Contrast are all handled by the tokens.
+
+## Permissions and onboarding
+
+Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the dictation key) and Accessibility (to type the text).
+
+- **First run** shows one screen: the mark, "Welcome to Diktatorn", an "Allow access" group with all three permissions, and one combined download bar for the first-run models. It enters once with a staggered fade and rise. When the downloads finish, the window switches to Home.
+- **Each permission row** has an icon tile, the name, one line on why it's needed, and either "Allowed" with a check or an "Open System Settings" button for that exact pane. The tile turns to the gradient once the permission is on, and the word says it too.
+- **Status is live.** The window updates as soon as a permission is switched on, without a restart or a click: the main process re-checks the microphone every second while it's off, the helper watches Accessibility, and it restarts itself when Input Monitoring comes on.
+- **After first run,** Home shows only the permissions that are missing, in the same rows, and the status reads "Needs your attention".
+- The buttons open fixed System Settings URLs held by the main process; the window can only name which permission.
 
 ## Copy
 
@@ -176,16 +187,8 @@ Found while auditing the renderer for this brief.
 
 **App window**
 
-- Spacing and radii are partly off the scales: 6, 7, 9, 10, 14, 18, 26, 28 and 52 px gaps, and 5 and 7 px radii. The sidebar's app name is 14 px, which isn't a text style.
-- Buttons, sidebar items and segments give no feedback when pressed.
-- Progress bars animate `width`, which reflows layout, instead of `transform`.
-- Reduce Motion currently turns off every transition and animation. It should use the movement tokens instead.
-- Segmented controls use `role="radio"` without arrow-key navigation.
-- The dictionary's remove button is 22 × 22 px, under the 24 px minimum.
-- The Copy button on recent dictations is invisible until hover.
 - Field and control borders are about 1.2:1 against their background. Fields are identified by their label and fill, as on macOS, but the accessibility pass should confirm that's enough.
-- The sidebar and the setup screen show a gradient square instead of the mark.
-- There is no permission onboarding yet ("Open System Settings").
+- Model rows are rebuilt on every download update, so a focused Cancel button loses focus while a download runs, and their progress bars jump instead of easing.
 
 **Overlay pill**
 
