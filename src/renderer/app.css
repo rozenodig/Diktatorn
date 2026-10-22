@@ -20,13 +20,19 @@ h2 {
 }
 p { margin: 0; }
 .lead { color: var(--muted); }
+.content .lead { max-width: 64ch; }
 .note { color: var(--dim); font-size: var(--text-callout); }
 :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+::placeholder { color: var(--dim); opacity: 1; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .icon { width: 16px; height: 16px; flex: none; }
 .mark { width: 20px; height: 20px; flex: none; }
 .mark-lg { width: var(--space-10); height: var(--space-10); }
+.stop-blue { stop-color: var(--brand-blue); }
+.stop-mint { stop-color: var(--brand-mint); }
+.glyph { fill: var(--on-grad); }
 
 /* The window has no title bar; this strip keeps it draggable. */
 .titlebar { position: fixed; inset: 0 0 auto 0; height: var(--space-10); -webkit-app-region: drag; z-index: 10; }
@@ -50,6 +56,7 @@ p { margin: 0; }
 }
 .nav:hover { background: var(--surface2); color: var(--text); }
 .nav[aria-current="page"], .nav:active { background: var(--surface3); color: var(--text); }
+.nav[aria-current="page"] { font-weight: var(--weight-semibold); } /* not the fill alone, which is faint in light mode */
 .content { overflow-y: auto; padding: var(--space-12) var(--space-10) var(--space-10); }
 .content > section { max-width: 620px; }
 .content h1 + .group, .content .lead + .group { margin-top: var(--space-4); }
@@ -60,8 +67,10 @@ p { margin: 0; }
 .hero h1 { margin: 0; }
 .hero .lead { margin-top: var(--space-1); }
 .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--grad); }
-.dot[data-state="busy"] { background: var(--warn); animation: pulse 1.4s ease-in-out infinite; }
-.dot[data-state="attention"] { background: var(--err); }
+/* Getting ready pulses a few times and then holds, so nothing blinks for longer than 5 s. Something
+   to do is amber, never red: red is for failures. */
+.dot[data-state="busy"] { background: var(--dim); animation: pulse var(--duration-loop) var(--ease-in-out) 3; }
+.dot[data-state="attention"] { background: var(--warn); }
 kbd {
   font: var(--weight-medium) var(--text-caption) var(--font-ui); padding: 1px var(--space-1); border-radius: var(--radius-xs);
   border: 1px solid var(--border); background: var(--surface2); color: var(--text);
@@ -115,7 +124,7 @@ select, input[type="text"] {
 }
 select { min-width: 200px; max-width: 260px; }
 input[type="text"] { width: 100%; user-select: text; cursor: text; }
-input[type="text"]:focus { border-color: var(--ring); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 20%, transparent); }
+input[type="text"]:focus { border-color: var(--ring); }
 
 .segmented { display: inline-flex; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 2px; }
 .segmented button {
@@ -157,6 +166,7 @@ input[type="text"]:focus { border-color: var(--ring); outline: none; box-shadow:
 }
 .button:active, .icon-button:active, .segmented button:active { transform: scale(var(--press-scale)); }
 
+/* Repeats the global focus ring, which the `all: unset` rules above would otherwise override. */
 .nav:focus-visible, .button:focus-visible, .icon-button:focus-visible, .segmented button:focus-visible, .switch:focus-visible {
   outline: 2px solid var(--ring); outline-offset: 2px;
 }
@@ -171,10 +181,20 @@ input[type="text"]:focus { border-color: var(--ring); outline: none; box-shadow:
 .model { padding: var(--space-3) var(--space-4); }
 .model-line { display: flex; align-items: center; gap: var(--space-3); }
 .model-line .row-title { flex: 1; }
-.model-line input[type="radio"] { accent-color: var(--brand); margin: 0; }
+/* Radios are drawn like the switch: --control-border when off; chosen, the gradient with a navy
+   centre and a --brand rim. */
+.model-line input[type="radio"] {
+  appearance: none; flex: none; width: 16px; height: 16px; margin: 0; border-radius: 50%;
+  background: var(--card); box-shadow: inset 0 0 0 1px var(--control-border);
+}
+.model-line input[type="radio"]:checked {
+  background: radial-gradient(circle, var(--on-grad) 3px, transparent 3.5px), var(--grad); box-shadow: inset 0 0 0 1px var(--brand);
+}
 .model-size { color: var(--dim); font-variant-numeric: tabular-nums; }
-.model-state { color: var(--muted); font-size: var(--text-callout); min-width: 84px; text-align: right; font-variant-numeric: tabular-nums; }
-.model-state.ready { color: var(--ok); }
+.model-end { min-width: 96px; display: flex; justify-content: flex-end; align-items: center; gap: var(--space-2); }
+.model-state { color: var(--muted); font-size: var(--text-callout); text-align: right; font-variant-numeric: tabular-nums; }
+/* Downloaded is the usual state, so it stays quiet; colour is for what needs a look. */
+.model-state.ready { display: inline-flex; align-items: center; gap: var(--space-1); }
 .progress { height: 4px; border-radius: var(--radius-pill); background: var(--surface3); overflow: hidden; margin-top: var(--space-2); }
 .progress span {
   display: block; height: 100%; background: var(--grad);
@@ -187,15 +207,12 @@ input[type="text"]:focus { border-color: var(--ring); outline: none; box-shadow:
 .setup { display: flex; height: 100%; overflow-y: auto; padding: var(--space-8) var(--space-10); }
 .setup-card { width: min(520px, 100%); margin: auto; }
 .setup-card > * { animation: enter var(--duration-slow) var(--ease-out) both; }
-.setup-card > :nth-child(2) { animation-delay: 60ms; }
-.setup-card > :nth-child(3) { animation-delay: 120ms; }
+.setup-card > :nth-child(2) { animation-delay: var(--stagger); }
+.setup-card > :nth-child(3) { animation-delay: calc(var(--stagger) * 2); }
 .setup-head { text-align: center; }
 .setup-head h1 { font-size: var(--text-large-title); letter-spacing: var(--tracking-large-title); margin: var(--space-3) 0 var(--space-1); }
 .setup-head .lead { text-wrap: balance; }
 
+/* Reduce Motion needs nothing here: the tokens take out the movement, and the pulse is a fade. */
 @keyframes pulse { 50% { opacity: 0.45; } }
 @keyframes enter { from { opacity: 0; transform: translateY(var(--enter-offset)); } }
-@media (prefers-reduced-motion: reduce) {
-  /* Movement is already off through the tokens; the busy dot also stops blinking. */
-  .dot[data-state="busy"] { animation: none; }
-}
