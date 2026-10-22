@@ -12,9 +12,14 @@ declare global {
         started(micStartMs: number): void;
         audio(samples: Float32Array): void;
         error(message: string): void;
+        /** How loud the microphone is while recording, 0 (silence) to 1 (loud speech). */
+        level(level: number): void;
       };
       overlay: {
         onState(cb: (update: OverlayUpdate) => void): void;
+        /** The pill should fade out; the window hides once it has. */
+        onHide(cb: () => void): void;
+        onLevel(cb: (level: number) => void): void;
       };
       app: {
         getState(): Promise<AppState>;

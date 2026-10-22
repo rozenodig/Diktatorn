@@ -119,6 +119,7 @@ Nested shapes are concentric: inner radius = outer radius − inset. A segmented
 - Surfaces are flat and separated by hairlines (`--border`, `--hairline`), not shadows.
 - Shadows are only for things that float or sit raised: the selected segment (`--shadow-raised`), the switch knob (`--shadow-knob`) and the overlay pill (`--hud-shadow`).
 - The overlay pill is navy at 88% with a light hairline. On a dark wallpaper the fill alone is 1.1:1, so the hairline is what keeps its edge visible.
+- The overlay window (360 × 96 px) is larger than the pill, so the shadow fits inside it instead of ending in a hard edge.
 - Reduce Transparency makes the pill opaque, and Increase Contrast strengthens borders. `tokens.css` handles both.
 - No native sidebar vibrancy. Electron's `sidebar` material would replace the Rozeno sidebar colour with a translucent system one, and the palette comes only from the tokens.
 
@@ -128,9 +129,9 @@ Decide by frequency first, then purpose, then curve and duration.
 
 | What | How often | Motion |
 | --- | --- | --- |
-| Overlay appears on the hotkey | 100+ times a day, from the keyboard | No delay before listening starts. At most a quick fade from `--enter-scale`, and leaving is faster than arriving. |
-| Listening | During every dictation | Continuous feedback tied to the voice level, not a decorative loop |
-| Transcribing, done, error | Every dictation | A clear state change, then the pill leaves |
+| Overlay appears on the hotkey | 100+ times a day, from the keyboard | None: it appears at full opacity in its first frame. It leaves with a `--duration-quick` fade and a shrink to `--enter-scale`. |
+| Listening | During every dictation | A wave whose height follows the voice. It travels only while there is sound, so a still line means silence. |
+| Transcribing, done, error | Every dictation | The indicator crossfades in `--duration-fast`: the wave settles flat and a glint runs along it, then a check or "!" appears, then the pill leaves. |
 | Switching sections in the app window | Tens of times a day | None. Instant. |
 | Press | Constantly | Buttons and segments scale to `--press-scale` over `--duration-quick` with `--ease-out`. Sidebar rows darken instead, like the system's. |
 | Hover, colour | Constantly | `--duration-fast` with `ease` |
@@ -149,7 +150,7 @@ Decide by frequency first, then purpose, then curve and duration.
 - Never `ease-in`, never `transition: all`, and never start from `scale(0)`.
 - Animate `transform` and `opacity` only.
 - Use transitions rather than keyframes for anything that can retrigger, so it can be interrupted.
-- **Reduce Motion means gentler, not none.** The movement tokens (`--press-scale`, `--enter-scale`, `--enter-offset`) switch to no movement, while fades and colour changes stay.
+- **Reduce Motion means gentler, not none.** The movement tokens (`--press-scale`, `--enter-scale`, `--enter-offset`) switch to no movement, while fades and colour changes stay. In the overlay, the wave keeps one shape and the voice changes its brightness instead, and the transcribing glint becomes a slow fade of the whole line.
 
 ## Iconography
 
@@ -176,6 +177,21 @@ Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the d
 - **After first run,** Home shows only the permissions that are missing, in the same rows, and the status reads "Needs your attention".
 - The buttons open fixed System Settings URLs held by the main process; the window can only name which permission.
 
+## The overlay pill
+
+The pill shows one state at a time, always as an indicator plus words:
+
+| State | Indicator | Words (from the main process) |
+| --- | --- | --- |
+| Listening | The wave, in the gradient | "Listening" |
+| Hands-free | A mint lock, then the wave | "Hands-free · tap fn to finish" |
+| Transcribing | A line with a gradient glint | "Transcribing" |
+| Done | A check in `--hud-ok` | "Inserted", "Copied to clipboard" |
+| Error | A circled "!" in `--hud-err` | "Something went wrong", "Still getting ready" |
+
+- The microphone level (0–1, from the loudness in decibels) reaches the overlay 20 times a second while it is shown. The wave smooths between updates, rising quickly and falling gently.
+- The window hides only after the fade has been painted, so the next dictation never shows a frame of the previous one.
+
 ## Copy
 
 - **English**, in sentence case.
@@ -186,10 +202,4 @@ Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the d
 
 ## Known gaps
 
-Found while auditing the renderer for this brief.
-
-**Overlay pill**
-
-- The pill's shadow is cut off by its 300 × 56 window, which shows as a faint rectangle on light backgrounds.
-- The listening pulse is a decorative loop; it should respond to the voice instead.
-- Listening and hands-free differ only by colour and wording.
+Gaps found by audits and reviews are listed here until they are fixed. None are open right now.

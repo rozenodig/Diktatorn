@@ -1,11 +1,18 @@
 // Hidden window that owns the microphone. Opens it on start, streams 16 kHz mono samples
-// into memory, and hands the whole utterance to the main process on stop.
+// into memory, and hands the whole utterance to the main process on stop. While recording it
+// also reports how loud the voice is, which the overlay shows.
 const api = window.diktatorn.capture;
+
+/** The level goes out 20 times a second; the overlay smooths between updates. */
+const LEVEL_INTERVAL_MS = 50;
+/** dBFS mapped to level 0 (room noise) and 1 (loud speech close to the microphone). */
+const QUIET_DB = -55;
+const LOUD_DB = -20;
 
 // Created at window load so the first recording only has to open the microphone.
 const ctx = new AudioContext({ sampleRate: 16_000 });
 const workletReady = ctx.audioWorklet.addModule("./worklet.js");
-let session: { stream: MediaStream; node: AudioWorkletNode; chunks: Float32Array[] } | null = null;
+let session: { stream: MediaStream; source: MediaStreamAudioSourceNode; node: AudioWorkletNode; chunks: Float32Array[]; meter: ReturnType<typeof setInterval> } | null = null;
 let starting: Promise<void> = Promise.resolve();
 /** The chosen microphone, or null for the system default. */
 let deviceId: string | null = null;
@@ -28,6 +35,15 @@ async function openMicrophone(): Promise<MediaStream> {
   }
 }
 
+/** The loudness of the last 64 ms as 0–1, from its RMS in decibels. */
+function level(analyser: AnalyserNode, samples: Float32Array<ArrayBuffer>): number {
+  analyser.getFloatTimeDomainData(samples);
+  let sum = 0;
+  for (const x of samples) sum += x * x;
+  const db = 10 * Math.log10(sum / samples.length + 1e-12);
+  return Math.min(1, Math.max(0, (db - QUIET_DB) / (LOUD_DB - QUIET_DB)));
+}
+
 async function start(): Promise<void> {
   const t0 = performance.now();
   await workletReady;
@@ -42,10 +58,15 @@ async function start(): Promise<void> {
       api.started(performance.now() - t0);
     }
   };
-  ctx.createMediaStreamSource(stream).connect(node);
+  const source = ctx.createMediaStreamSource(stream);
+  source.connect(node);
   node.connect(ctx.destination); // keeps the node in the rendered graph; it outputs silence
+  const analyser = new AnalyserNode(ctx, { fftSize: 1024 });
+  source.connect(analyser);
+  const samples = new Float32Array(analyser.fftSize);
   await ctx.resume();
-  session = { stream, node, chunks };
+  const meter = setInterval(() => api.level(level(analyser, samples)), LEVEL_INTERVAL_MS);
+  session = { stream, source, node, chunks, meter };
 }
 
 async function finish(deliver: boolean): Promise<void> {
@@ -53,10 +74,12 @@ async function finish(deliver: boolean): Promise<void> {
   const s = session;
   session = null;
   if (!s) return;
+  clearInterval(s.meter);
   // Ask the worklet to flush its partial block, then give it one render quantum to arrive.
   s.node.port.postMessage("flush");
   await new Promise((r) => setTimeout(r, 30));
   s.stream.getTracks().forEach((t) => t.stop());
+  s.source.disconnect();
   s.node.disconnect();
   if (!deliver) return;
   const total = s.chunks.reduce((n, c) => n + c.length, 0);

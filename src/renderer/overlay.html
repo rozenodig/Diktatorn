@@ -9,25 +9,72 @@
       :root { color-scheme: dark; } /* the pill is a dark HUD in both themes */
       html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none; cursor: default; }
       body { display: flex; align-items: center; justify-content: center; font: var(--weight-medium) var(--text-body) var(--font-ui); }
+
+      /* The pill appears at once, because it answers a key press many times a day. It leaves with
+         a quick fade and a slight shrink; Reduce Motion keeps the fade only. */
       .pill {
-        display: flex; align-items: center; gap: 9px; padding: 9px 16px 9px 13px; border-radius: var(--radius-pill);
+        display: flex; align-items: center; gap: var(--space-2); min-height: 36px; max-width: calc(100vw - var(--space-12));
+        padding: 0 var(--space-4) 0 var(--space-3); border-radius: var(--radius-pill);
         color: var(--hud-text); background: var(--hud-surface); box-shadow: var(--hud-shadow);
-        border: 1px solid var(--hud-border); white-space: nowrap; transition: opacity var(--duration-quick);
+        border: 1px solid var(--hud-border); white-space: nowrap;
+        transition: opacity var(--duration-quick) var(--ease-out), transform var(--duration-quick) var(--ease-out);
       }
-      .icon { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-      [data-state="listening"] .icon { background: var(--grad); animation: pulse 1.1s ease-in-out infinite; }
-      [data-state="handsFree"] .icon { background: var(--brand-mint); animation: pulse 1.6s ease-in-out infinite; }
-      [data-state="processing"] .icon { border: 2px solid var(--hud-track); border-top-color: var(--brand-blue); width: 8px; height: 8px; animation: spin 0.8s linear infinite; }
-      [data-state="done"] .icon { background: var(--hud-ok); }
-      [data-state="error"] .icon { background: var(--hud-err); border-radius: 2px; }
-      @keyframes pulse { 50% { transform: scale(0.65); opacity: 0.6; } }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) { .icon { animation: none !important; } }
+      .pill[data-visible="false"] { opacity: 0; transform: scale(var(--enter-scale)); }
+      .pill[data-visible="true"], .pill[data-instant], .pill[data-instant] * { transition: none; }
+      #text { overflow: hidden; text-overflow: ellipsis; }
+
+      /* The indicator: one slot that crossfades between the wave, the transcribing line and the
+         done or error mark. */
+      .indicator { position: relative; width: 28px; height: 16px; flex: none; }
+      .indicator > * {
+        position: absolute; inset: 0; margin: auto; opacity: 0;
+        transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+      }
+      svg { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+      .wave { width: 28px; height: 16px; stroke: url(#wave-gradient); stroke-width: 2; overflow: visible; }
+      .track { width: 24px; height: 2px; border-radius: var(--radius-pill); background: var(--hud-track); overflow: hidden; }
+      .glint { display: block; width: 8px; height: 100%; border-radius: inherit; background: var(--grad); }
+      [data-state="processing"] .glint { animation: glint 900ms linear infinite; }
+      .mark { width: 16px; height: 16px; transform: scale(var(--enter-scale)); }
+      .ok { stroke: var(--hud-ok); }
+      .err { stroke: var(--hud-err); }
+      .lock { display: none; width: 16px; height: 16px; flex: none; stroke: var(--brand-mint); }
+
+      [data-state="listening"] .wave, [data-state="handsFree"] .wave, [data-state="processing"] .track { opacity: 1; }
+      [data-state="done"] .ok, [data-state="error"] .err { opacity: 1; transform: none; }
+      [data-state="handsFree"] .lock { display: block; }
+      [data-state="done"] .indicator, [data-state="error"] .indicator { width: 16px; } /* the marks are narrower than the wave */
+
+      @keyframes glint { from { transform: translateX(-8px); } to { transform: translateX(24px); } }
+      @keyframes breathe { from { opacity: 0.35; } }
+      @media (prefers-reduced-motion: reduce) {
+        /* The glint stops travelling: the whole line fades gently instead. */
+        .glint { width: 100%; }
+        [data-state="processing"] .glint { animation: breathe 1.2s ease-in-out infinite alternate; }
+      }
     </style>
   </head>
   <body>
-    <div class="pill" id="pill" data-state="listening" role="status" aria-live="polite">
-      <span class="icon"></span><span id="text"></span>
+    <div class="pill" id="pill" data-state="listening" data-visible="false" role="status" aria-live="polite">
+      <svg class="lock" viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="3.75" y="7.25" width="8.5" height="6.5" rx="1.5" />
+        <path d="M5.5 7.25V5a2.5 2.5 0 0 1 5 0v2.25" />
+      </svg>
+      <span class="indicator" aria-hidden="true">
+        <svg class="wave" viewBox="0 0 28 16">
+          <defs>
+            <linearGradient id="wave-gradient" x1="0" y1="0" x2="28" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" style="stop-color: var(--brand-blue)" />
+              <stop offset="1" style="stop-color: var(--brand-mint)" />
+            </linearGradient>
+          </defs>
+          <path id="wave" d="M2 8H26" />
+        </svg>
+        <span class="track"><span class="glint"></span></span>
+        <svg class="mark ok" viewBox="0 0 16 16"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" /></svg>
+        <svg class="mark err" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" /><path d="M8 5v3.5M8 11h.01" /></svg>
+      </span>
+      <span id="text"></span>
     </div>
     <script type="module" src="./overlay.js"></script>
   </body>

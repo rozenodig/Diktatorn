@@ -15,9 +15,12 @@ contextBridge.exposeInMainWorld("diktatorn", {
     started: (micStartMs: number) => ipcRenderer.send("capture:started", micStartMs),
     audio: (samples: Float32Array) => ipcRenderer.send("capture:audio", samples),
     error: (message: string) => ipcRenderer.send("capture:error", message),
+    level: (level: number) => ipcRenderer.send("capture:level", level),
   },
   overlay: {
     onState: (cb: (update: unknown) => void) => on("overlay:state", cb),
+    onHide: (cb: () => void) => on("overlay:hide", cb),
+    onLevel: (cb: (level: unknown) => void) => on("overlay:level", cb),
   },
   app: {
     getState: () => ipcRenderer.invoke("app:get-state"),

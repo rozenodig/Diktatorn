@@ -505,6 +505,9 @@ ipcMain.on(IPC.captureAudio, (e, samples: Float32Array) => {
   if (!from(captureWin, e)) return;
   queue = queue.then(() => handleAudio(samples)).catch(fail);
 });
+ipcMain.on(IPC.captureLevel, (e, level: unknown) => {
+  if (from(captureWin, e) && typeof level === "number") overlay?.level(level);
+});
 ipcMain.on(IPC.captureError, (e, message: string) => {
   if (from(captureWin, e)) setStatus({ key: "mic", ok: false, text: message });
 });

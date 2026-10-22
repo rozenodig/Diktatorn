@@ -4,8 +4,12 @@
 import { BrowserWindow, screen, type WebPreferences } from "electron";
 import { IPC, type OverlayState } from "../shared/ipc.ts";
 
-const SIZE = { width: 300, height: 56 };
-const BOTTOM_MARGIN = 24;
+/** Larger than the pill, so its shadow fits inside the transparent window. */
+const SIZE = { width: 360, height: 96 };
+/** Where the pill's centre sits above the bottom of the screen's usable area. */
+const PILL_CENTRE_ABOVE_BOTTOM = 52;
+/** The pill fades out in --duration-quick (120 ms); the window hides once the fade has been painted. */
+const FADE_OUT_MS = 160;
 
 export class Overlay {
   private readonly win: BrowserWindow;
@@ -46,16 +50,26 @@ export class Overlay {
       const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea;
       this.win.setBounds({
         x: Math.round(area.x + (area.width - SIZE.width) / 2),
-        y: Math.round(area.y + area.height - SIZE.height - BOTTOM_MARGIN),
+        y: Math.round(area.y + area.height - PILL_CENTRE_ABOVE_BOTTOM - SIZE.height / 2),
         ...SIZE,
       });
       this.win.showInactive();
     }
   }
 
+  /** Fades the pill out, then hides the window. A show() before then cancels the hide. */
   hide(): void {
     if (this.hideTimer) clearTimeout(this.hideTimer);
-    this.hideTimer = null;
-    this.win.hide();
+    if (!this.win.isVisible()) return;
+    this.win.webContents.send(IPC.overlayHide);
+    this.hideTimer = setTimeout(() => {
+      this.hideTimer = null;
+      this.win.hide();
+    }, FADE_OUT_MS);
+  }
+
+  /** The microphone level while listening, 0–1. */
+  level(level: number): void {
+    if (this.win.isVisible()) this.win.webContents.send(IPC.overlayLevel, level);
   }
 }
