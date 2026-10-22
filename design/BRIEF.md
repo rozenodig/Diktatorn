@@ -45,6 +45,7 @@ The palette is Rozeno Digital's. Don't add colours outside it.
 | `--muted` | `#4F5A6B` | `#9AA4B8` | Secondary text |
 | `--dim` | `#5F6A7D` | `#7A849A` | Section labels, metadata |
 | `--border` / `--hairline` | `#DFE5EE` / `#E9EEF4` | `#1E2536` / `#161C2A` | Outlines / dividers inside a group |
+| `--control-border` | `#7F8897` | `#656E82` | The outline of fields, the chosen segment and the switch track: `--dim` mixed 80% into `--card` |
 | `--brand` | `#006E9C` | `#00C2FF` | Brand-coloured text and links (AA in both themes) |
 | `--ring` | `#0077A8` | `#00C2FF` | Focus ring |
 | `--ok` / `--warn` / `--err` | `#137636` / `#A44D08` / `#C81E2E` | `#2FD36F` / `#FFB020` / `#FF5C6C` | Status |
@@ -57,6 +58,7 @@ The palette is Rozeno Digital's. Don't add colours outside it.
 - Text on the gradient is navy (`--on-grad`): 9.3:1 on the blue end and 12.9:1 on the mint end. White fails at 2.1:1 and 1.5:1.
 - Status is never shown by colour alone; a word always goes with it.
 - `--dim` is for text on `--bg`, `--card` and `--surface2`. On dark `--surface3` it drops to 4.2:1, so use `--muted` there.
+- A control whose outline is what identifies it (a text field, a select, the chosen segment, a switch) uses `--control-border`, which is 3:1 against its background. `--border` (about 1.2:1) is for surfaces, and for buttons, whose label identifies them. A switch that is on gets a `--brand` rim, because the gradient alone is 2.1:1 or less on a light card.
 
 **Contrast**, checked with the WCAG formula:
 
@@ -68,6 +70,7 @@ The palette is Rozeno Digital's. Don't add colours outside it.
 | `--brand` on `--bg` | 5.3 | 9.3 |
 | `--ok` / `--warn` / `--err` on `--card` | 5.7 / 5.8 / 5.7 | 9.3 / 10.1 / 6.1 |
 | `--ring` on `--bg` (needs 3:1) | 4.7 | 9.3 |
+| `--control-border` on `--card` / `--bg` (needs 3:1) | 3.6 / 3.3 | 3.6 / 3.7 |
 | `--hud-text` / `--hud-muted` on the pill over white | 12.8 / 5.6 | same |
 
 ## Typography
@@ -184,11 +187,6 @@ Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the d
 ## Known gaps
 
 Found while auditing the renderer for this brief.
-
-**App window**
-
-- Field and control borders are about 1.2:1 against their background. Fields are identified by their label and fill, as on macOS, but the accessibility pass should confirm that's enough.
-- Model rows are rebuilt on every download update, so a focused Cancel button loses focus while a download runs, and their progress bars jump instead of easing.
 
 **Overlay pill**
 

@@ -107,9 +107,11 @@ kbd {
 .permission-icon[data-on] { background: var(--grad); color: var(--on-grad); }
 .allowed { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--ok); font-weight: var(--weight-medium); }
 
+/* Fields, the chosen segment and the switch track carry --control-border, the outline that tells
+   them apart from their background. Buttons are identified by their label and keep --border. */
 select, input[type="text"] {
   font: inherit; color: var(--text); background: var(--surface2);
-  border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--control-border); border-radius: var(--radius-md); padding: var(--space-1) var(--space-2);
 }
 select { min-width: 200px; max-width: 260px; }
 input[type="text"] { width: 100%; user-select: text; cursor: text; }
@@ -120,16 +122,20 @@ input[type="text"]:focus { border-color: var(--ring); outline: none; box-shadow:
   all: unset; padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); color: var(--muted); font-weight: var(--weight-medium);
 }
 .segmented button:hover { color: var(--text); }
-.segmented button[aria-checked="true"] { background: var(--card); color: var(--text); box-shadow: var(--shadow-raised); }
+.segmented button[aria-checked="true"] {
+  background: var(--card); color: var(--text); box-shadow: inset 0 0 0 1px var(--control-border), var(--shadow-raised);
+}
 
 .switch {
   all: unset; width: 38px; height: 22px; border-radius: var(--radius-pill); background: var(--surface3); position: relative; flex: none;
+  box-shadow: inset 0 0 0 1px var(--control-border);
 }
 .switch span {
   position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--switch-knob);
   box-shadow: var(--shadow-knob); transition: transform var(--duration-fast) var(--ease-out);
 }
-.switch[aria-checked="true"] { background: var(--grad); }
+/* On, the rim turns brand blue: the gradient alone is 2.1:1 or less against a light card. */
+.switch[aria-checked="true"] { background: var(--grad); box-shadow: inset 0 0 0 1px var(--brand); }
 .switch[aria-checked="true"] span { transform: translateX(16px); }
 
 .button {

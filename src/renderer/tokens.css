@@ -26,6 +26,9 @@
   --ok: #137636;
   --warn: #a44d08;
   --err: #c81e2e;
+  /* The outline that identifies a field, a segmented choice or a switch: at least 3:1 against
+     --card and --bg in both themes (WCAG 1.4.11). Mixed from the palette, so it follows the theme. */
+  --control-border: color-mix(in srgb, var(--dim) 80%, var(--card));
 
   /* The overlay pill is a dark heads-up display in both themes, like the system's own HUDs. */
   --hud-surface: rgb(11 15 25 / 0.88);
@@ -133,6 +136,7 @@
 @media (prefers-contrast: more) {
   :root {
     --border: var(--border-strong);
+    --control-border: var(--dim);
     --hud-border: rgb(255 255 255 / 0.3);
   }
 }
