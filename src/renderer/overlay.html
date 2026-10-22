@@ -1,58 +1,11 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'" />
     <title>Diktatorn overlay</title>
     <link rel="stylesheet" href="./tokens.css" />
-    <style>
-      :root { color-scheme: dark; } /* the pill is a dark HUD in both themes */
-      html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none; cursor: default; }
-      body { display: flex; align-items: center; justify-content: center; font: var(--weight-medium) var(--text-body) var(--font-ui); }
-
-      /* The pill appears at once, because it answers a key press many times a day. It leaves with
-         a quick fade and a slight shrink; Reduce Motion keeps the fade only. */
-      .pill {
-        display: flex; align-items: center; gap: var(--space-2); min-height: 36px; max-width: calc(100vw - var(--space-12));
-        padding: 0 var(--space-4) 0 var(--space-3); border-radius: var(--radius-pill);
-        color: var(--hud-text); background: var(--hud-surface); box-shadow: var(--hud-shadow);
-        border: 1px solid var(--hud-border); white-space: nowrap;
-        transition: opacity var(--duration-quick) var(--ease-out), transform var(--duration-quick) var(--ease-out);
-      }
-      .pill[data-visible="false"] { opacity: 0; transform: scale(var(--enter-scale)); }
-      .pill[data-visible="true"], .pill[data-instant], .pill[data-instant] * { transition: none; }
-      #text { overflow: hidden; text-overflow: ellipsis; }
-
-      /* The indicator: one slot that crossfades between the wave, the transcribing line and the
-         done or error mark. */
-      .indicator { position: relative; width: 28px; height: 16px; flex: none; }
-      .indicator > * {
-        position: absolute; inset: 0; margin: auto; opacity: 0;
-        transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
-      }
-      svg { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-      .wave { width: 28px; height: 16px; stroke: url(#wave-gradient); stroke-width: 2; overflow: visible; }
-      .track { width: 24px; height: 2px; border-radius: var(--radius-pill); background: var(--hud-track); overflow: hidden; }
-      .glint { display: block; width: 8px; height: 100%; border-radius: inherit; background: var(--grad); }
-      [data-state="processing"] .glint { animation: glint 900ms linear infinite; }
-      .mark { width: 16px; height: 16px; transform: scale(var(--enter-scale)); }
-      .ok { stroke: var(--hud-ok); }
-      .err { stroke: var(--hud-err); }
-      .lock { display: none; width: 16px; height: 16px; flex: none; stroke: var(--brand-mint); }
-
-      [data-state="listening"] .wave, [data-state="handsFree"] .wave, [data-state="processing"] .track { opacity: 1; }
-      [data-state="done"] .ok, [data-state="error"] .err { opacity: 1; transform: none; }
-      [data-state="handsFree"] .lock { display: block; }
-      [data-state="done"] .indicator, [data-state="error"] .indicator { width: 16px; } /* the marks are narrower than the wave */
-
-      @keyframes glint { from { transform: translateX(-8px); } to { transform: translateX(24px); } }
-      @keyframes breathe { from { opacity: 0.35; } }
-      @media (prefers-reduced-motion: reduce) {
-        /* The glint stops travelling: the whole line fades gently instead. */
-        .glint { width: 100%; }
-        [data-state="processing"] .glint { animation: breathe 1.2s ease-in-out infinite alternate; }
-      }
-    </style>
+    <link rel="stylesheet" href="./overlay.css" />
   </head>
   <body>
     <div class="pill" id="pill" data-state="listening" data-visible="false" role="status" aria-live="polite">
@@ -64,8 +17,8 @@
         <svg class="wave" viewBox="0 0 28 16">
           <defs>
             <linearGradient id="wave-gradient" x1="0" y1="0" x2="28" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0" style="stop-color: var(--brand-blue)" />
-              <stop offset="1" style="stop-color: var(--brand-mint)" />
+              <stop offset="0" class="stop-blue" />
+              <stop offset="1" class="stop-mint" />
             </linearGradient>
           </defs>
           <path id="wave" d="M2 8H26" />

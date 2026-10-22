@@ -1,0 +1,15 @@
+/* Diktatorn debug window: tokens for colour and type, no polish bar (design/BRIEF.md). */
+body { margin: 16px; font: var(--text-body) var(--font-ui); color: var(--text); background: var(--bg); }
+h1 { font-size: var(--text-title-3); margin: 0 0 12px; }
+#status { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin-bottom: 12px; }
+.ok { color: var(--ok); } .bad { color: var(--err); }
+button { font: inherit; padding: 6px 12px; margin-bottom: 12px; }
+.result { border-top: 1px solid var(--border); padding: 8px 0; }
+.text { font-size: var(--text-title-3); margin: 2px 0 4px; white-space: pre-wrap; }
+.raw { color: var(--dim); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--dim) 60%, transparent); margin-bottom: 4px; white-space: pre-wrap; }
+.meta { color: var(--muted); font-variant-numeric: tabular-nums; }
+#bench { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 12px; }
+#bench h2 { font-size: var(--text-body); margin: 0 0 4px; }
+#bench p { margin: 0 0 8px; }
+#bench-text { font-size: var(--text-title-1); line-height: 1.35; margin: 8px 0 12px; }
+#bench button { margin: 0 6px 0 0; }
