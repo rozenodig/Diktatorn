@@ -6,3 +6,5 @@ native/*/.build/
 .DS_Store
 *.log
 bench/recordings/
+.env
+CLAUDE.md
