@@ -5,6 +5,8 @@
   </picture>
 </h1>
 
+[![CI](https://github.com/rozenodig/Diktatorn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rozenodig/Diktatorn/actions/workflows/ci.yml)
+
 Local dictation for macOS that speaks Swedish first and English too. Hold **fn**, talk, release, and the text appears wherever you were typing. Speech recognition, language detection and text cleanup all run on your Mac: no account, no cloud service, and no audio ever leaves the machine.
 
 - **Swedish and English, detected for every dictation.** Swedish goes to [KB-Whisper](https://huggingface.co/KBLab/kb-whisper-medium), the National Library of Sweden's Whisper model trained on Swedish speech. English goes to Whisper large-v3 turbo.
