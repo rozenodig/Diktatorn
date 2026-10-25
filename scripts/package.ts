@@ -81,6 +81,7 @@ cpSync(join(outDir, "LICENSE"), join(licenses, "Electron-LICENSE"));
 cpSync(join(outDir, "LICENSES.chromium.html"), join(licenses, "LICENSES.chromium.html"));
 cpSync(join(ROOT, "native", "vendor", "whisper.cpp", "LICENSE"), join(licenses, "whisper.cpp-LICENSE"));
 cpSync(join(ROOT, "native", "vendor", "llama.cpp", "LICENSE"), join(licenses, "llama.cpp-LICENSE"));
+cpSync(join(ROOT, "assets", "THIRD-PARTY-NOTICES.txt"), join(licenses, "THIRD-PARTY-NOTICES.txt"));
 
 // Without these, anyone who can start the app could run their own code inside it, with the
 // Accessibility access the user gave Diktatorn: as plain Node, through NODE_OPTIONS or a
