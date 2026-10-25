@@ -33,8 +33,8 @@ export const SWEDISH_MODELS = ["kb-whisper-medium", "kb-whisper-large"] as const
 export const LANGUAGE_MODES = ["auto", "sv", "en"] as const;
 export const APPEARANCES = ["system", "light", "dark"] as const;
 
-/** The macOS permissions Diktatorn asks for. */
-export const PERMISSIONS = ["microphone", "inputMonitoring", "accessibility"] as const;
+/** The macOS permissions Diktatorn asks for. Accessibility also lets the helper listen for the dictation key. */
+export const PERMISSIONS = ["microphone", "accessibility"] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 /** Whether each permission is on; null while it isn't known yet, e.g. while the system is still asking. */
 export type Permissions = Record<Permission, boolean | null>;

@@ -180,11 +180,11 @@ Decide by frequency first, then purpose, then curve and duration.
 
 ## Permissions and onboarding
 
-Diktatorn needs three permissions: Microphone, Input Monitoring (to notice the dictation key) and Accessibility (to type the text).
+Diktatorn needs two permissions: Microphone and Accessibility (to notice the dictation key and to type the text). Accessibility also gives keyboard access, so there is no separate Input Monitoring step: macOS doesn't list Diktatorn under Input Monitoring, so it could never be completed.
 
-- **First run** shows one screen: the mark, "Welcome to Diktatorn", an "Allow access" group with all three permissions, and one combined download bar for the first-run models. It enters once with a staggered fade and rise. When the downloads finish, the window switches to Home.
+- **First run** shows one screen: the mark, "Welcome to Diktatorn", an "Allow access" group with both permissions, and one combined download bar for the first-run models. It enters once with a staggered fade and rise. When the downloads finish, the window switches to Home.
 - **Each permission row** has an icon tile, the name, one line on why it's needed, and either "Allowed" with a check or an "Open System Settings" button for that exact pane. The tile turns to the gradient once the permission is on, and the word says it too.
-- **Status is live.** The window updates as soon as a permission is switched on, without a restart or a click: the main process re-checks the microphone every second while it's off, the helper watches Accessibility, and it restarts itself when Input Monitoring comes on.
+- **Status is live.** The window updates as soon as a permission is switched on, without a restart or a click: the main process re-checks the microphone every second while it's off, the helper watches Accessibility, and it restarts itself once the keyboard access that comes with it is there.
 - **After first run,** Home shows only the permissions that are missing, in the same rows, and the status reads "Needs your attention".
 - The buttons open fixed System Settings URLs held by the main process; the window can only name which permission.
 
@@ -207,7 +207,7 @@ The pill shows one state at a time, always as an indicator plus words:
 
 - **English**, in sentence case.
 - **Short and specific.** Buttons are verbs: "Download", "Retry", "Open System Settings".
-- **Say what happened and what to do:** "Diktatorn needs Input Monitoring to hear the dictation key."
+- **Say what happened and what to do:** "Diktatorn needs Accessibility to notice the dictation key."
 - **No exclamation marks, no blame,** and no jargon in the app window: no "ASR", "VAD" or "LLM" (the debug window is exempt).
 - **Keys are written as they appear on the keyboard:** fn, ⌥, ⌘, esc.
 

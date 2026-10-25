@@ -4,10 +4,10 @@
 // Protocol: one JSON object per line. Events and responses go to stdout; requests with an
 // "id" arrive on stdin and are answered with the same id and "ok". EOF on stdin means the
 // parent is gone and the helper exits.
-//   out  {"event":"ready","inputMonitoring":true,"accessibility":true,"tap":true,"hid":true}
-//   out  {"event":"permission","inputMonitoring":true} granted while running; exits with code 3 so the
+//   out  {"event":"ready","keyboard":true,"accessibility":true,"tap":true,"hid":true}
+//   out  {"event":"permission","keyboard":true}       granted while running; exits with code 3 so the
 //                                                      parent restarts it with a tap that receives events
-//   out  {"event":"accessibility","accessibility":true} granted while running; pasting works from now on
+//   out  {"event":"accessibility","accessibility":true,"keyboard":true} granted while running; pasting works from now on
 //   out  {"event":"hotkey","down":true,"t":123456.7}   t = monotonic milliseconds
 //   out  {"event":"chord","t":...}                      another key went down while the hotkey was held
 //   out  {"event":"escape","t":...}                     Esc pressed while recording (swallowed if the tap is active)
@@ -23,13 +23,20 @@
 // Privacy: no key codes or characters ever leave this process. The opt-in debug mode
 // (DIKTATORN_HELPER_DEBUG=1) reports modifier-key changes only, never character keys.
 //
-// Without Input Monitoring the system still lets us create a listen-only tap but silently
-// withholds keyboard events from it, so permission is checked explicitly.
+// Without keyboard access the system still lets us create a listen-only tap but silently
+// withholds keyboard events from it, so access is checked explicitly. Accessibility grants it,
+// so Diktatorn doesn't ask for Input Monitoring separately: macOS doesn't list the app under
+// Input Monitoring anyway, and an extra permission nobody can switch on would only block setup.
 
 import ApplicationServices
 import Foundation
+import IOKit.hid
 
 let exitPermissionGranted: Int32 = 3
+
+/// CGPreflightListenEventAccess keeps returning its first answer for the life of the process, so
+/// it never sees access being granted; IOHIDCheckAccess asks the system again on every call.
+func keyboardAccess() -> Bool { IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted }
 let hotkeyState = HotkeyState()
 let inserter = Inserter(hotkeyIsDown: { hotkeyState.down })
 let keyTap = KeyTap(state: hotkeyState)
@@ -90,28 +97,28 @@ readCommands()
 
 // Tests exercise the clipboard without touching the keyboard (or its permission prompt).
 if ProcessInfo.processInfo.environment["DIKTATORN_HELPER_NO_KEYS"] != nil {
-    emit(["event": "ready", "inputMonitoring": false, "accessibility": inserter.accessibilityTrusted, "keys": false])
+    emit(["event": "ready", "keyboard": false, "accessibility": inserter.accessibilityTrusted, "keys": false])
     CFRunLoopRun()
 }
 
 // Accessibility can be switched on while the helper runs, and the app window shows it as soon as it is.
-// The parent restarts the helper once Input Monitoring is on; the restarted helper doesn't ask again.
+// Keyboard access comes with it, and the parent then restarts the helper; the restarted helper doesn't ask again.
 if !inserter.accessibilityTrusted {
     if ProcessInfo.processInfo.environment["DIKTATORN_HELPER_RESTARTED"] == nil { inserter.promptForAccessibility() }
     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
         guard inserter.accessibilityTrusted else { return }
         timer.invalidate()
-        emit(["event": "accessibility", "accessibility": true])
+        // Keyboard access normally comes with it; if it does, this helper restarts within a second.
+        emit(["event": "accessibility", "accessibility": true, "keyboard": keyboardAccess()])
     }
 }
 
-if !CGPreflightListenEventAccess() {
-    _ = CGRequestListenEventAccess()  // shows the system prompt once; afterwards the app is listed, switched off
-    emit(["event": "ready", "inputMonitoring": false, "accessibility": inserter.accessibilityTrusted])
-    // A tap created now would never receive keys, so wait for the grant and let the parent restart us.
+if !keyboardAccess() {
+    emit(["event": "ready", "keyboard": false, "accessibility": inserter.accessibilityTrusted])
+    // A tap created now would never receive keys, so wait for access and let the parent restart us.
     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-        guard CGPreflightListenEventAccess() else { return }
-        emit(["event": "permission", "inputMonitoring": true])
+        guard keyboardAccess() else { return }
+        emit(["event": "permission", "keyboard": true])
         exit(exitPermissionGranted)
     }
     CFRunLoopRun()
@@ -119,7 +126,7 @@ if !CGPreflightListenEventAccess() {
 
 let tapOK = keyTap.start()
 let hidOK = fnHID.start()
-emit(["event": "ready", "inputMonitoring": true, "accessibility": inserter.accessibilityTrusted, "tap": tapOK,
+emit(["event": "ready", "keyboard": true, "accessibility": inserter.accessibilityTrusted, "tap": tapOK,
       "tapActive": keyTap.active, "hid": hidOK])
 if !tapOK && !hidOK { emit(["event": "error", "message": "could not open the keyboard (event tap and HID both failed)"]) }
 CFRunLoopRun()  // on total failure, stay alive so the parent shows the error; exit on stdin EOF

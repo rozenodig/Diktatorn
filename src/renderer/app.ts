@@ -144,8 +144,7 @@ function renderSegments(attribute: string, value: string): void {
 
 const PERMISSION_ROWS: Record<Permission, { title: string; why: (key: string) => string; icon: string }> = {
   microphone: { title: "Microphone", why: () => "To hear you while you dictate.", icon: "microphone" },
-  inputMonitoring: { title: "Input Monitoring", why: (key) => `To notice when you hold ${key}, in any app.`, icon: "keyboard" },
-  accessibility: { title: "Accessibility", why: () => "To type the text where you are writing.", icon: "accessibility" },
+  accessibility: { title: "Accessibility", why: (key) => `To notice when you hold ${key} and type the text where you are writing.`, icon: "accessibility" },
 };
 
 function permissionRow(permission: Permission): HTMLElement {
@@ -195,8 +194,8 @@ const STATUS_TITLES: Partial<Record<StatusUpdate["key"], string>> = {
 
 /** Statuses that a missing permission already explains; its row on Home says what to do. */
 function explainedByPermission(s: StatusUpdate, permissions: AppState["permissions"]): boolean {
-  const { microphone, inputMonitoring, accessibility } = permissions;
-  return (s.key === "mic" && microphone === false) || (s.key === "keys" && inputMonitoring === false) || (s.key === "paste" && accessibility === false);
+  const { microphone, accessibility } = permissions;
+  return (s.key === "mic" && microphone === false) || ((s.key === "keys" || s.key === "paste") && accessibility === false);
 }
 
 const HOME_TITLES = { ready: "Ready to dictate", busy: "Getting ready…", attention: "Needs your attention" };

@@ -50,7 +50,7 @@ import { WhisperProcessEngine } from "./speech-engine.ts";
 const MIN_HOLD_MS = 150;
 /** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
-/** The helper exits with this code once Input Monitoring is granted, so it can be restarted. */
+/** The helper exits with this code once it has keyboard access, so it can be restarted with a working tap. */
 const HELPER_EXIT_PERMISSION_GRANTED = 3;
 const MAX_RECENT = 20;
 const KEY_NAMES: Record<Settings["hotkey"], string> = {
@@ -89,12 +89,13 @@ let dictionary: DictionaryEntry[] = [];
 /** True until every first-run model is on disk. */
 let setup = false;
 /** As the helper last reported them; null until it has started. */
-const helperPermissions: Omit<Permissions, "microphone"> = { inputMonitoring: null, accessibility: null };
+const helperPermissions: Omit<Permissions, "microphone"> = { accessibility: null };
 let microphoneWatch: NodeJS.Timeout | null = null;
 
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const engineRestarts = new RestartPolicy();
 const cleanerRestarts = new RestartPolicy();
+const helperRestarts = new RestartPolicy();
 const statuses = new Map<string, StatusUpdate>();
 const recent: RecentDictation[] = [];
 let previousLanguage: Lang | null = null;
@@ -410,14 +411,22 @@ function applySettings(before: Settings, after: Settings): void {
 }
 
 const PERMISSION_HINT = "Diktatorn in System Settings → Privacy & Security";
+/** The dictation key's status while the helper has no working tap yet. */
+function waitingKeysStatus(accessibility: boolean, keyboard: boolean): StatusUpdate {
+  if (!accessibility) {
+    return { key: "keys", ok: false, text: `Accessibility not granted. Allow ${PERMISSION_HINT} → Accessibility; the dictation key starts working as soon as it is on.` };
+  }
+  // Accessibility normally brings keyboard access with it, and the helper then restarts with a working tap.
+  if (keyboard) return { key: "keys", ok: true, text: "keyboard access granted; restarting helper…" };
+  return { key: "keys", ok: false, text: `no keyboard access. Add ${PERMISSION_HINT} → Input Monitoring with +; the dictation key starts working as soon as it is on.` };
+}
 /** The System Settings pane for each permission. These fixed URLs are the only ones the app window can open. */
 const SETTINGS_PANES: Record<Permission, string> = {
   microphone: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
-  inputMonitoring: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
   accessibility: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
 };
 
-/** `restarted`: the helper is coming back after Input Monitoring was switched on, so it won't ask for Accessibility again. */
+/** `restarted`: the helper is coming back, after it got keyboard access or after a crash, so it won't ask for Accessibility again. */
 function startHelper(restarted = false): void {
   if (!existsSync(binary("diktatorn-helper"))) {
     setStatus({ key: "keys", ok: false, text: "missing helper; run npm run build:native" });
@@ -427,7 +436,7 @@ function startHelper(restarted = false): void {
   const proc = new JsonLinesProcess("helper", binary("diktatorn-helper"), env);
   helper = proc;
   type HelperEvent = {
-    event: string; down?: boolean; t: number; inputMonitoring?: boolean; accessibility?: boolean;
+    event: string; down?: boolean; t: number; keyboard?: boolean; accessibility?: boolean;
     tap?: boolean; tapActive?: boolean; hid?: boolean; message?: string; reason?: string;
   };
   proc.on("event", (msg: HelperEvent) => {
@@ -435,23 +444,22 @@ function startHelper(restarted = false): void {
       case "ready": {
         proc.request("hotkey", { key: settings.current.hotkey }).catch(() => {});
         const key = KEY_NAMES[settings.current.hotkey];
-        helperPermissions.inputMonitoring = msg.inputMonitoring ?? false;
         helperPermissions.accessibility = msg.accessibility ?? false;
-        setStatus(msg.inputMonitoring
+        setStatus(msg.keyboard
           ? { key: "keys", ok: true, text: `hold ${key} to dictate, double-tap for hands-free (HID ${msg.hid ? "on" : "off"}, event tap ${msg.tapActive ? "active" : msg.tap ? "listen-only, Esc not swallowed" : "off"})` }
-          : { key: "keys", ok: false, text: `Input Monitoring not granted. Allow ${PERMISSION_HINT} → Input Monitoring; the dictation key starts working as soon as it is on.` });
+          : waitingKeysStatus(msg.accessibility ?? false, false));
         setStatus(msg.accessibility
           ? { key: "paste", ok: true, text: "pastes into the frontmost app" }
           : { key: "paste", ok: false, text: `Accessibility not granted; transcripts are left on the clipboard. Allow ${PERMISSION_HINT} → Accessibility.` });
         break;
       }
       case "permission":
-        helperPermissions.inputMonitoring = true;
-        setStatus({ key: "keys", ok: true, text: "Input Monitoring granted; restarting helper…" });
+        setStatus(waitingKeysStatus(true, true));
         break;
       case "accessibility":
         helperPermissions.accessibility = true;
         setStatus({ key: "paste", ok: true, text: "pastes into the frontmost app" });
+        if (msg.keyboard !== undefined) setStatus(waitingKeysStatus(true, msg.keyboard));
         break;
       case "debug":
         console.log(`[helper] debug ${JSON.stringify(msg)}`);
@@ -473,10 +481,21 @@ function startHelper(restarted = false): void {
         break;
     }
   });
-  proc.on("exit", (code: number | null) => {
+  proc.on("exit", (code: number | null, signal: string | null) => {
     if (helper !== proc) return; // superseded or shutting down
-    if (code === HELPER_EXIT_PERMISSION_GRANTED) startHelper(true);
-    else setStatus({ key: "keys", ok: false, text: `helper exited (code ${code})` });
+    if (code === HELPER_EXIT_PERMISSION_GRANTED) {
+      startHelper(true);
+      return;
+    }
+    helper = null;
+    const reason = `code ${code}, signal ${signal}`;
+    const delay = helperRestarts.crashed(Date.now());
+    if (delay === null) {
+      setStatus({ key: "keys", ok: false, text: `keyboard helper keeps stopping (${reason}); restart Diktatorn` });
+      return;
+    }
+    setStatus({ key: "keys", ok: false, text: `keyboard helper stopped (${reason}); restarting…` });
+    setTimeout(() => startHelper(true), delay);
   });
 }
 

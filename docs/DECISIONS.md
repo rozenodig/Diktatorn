@@ -14,7 +14,7 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - Hold fn = push-to-talk; double-tap fn = hands-free toggle.
 - Esc cancels. A configurable fallback hotkey covers keyboards without fn.
 - An active CGEventTap, plus IOHID where fn is not reported.
-- Permissions: Accessibility and Input Monitoring.
+- Permissions: Accessibility only. It also gives the helper keyboard access, so Input Monitoring isn't requested separately; macOS doesn't list Diktatorn under Input Monitoring, so a step there could never be completed.
 
 **Alternatives considered:** CGEventTap only; Electron `globalShortcut` (no fn, no key-up).
 **Rationale:** _TODO_
