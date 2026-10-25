@@ -105,8 +105,9 @@ console.log(`signing with "${IDENTITY}"`);
 const files = walk(app);
 const code = files.filter(isMachO);
 for (const file of code) {
+  // A helper's identifier is its file name, because Electron's helper apps already use BUNDLE_ID.helper.
   const helper = HELPERS.includes(basename(file)) && file.startsWith(join(contents, "MacOS"));
-  sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file).replace("diktatorn-", "")}`] : []);
+  sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file)}`] : []);
 }
 const bundles = walk(join(contents, "Frameworks"), true)
   .filter((dir) => dir.endsWith(".framework") || dir.endsWith(".app"))
