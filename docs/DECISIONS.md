@@ -5,7 +5,9 @@ Each entry records the choice, the alternatives that were considered, and why. R
 ## 1. Native helper
 
 **Choice:** A small Swift executable for OS integration, talking to Electron over stdio with one JSON message per line.
+
 **Alternatives considered:** N-API add-on (Objective-C++), Rust (napi-rs).
+
 **Rationale:** _TODO_
 
 ## 2. Key capture
@@ -17,6 +19,7 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - Permissions: Accessibility only. It also gives the helper keyboard access, so Input Monitoring isn't requested separately; macOS doesn't list Diktatorn under Input Monitoring, so a step there could never be completed.
 
 **Alternatives considered:** CGEventTap only; Electron `globalShortcut` (no fn, no key-up).
+
 **Rationale:** _TODO_
 
 ## 3. Audio capture and voice activity detection
@@ -26,6 +29,7 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - Voice activity detection: whisper.cpp's built-in Silero, used only to trim silence and to skip empty recordings.
 
 **Alternatives considered:** capture in the Swift helper (AVAudioEngine); a native Node audio module; Silero in the renderer; an energy gate.
+
 **Rationale:** _TODO_
 
 ## 4. Speech-recognition runtime and models
@@ -37,12 +41,15 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - kb-whisper-large (q5_0) as an optional higher-accuracy model.
 
 **Alternatives considered:** a Node binding for whisper.cpp in a utility process; the whisper.cpp HTTP server; WhisperKit (Core ML).
+
 **Rationale:** _TODO_
 
 ## 5. Language handling
 
 **Choice:** Automatic detection restricted to Swedish and English, routing to the Swedish or English model, with a manual override (Auto / Svenska / English).
+
 **Alternatives considered:** a separate hotkey or setting per language; one model for everything.
+
 **Rationale:** _TODO_
 
 ## 6. Text cleanup
@@ -55,18 +62,23 @@ Each entry records the choice, the alternatives that were considered, and why. R
 Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is part of the first-run download, and the pass can be switched off under Smart cleanup (on by default).
 
 **Alternatives considered:** rules only; LLM only. For the runtime: node-llama-cpp in a utility process; Ollama. For enforcing deletion-only output: a grammar that only allows subsequences of the input during decoding.
+
 **Rationale:** _TODO_
 
 ## 7. Insertion
 
 **Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table: in terminals newlines become spaces, and Chromium and Electron apps get a longer restore delay.
+
 **Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
+
 **Rationale:** _TODO_
 
 ## 8. Overlay
 
 **Choice:** A click-through, non-focusable Electron panel shown without activation. A native non-activating panel is the fallback if the overlay ever needs to be clickable.
+
 **Alternatives considered:** native non-activating `NSPanel` from the start; a clickable window that re-activates the previous app.
+
 **Rationale:** _TODO_
 
 ## 9. Storage
@@ -76,6 +88,7 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 - No history on disk: recent dictations are kept in memory for the current session only. No audio is ever stored.
 
 **Alternatives considered:** SQLite history (`node:sqlite`); JSONL history; SQLite for everything.
+
 **Rationale:** _TODO_
 
 ## 10. Speech engine boundary
@@ -84,5 +97,7 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 - An utterance-level interface behind a process boundary: `ensureLoaded`, `speechSegments`, `detectLanguage`, `transcribe` and `close`.
 - The engine provides mechanisms only. Policy (silence trimming, the empty-recording gate, language routing) lives in the caller.
 - A future meeting mode reuses it by segmenting audio before calling `transcribe`.
+
 **Alternatives considered:** a streaming session API; a local HTTP service.
+
 **Rationale:** _TODO_
