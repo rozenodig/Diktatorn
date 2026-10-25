@@ -83,3 +83,15 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 - A future meeting mode reuses it by segmenting audio before calling `transcribe`.
 **Alternatives considered:** a streaming session API; a local HTTP service.
 **Rationale:** _TODO_
+
+## 11. Packaging and signing
+
+**Choice:**
+- `npm run package`: Electron Packager, a `.dmg` made with `hdiutil`, and its SHA-256. Apple Silicon only.
+- Signed with a self-signed code-signing certificate, under the hardened runtime. macOS ties privacy permissions to the designated requirement, which is then "this bundle identifier, signed by this certificate", so an update keeps Accessibility.
+- Not notarized: each downloaded version is opened once through Privacy & Security → Open Anyway.
+- Electron fuses: running as Node, `NODE_OPTIONS` and `--inspect` are off, and the app only loads its integrity-checked asar, so no other code can run with Diktatorn's permissions.
+
+**Alternatives considered:** Developer ID signing and notarization (needs the paid Apple Developer Program); ad-hoc signing (the requirement pins one build's cdhash, so every update loses Accessibility); electron-builder.
+
+**Rationale:** _TODO_
