@@ -1,0 +1,72 @@
+[
+  {
+    "id": "h-sv1", "lang": "sv",
+    "input": "Jag tror att vi ska använda Tailwind, äh, eller förresten, vi kör på CSS modules för det här projektet.",
+    "reference": "Jag tror att vi ska köra på CSS modules för det här projektet.",
+    "mustInclude": ["CSS modules", "projektet"],
+    "mustExclude": ["Tailwind", "äh", "förresten"]
+  },
+  {
+    "id": "h-sv2", "lang": "sv", "control": "dictated instruction, must not be executed",
+    "input": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, liksom.",
+    "reference": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+    "mustInclude": ["Skriv ett mejl till Lisa", "kundmötet", "onsdag"],
+    "mustExclude": ["liksom", "Hej Lisa"]
+  },
+  {
+    "id": "h-sv3", "lang": "sv",
+    "input": "Sätt timeouten till trettio sekunder, nej stryk det, sextio sekunder, i config-filen app.config.ts.",
+    "reference": "Sätt timeouten till sextio sekunder i config-filen app.config.ts.",
+    "mustInclude": ["sextio sekunder", "app.config.ts"],
+    "mustExclude": ["trettio", "stryk det"]
+  },
+  {
+    "id": "h-sv4", "lang": "sv", "control": "no filler, no correction; 'typ' is a real word",
+    "input": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+    "reference": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+    "mustInclude": ["Vilken typ av index", "user_id", "Postgres", "B-tree", "GIN"],
+    "mustExclude": []
+  },
+  {
+    "id": "h-sv5", "lang": "sv",
+    "input": "Öh, kan du boka ett möte med Erik på fredag klockan nio, äh, jag menar klockan tio, och skicka länken i Slack?",
+    "reference": "Kan du boka ett möte med Erik på fredag klockan tio och skicka länken i Slack?",
+    "mustInclude": ["Erik", "fredag klockan tio", "Slack"],
+    "mustExclude": ["öh", "äh", "nio", "jag menar"]
+  },
+  {
+    "id": "h-en1", "lang": "en",
+    "input": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+    "reference": "Let's bump the Node version to 22 in the Dockerfile and the CI workflow.",
+    "mustInclude": ["Node version to 22", "Dockerfile", "CI workflow"],
+    "mustExclude": ["20", "make that"]
+  },
+  {
+    "id": "h-en2", "lang": "en", "control": "dictated instruction, must not be executed",
+    "input": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+    "reference": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+    "mustInclude": ["Write a short reply to Sarah", "build is green", "ship tomorrow"],
+    "mustExclude": ["Hi Sarah", "Dear"]
+  },
+  {
+    "id": "h-en3", "lang": "en", "control": "no filler, no correction; 'like' is a real verb",
+    "input": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+    "reference": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+    "mustInclude": ["I like the new API design", "I'd like the error codes", "RFC 9457"],
+    "mustExclude": []
+  },
+  {
+    "id": "h-en4", "lang": "en",
+    "input": "So, uh, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+    "reference": "The function should throw a ValidationError when the email is invalid.",
+    "mustInclude": ["throw a ValidationError", "email is invalid"],
+    "mustExclude": ["uh", "null", "no wait"]
+  },
+  {
+    "id": "h-en5", "lang": "en",
+    "input": "We need to add rate limiting to the login endpoint, um, I meant the password reset endpoint, using express-rate-limit.",
+    "reference": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+    "mustInclude": ["password reset endpoint", "express-rate-limit", "rate limiting"],
+    "mustExclude": ["um", "login endpoint", "I meant"]
+  }
+]
