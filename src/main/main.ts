@@ -7,6 +7,7 @@ import {
   clipboard,
   ipcMain,
   Menu,
+  nativeImage,
   nativeTheme,
   session,
   shell,
@@ -590,7 +591,20 @@ models.on("ready", (id: ModelId) => {
   else void loadSpeechEngine();
 });
 
+/**
+ * `npm run package` starts the signed app with DIKTATORN_LAUNCH_CHECK=1 to prove that it loads its
+ * frameworks, helper processes and packaged files, and quits before it would ask for any permission.
+ */
+async function launchCheck(): Promise<void> {
+  const win = new BrowserWindow({ show: false, webPreferences });
+  await win.loadFile(renderer("overlay.html"));
+  const icon = nativeImage.createFromPath(join(app.getAppPath(), "assets", "trayTemplate.png"));
+  console.log(icon.isEmpty() ? "launch check: menu bar icon missing" : "launch check: ok");
+  app.exit(icon.isEmpty() ? 1 : 0);
+}
+
 app.whenReady().then(async () => {
+  if (process.env.DIKTATORN_LAUNCH_CHECK) return launchCheck();
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "media"));
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === "media");
   // View has only the zoom items, so text in the app window can be made larger (⌘+, ⌘−, ⌘0).

@@ -116,6 +116,18 @@ run("codesign", ["--verify", "--deep", "--strict", app]);
 const unsigned = code.filter((file) => !signedByIdentity(file));
 if (unsigned.length > 0) throw new Error(`not signed with "${IDENTITY}":\n${unsigned.join("\n")}`);
 
+// A valid signature doesn't mean the app starts: the hardened runtime and the fuses are only
+// enforced at launch.
+const check = spawnSync(join(contents, "MacOS", "Diktatorn"), [], {
+  env: { ...process.env, DIKTATORN_LAUNCH_CHECK: "1" },
+  encoding: "utf8",
+  timeout: 60_000,
+});
+if (check.status !== 0 || !check.stdout.includes("launch check: ok")) {
+  throw new Error(`the signed app does not start (status ${check.status}):\n${check.stdout}${check.stderr}`);
+}
+console.log("launch check: ok");
+
 const dmg = join(OUT, `Diktatorn-${version}-arm64.dmg`);
 const stage = join(OUT, "dmg");
 mkdirSync(stage);
