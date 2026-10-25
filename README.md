@@ -65,7 +65,7 @@ npm start
 
 **First launch:**
 - It downloads about 4.5 GB of models from Hugging Face. Each one is pinned to a fixed commit and checked against its SHA-256 before use, and an interrupted download resumes where it stopped.
-- macOS asks for three permissions, each explained under [Privacy](#privacy). The first-run screen lists them, with a button that opens the right pane of System Settings, and marks each one as allowed as soon as you switch it on.
+- macOS asks for two permissions, each explained under [Privacy](#privacy). The first-run screen lists them, with a button that opens the right pane of System Settings, and marks each one as allowed as soon as you switch it on.
 - Development builds run as `build/Diktatorn.app`, so the permission prompts say Diktatorn.
 
 ## Hardware
@@ -87,8 +87,7 @@ Measured on an M1 Max with 64 GB:
 | Permission | Why |
 |---|---|
 | Microphone | To hear you while you dictate. |
-| Input Monitoring | To notice the dictation key. The helper reports only that key, Esc, and "another key was pressed", never which keys you type. |
-| Accessibility | To paste with ⌘V, and to keep Esc from reaching the app you're typing in while it cancels a dictation. Without it, transcripts are left on the clipboard instead. |
+| Accessibility | To notice the dictation key, to paste with ⌘V, and to keep Esc from reaching the app you're typing in while it cancels a dictation. The helper reports only the dictation key, Esc, and "another key was pressed", never which keys you type. Without Accessibility, the dictation key doesn't work and transcripts are left on the clipboard. |
 
 **Clipboard.**
 - Your clipboard is restored after each paste, unless you copied something new in the meantime.
