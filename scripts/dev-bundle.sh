@@ -17,6 +17,9 @@ if [ -d "$DEST" ] && [ "$(cat "$STAMP" 2>/dev/null)" = "$VERSION" ]; then
 fi
 
 echo "build/Diktatorn.app: creating from Electron $VERSION"
+# Electron has no install script; its runtime is downloaded (checksum-verified, cached in
+# ~/Library/Caches/electron) on first use. Copying dist/ directly skips that, so fetch it here.
+node "$ROOT/node_modules/electron/install.js"
 rm -rf "$DEST"
 mkdir -p "$ROOT/build"
 ditto "$SRC" "$DEST"
