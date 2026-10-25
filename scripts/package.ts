@@ -83,16 +83,22 @@ cpSync(join(ROOT, "native", "vendor", "whisper.cpp", "LICENSE"), join(licenses, 
 cpSync(join(ROOT, "native", "vendor", "llama.cpp", "LICENSE"), join(licenses, "llama.cpp-LICENSE"));
 cpSync(join(ROOT, "assets", "THIRD-PARTY-NOTICES.txt"), join(licenses, "THIRD-PARTY-NOTICES.txt"));
 
-// Without these, anyone who can start the app could run their own code inside it, with the
-// Accessibility access the user gave Diktatorn: as plain Node, through NODE_OPTIONS or a
-// debugger, or by editing the app's files.
+// Without the first five, anyone who can start the app could run their own code inside it, with
+// the Accessibility access the user gave Diktatorn: as plain Node, through NODE_OPTIONS or a
+// debugger, or by editing the app's files. The rest keep Electron's defaults. Every fuse is set
+// explicitly, so an Electron upgrade that adds one fails here until it has been decided.
 await flipFuses(app, {
   version: FuseVersion.V1,
+  strictlyRequireAllFuses: true,
   [FuseV1Options.RunAsNode]: false,
   [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
   [FuseV1Options.EnableNodeCliInspectArguments]: false,
   [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
   [FuseV1Options.OnlyLoadAppFromAsar]: true,
+  [FuseV1Options.EnableCookieEncryption]: false,
+  [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
+  [FuseV1Options.GrantFileProtocolExtraPrivileges]: true,
+  [FuseV1Options.WasmTrapHandlers]: true,
 });
 
 // Inside out: every executable and library, then the frameworks and Electron helper apps from the
