@@ -6,21 +6,9 @@
 import { flipFuses, FuseV1Options, FuseVersion } from "@electron/fuses";
 import { packager } from "@electron/packager";
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  closeSync,
-  cpSync,
-  existsSync,
-  mkdirSync,
-  openSync,
-  readdirSync,
-  readFileSync,
-  readSync,
-  realpathSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { isMachO, walk } from "./bundle-files.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const OUT = join(ROOT, "build", "release");
@@ -152,23 +140,6 @@ rmSync(stage, { recursive: true });
 const sha = execFileSync("shasum", ["-a", "256", basename(dmg)], { cwd: OUT, encoding: "utf8" });
 writeFileSync(`${dmg}.sha256`, sha);
 console.log(`\n${dmg}\n${sha.trim()}`);
-
-/** Real paths of the files (or directories) under `dir`, each once: frameworks reach the same files through Versions/Current symlinks. */
-function walk(dir: string, directories = false): string[] {
-  const found = new Set<string>();
-  for (const entry of readdirSync(dir, { withFileTypes: true, recursive: true })) {
-    if (directories ? entry.isDirectory() : entry.isFile()) found.add(realpathSync(join(entry.parentPath, entry.name)));
-  }
-  return [...found];
-}
-
-function isMachO(file: string): boolean {
-  const head = Buffer.alloc(4);
-  const fd = openSync(file, "r");
-  const bytes = readSync(fd, head, 0, 4, 0);
-  closeSync(fd);
-  return bytes === 4 && [0xfeedfacf, 0xcffaedfe, 0xcafebabe, 0xbebafeca].includes(head.readUInt32BE(0));
-}
 
 function signedByIdentity(file: string): boolean {
   // codesign prints the signature details on stderr.
