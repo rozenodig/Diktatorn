@@ -16,7 +16,7 @@ import {
   type Tray,
 } from "electron";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   FIRST_RUN_MODELS,
   IPC,
@@ -60,7 +60,10 @@ const KEY_NAMES: Record<Settings["hotkey"], string> = {
   rightControl: "right ⌃",
 };
 
-const binary = (name: string) => join(app.getAppPath(), "build", "bin", name);
+// A packaged app keeps the helpers beside its own executable in Contents/MacOS, where they are
+// signed with the app. Development builds run them from build/bin.
+const binary = (name: string) =>
+  app.isPackaged ? join(dirname(process.execPath), name) : join(app.getAppPath(), "build", "bin", name);
 const renderer = (file: string) => join(import.meta.dirname, "..", "renderer", file);
 const preload = join(import.meta.dirname, "..", "preload", "preload.cjs");
 const webPreferences = { preload, sandbox: true, contextIsolation: true, nodeIntegration: false };
