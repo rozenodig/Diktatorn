@@ -11,8 +11,8 @@ Each entry records the choice, the alternatives that were considered, and why. R
 ## 2. Key capture
 
 **Choice:**
-- Hold fn = push-to-talk; double-tap fn = hands-free toggle.
-- Esc cancels. A configurable fallback hotkey covers keyboards without fn.
+- Hold the dictation key = push-to-talk; double-tap it = hands-free toggle. Esc cancels.
+- The key is fn by default, or a right-hand ⌥, ⌘ or ⌃ for keyboards without fn.
 - An active CGEventTap, plus IOHID where fn is not reported.
 - Permissions: Accessibility only. It also gives the helper keyboard access, so Input Monitoring isn't requested separately; macOS doesn't list Diktatorn under Input Monitoring, so a step there could never be completed.
 
@@ -50,16 +50,16 @@ Each entry records the choice, the alternatives that were considered, and why. R
 **Choice:** a hybrid pipeline.
 1. Conservative rules always run (unambiguous fillers, spacing, capitalisation).
 2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used. Each deleted run must also be fillers or a self-correction (a correction phrase plus the words it takes back); any other deleted words are kept.
-3. Dictionary replacements and snippets are applied deterministically at the end.
+3. Dictionary replacements are applied deterministically at the end. The same terms are passed to Whisper as a prompt.
 
-Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is downloaded separately from the speech models.
+Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is part of the first-run download, and the pass can be switched off under Smart cleanup (on by default).
 
 **Alternatives considered:** rules only; LLM only. For the runtime: node-llama-cpp in a utility process; Ollama. For enforcing deletion-only output: a grammar that only allows subsequences of the input during decoding.
 **Rationale:** _TODO_
 
 ## 7. Insertion
 
-**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table (e.g. terminals: plain text, no trailing newline).
+**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table: in terminals newlines become spaces, and Chromium and Electron apps get a longer restore delay.
 **Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
 **Rationale:** _TODO_
 
@@ -71,8 +71,11 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 ## 9. Storage
 
-**Choice:** JSON files for settings and the dictionary, SQLite for history. No audio is stored by default.
-**Alternatives considered:** JSON/JSONL only; SQLite for everything.
+**Choice:**
+- JSON files for settings and the dictionary, written atomically.
+- No history on disk: recent dictations are kept in memory for the current session only. No audio is ever stored.
+
+**Alternatives considered:** SQLite history (`node:sqlite`); JSONL history; SQLite for everything.
 **Rationale:** _TODO_
 
 ## 10. Speech engine boundary
