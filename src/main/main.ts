@@ -48,6 +48,14 @@ import { RestartPolicy } from "./restart.ts";
 import { SettingsStore } from "./settings.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
+// Finder and LaunchServices start the packaged app without arguments. A command-line switch such
+// as --remote-debugging-port, which no Electron fuse turns off, would let other code drive the app
+// and use its permissions, so the packaged app refuses to start with any.
+if (app.isPackaged && process.argv.length > 1) {
+  console.error(`Diktatorn doesn't take command-line arguments: ${process.argv.slice(1).join(" ")}`);
+  process.exit(1);
+}
+
 const MIN_HOLD_MS = 150;
 /** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;

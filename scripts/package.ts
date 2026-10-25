@@ -117,14 +117,20 @@ const unsigned = code.filter((file) => !signedByIdentity(file));
 if (unsigned.length > 0) throw new Error(`not signed with "${IDENTITY}":\n${unsigned.join("\n")}`);
 
 // A valid signature doesn't mean the app starts: the hardened runtime and the fuses are only
-// enforced at launch.
-const check = spawnSync(join(contents, "MacOS", "Diktatorn"), [], {
-  env: { ...process.env, DIKTATORN_LAUNCH_CHECK: "1" },
-  encoding: "utf8",
-  timeout: 60_000,
-});
+// enforced at launch. It must also refuse command-line switches, which no fuse covers.
+const launch = (args: string[]) =>
+  spawnSync(join(contents, "MacOS", "Diktatorn"), args, {
+    env: { ...process.env, DIKTATORN_LAUNCH_CHECK: "1" },
+    encoding: "utf8",
+    timeout: 60_000,
+  });
+const check = launch([]);
 if (check.status !== 0 || !check.stdout.includes("launch check: ok")) {
   throw new Error(`the signed app does not start (status ${check.status}):\n${check.stdout}${check.stderr}`);
+}
+const withSwitch = launch(["--remote-debugging-port=0"]);
+if (withSwitch.status === 0 || withSwitch.stdout.includes("launch check: ok")) {
+  throw new Error("the signed app starts with --remote-debugging-port, which would let other code use its permissions");
 }
 console.log("launch check: ok");
 
