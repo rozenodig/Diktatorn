@@ -64,9 +64,9 @@ Cleanup is measured on its own on 20 transcripts with hesitations, fillers and s
 
 Diktatorn needs an Apple Silicon Mac with macOS 14 or later.
 
-1. Download `Diktatorn-<version>-arm64.dmg` from the [latest release](https://github.com/rozenodig/Diktatorn/releases/latest). To check it, put the `.sha256` file from the same release next to it and run `shasum -a 256 -c Diktatorn-<version>-arm64.dmg.sha256`.
+1. Download `Diktatorn-<version>-arm64.dmg` from the [latest release](https://github.com/rozenodig/Diktatorn/releases/latest). To check it, download the `.sha256` file from the same release into the same folder and run `shasum -a 256 -c Diktatorn-<version>-arm64.dmg.sha256` there.
 2. Open the .dmg and drag Diktatorn to Applications.
-3. Open Diktatorn. macOS says *"Diktatorn" can't be opened because Apple cannot check it for malicious software.* Close the message.
+3. Open Diktatorn. macOS warns that Apple can't check it for malicious software; on macOS 14 it says *"Diktatorn" can't be opened because Apple cannot check it for malicious software.* Close the message without moving Diktatorn to the Bin.
 4. Go to System Settings → Privacy & Security, scroll down to Security and click **Open Anyway** next to the message about Diktatorn, then confirm. On macOS 14 you can instead Control-click Diktatorn in Applications and choose **Open**.
 
 **Why the warning:** Apple only stops showing it for notarized apps, and notarizing needs a paid developer account. Diktatorn is signed with its own certificate instead. macOS ties Diktatorn's permissions to that certificate, so an update keeps them, but each newly downloaded version has to be opened this way once.
