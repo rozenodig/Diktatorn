@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { applyDictionary, DictionaryFile, dictionaryPrompt, parseDictionary, saveDictionary } from "../src/main/cleanup/dictionary.ts";
 import type { Cleaner, LlmOutput } from "../src/main/cleanup/llm.ts";
-import { cleanUp, unexplainedDeletion } from "../src/main/cleanup/pipeline.ts";
+import { cleanUp, restoreUnexplained } from "../src/main/cleanup/pipeline.ts";
 import { applyRules } from "../src/main/cleanup/rules.ts";
 import { joinKept, keptWords, splitWords } from "../src/main/cleanup/words.ts";
 
@@ -80,17 +80,23 @@ test("dictionary files are validated and terms become a bounded recognition prom
   assert.ok(dictionaryPrompt(many).length <= 601);
 });
 
-test("a long deleted run needs a correction phrase unless it is only fillers", () => {
+test("a deleted run must be only fillers, or a correction phrase with the words it takes back", () => {
   const check = (text: string, deleted: string) => {
     const words = splitWords(text);
     const drop = splitWords(deleted);
     const start = words.findIndex((_, i) => drop.every((d, j) => words[i + j] === d));
-    return unexplainedDeletion(words, words.map((_, i) => i < start || i >= start + drop.length));
+    const { keep, restored } = restoreUnexplained(words, words.map((_, i) => i < start || i >= start + drop.length));
+    assert.equal(keep.every(Boolean), restored.length > 0, "a restored run is kept again");
+    return restored[0] ?? null;
   };
   assert.equal(check("Sätt den till trettio, nej stryk det, sextio sekunder.", "trettio, nej stryk det,"), null);
   assert.equal(check("Bump it to 20, make that 22, today.", "20, make that"), null);
   assert.equal(check("So ja alltså typ we ship.", "ja alltså typ"), null);
-  assert.equal(check("Use B-tree or GIN here.", "B-tree or"), null, "two words need no cue");
+  assert.equal(check("It was, like, fine.", "like,"), null);
+  assert.equal(check("However, the tests pass.", "However,"), "However,", "a single word needs a reason too");
+  assert.equal(check("Use B-tree or GIN here.", "B-tree or"), "B-tree or");
+  assert.equal(check("Return null, no wait, throw instead.", "no wait,"), "no wait,", "a cue alone takes nothing back");
+  assert.equal(check("Det går, nej, inte.", "nej,"), "nej,");
   assert.equal(
     check("Write a short reply to Sarah saying the build is green.", "Write a short reply to Sarah saying"),
     "Write a short reply to Sarah saying",
@@ -133,6 +139,18 @@ test("an accepted model pass deletes words; the dictionary still applies afterwa
   assert.equal(result.rulesText, "Pusha till main, nej vänta, till develop på github.");
   assert.equal(result.text, "Pusha till develop på GitHub.");
   assert.equal(result.llm?.status, "accepted");
+});
+
+test("words the model deletes without a reason are kept, while its filler deletions still apply", async () => {
+  const llm = fakeCleaner(() => ({ text: "We should ship it today." }));
+  const result = await cleanUp("However, we should, like, ship it today.", opts(llm));
+  assert.equal(result.text, "However, we should ship it today.");
+  assert.equal(result.llm?.status, "accepted");
+  assert.match(result.llm?.detail ?? "", /kept "However,"/);
+
+  const only = await cleanUp("The fix is actually simple, we just clear the cache.", opts(fakeCleaner(() => ({ text: "The fix is simple, we just clear the cache." }))));
+  assert.equal(only.text, "The fix is actually simple, we just clear the cache.");
+  assert.equal(only.llm?.status, "rejected", "nothing is left to delete");
 });
 
 test("model output that is not a pure deletion, or a timeout, falls back to the rule output", async () => {

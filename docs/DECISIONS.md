@@ -49,7 +49,7 @@ Each entry records the choice, the alternatives that were considered, and why. R
 
 **Choice:** a hybrid pipeline.
 1. Conservative rules always run (unambiguous fillers, spacing, capitalisation).
-2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used.
+2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used. Each deleted run must also be fillers or a self-correction (a correction phrase plus the words it takes back); any other deleted words are kept.
 3. Dictionary replacements and snippets are applied deterministically at the end.
 
 Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is downloaded separately from the speech models.

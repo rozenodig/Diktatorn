@@ -1,7 +1,8 @@
 // Cleanup pipeline: conservative rules, then the optional language-model pass, then the user
 // dictionary. The model's answer is only used to decide which words to delete; it is
 // rejected unless it is the rule output with words removed, and the rule output is used
-// instead whenever the model is off, slow, wrong or failing.
+// instead whenever the model is off, slow, wrong or failing. Each deleted run must then be
+// fillers or a self-correction, and any other run is put back.
 import { applyDictionary, type DictionaryEntry } from "./dictionary.ts";
 import type { Cleaner } from "./llm.ts";
 import { applyRules, isHesitation } from "./rules.ts";
@@ -14,14 +15,14 @@ const MIN_LLM_WORDS = 4;
 /** A cleanup that deletes more than this share of a longer transcript is assumed to be wrong. */
 const MAX_DELETED_SHARE = 0.5;
 const LONG_TRANSCRIPT_WORDS = 8;
-/** Deleting this many words in a row needs a reason: a correction phrase in the deleted run. */
-const MIN_RUN_NEEDING_CUE = 3;
-/** Ways speakers take something back. A long deletion without one is more likely the model
- * acting on the text (answering or carrying out an instruction) than a self-correction. */
+/** Ways speakers take something back. Any deletion other than fillers must contain one, plus the
+ * words it takes back: otherwise the model has dropped a real word ("however"), hidden a
+ * correction by deleting only the cue, or acted on the text (answered or carried out an
+ * instruction) instead of cleaning it, and those words are kept. */
 const CORRECTION_CUES = [
   "nej", "förlåt", "menar", "vänta", "stryk det", "rättare sagt",
   "no wait", "wait no", "actually", "sorry", "i mean", "i meant", "scratch that", "make that", "rather",
-];
+].map((cue) => cue.split(" "));
 const FILLER_WORDS = new Set(["typ", "liksom", "alltså", "ba", "ja", "like", "you", "know"]);
 
 export type LlmStatus = "accepted" | "unchanged" | "skipped" | "rejected" | "timeout" | "error";
@@ -56,20 +57,25 @@ export async function cleanUp(raw: string, opts: CleanupOptions): Promise<Cleanu
         const ms = performance.now() - t;
         const keep = keptWords(words, splitWords(out.text));
         const kept = keep?.filter(Boolean).length ?? 0;
-        const unexplained = keep && unexplainedDeletion(words, keep);
         if (out.stop !== "eog") {
           llm = { status: out.stop === "timeout" ? "timeout" : "rejected", ms, detail: `stopped: ${out.stop}` };
         } else if (!keep || kept === 0) {
           llm = { status: "rejected", ms, detail: `not a deletion of the input: ${out.text}` };
         } else if (words.length >= LONG_TRANSCRIPT_WORDS && kept < words.length * (1 - MAX_DELETED_SHARE)) {
           llm = { status: "rejected", ms, detail: `would delete ${words.length - kept} of ${words.length} words` };
-        } else if (unexplained) {
-          llm = { status: "rejected", ms, detail: `deletes "${unexplained}" without a correction phrase` };
         } else if (kept === words.length) {
           llm = { status: "unchanged", ms, detail: "" };
         } else {
-          text = joinKept(words, keep);
-          llm = { status: "accepted", ms, detail: `deleted ${words.length - kept} of ${words.length} words` };
+          const checked = restoreUnexplained(words, keep);
+          const deleted = checked.keep.filter((k) => !k).length;
+          const restored = checked.restored.map((run) => `"${run}"`).join(", ");
+          if (deleted === 0) {
+            llm = { status: "rejected", ms, detail: `deletes ${restored} without a correction phrase` };
+          } else {
+            text = joinKept(words, checked.keep);
+            const note = restored ? `; kept ${restored}, no correction phrase` : "";
+            llm = { status: "accepted", ms, detail: `deleted ${deleted} of ${words.length} words${note}` };
+          }
         }
       } catch (err) {
         llm = { status: "error", ms: performance.now() - t, detail: String(err) };
@@ -81,8 +87,13 @@ export async function cleanUp(raw: string, opts: CleanupOptions): Promise<Cleanu
   return { text, rulesText, llm, ms: performance.now() - t0 };
 }
 
-/** The first long deleted run that is neither all fillers nor contains a correction phrase. */
-export function unexplainedDeletion(words: string[], keep: boolean[]): string | null {
+/**
+ * The deletion with every run that is neither all fillers nor a correction phrase with what it
+ * takes back put back, and the runs that were put back.
+ */
+export function restoreUnexplained(words: string[], keep: boolean[]): { keep: boolean[]; restored: string[] } {
+  const out = [...keep];
+  const restored: string[] = [];
   for (let i = 0; i < words.length; ) {
     if (keep[i]) {
       i++;
@@ -91,12 +102,27 @@ export function unexplainedDeletion(words: string[], keep: boolean[]): string | 
     let end = i;
     while (end < words.length && !keep[end]) end++;
     const run = words.slice(i, end);
-    const bare = ` ${run.map(bareWord).join(" ")} `;
-    const allFillers = run.every((w) => isHesitation(w) || FILLER_WORDS.has(bareWord(w)));
-    if (run.length >= MIN_RUN_NEEDING_CUE && !allFillers && !CORRECTION_CUES.some((cue) => bare.includes(` ${cue} `))) {
-      return run.join(" ");
+    if (!isFillerRun(run) && !isCorrection(run)) {
+      out.fill(true, i, end);
+      restored.push(run.join(" "));
     }
     i = end;
   }
-  return null;
+  return { keep: out, restored };
+}
+
+function isFillerRun(run: string[]): boolean {
+  return run.every((w) => isHesitation(w) || FILLER_WORDS.has(bareWord(w)));
+}
+
+/** A correction phrase plus at least one word that is neither part of it nor a filler. */
+function isCorrection(run: string[]): boolean {
+  const bare = run.map(bareWord);
+  const inCue = bare.map(() => false);
+  for (let i = 0; i < bare.length; i++) {
+    for (const cue of CORRECTION_CUES) {
+      if (cue.every((w, j) => bare[i + j] === w)) cue.forEach((_, j) => (inCue[i + j] = true));
+    }
+  }
+  return inCue.includes(true) && run.some((w, i) => !inCue[i] && !isFillerRun([w]));
 }
