@@ -28,6 +28,7 @@
 
 import ApplicationServices
 import Foundation
+import IOKit.hid
 
 let exitPermissionGranted: Int32 = 3
 let hotkeyState = HotkeyState()
@@ -109,8 +110,10 @@ if !CGPreflightListenEventAccess() {
     _ = CGRequestListenEventAccess()  // shows the system prompt once; afterwards the app is listed, switched off
     emit(["event": "ready", "inputMonitoring": false, "accessibility": inserter.accessibilityTrusted])
     // A tap created now would never receive keys, so wait for the grant and let the parent restart us.
+    // CGPreflightListenEventAccess keeps returning its first answer for the life of the process, so
+    // it never sees the grant; IOHIDCheckAccess asks the system again on every call.
     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-        guard CGPreflightListenEventAccess() else { return }
+        guard IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted else { return }
         emit(["event": "permission", "inputMonitoring": true])
         exit(exitPermissionGranted)
     }
