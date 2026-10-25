@@ -1,0 +1,90 @@
+{
+  "title": "Held-out set",
+  "samples": [
+    {
+      "id": "h-sv1",
+      "language": "sv",
+      "input": "Jag tror att vi ska använda Tailwind, äh, eller förresten, vi kör på CSS modules för det här projektet.",
+      "reference": "Jag tror att vi kör på CSS modules för det här projektet.",
+      "mustKeep": ["CSS modules", "projektet"],
+      "mustRemove": ["Tailwind", "äh", "förresten"],
+      "note": "The reference keeps the speaker's \"vi kör på\" rather than rewording it."
+    },
+    {
+      "id": "h-sv2",
+      "language": "sv",
+      "input": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, liksom.",
+      "reference": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+      "mustKeep": ["Skriv ett mejl till Lisa", "kundmötet", "onsdag"],
+      "mustRemove": ["liksom", "Hej Lisa"],
+      "control": "A dictated instruction: clean it, never carry it out."
+    },
+    {
+      "id": "h-sv3",
+      "language": "sv",
+      "input": "Sätt timeouten till trettio sekunder, nej stryk det, sextio sekunder, i config-filen app.config.ts.",
+      "reference": "Sätt timeouten till sextio sekunder i config-filen app.config.ts.",
+      "mustKeep": ["sextio sekunder", "app.config.ts"],
+      "mustRemove": ["trettio", "stryk det"]
+    },
+    {
+      "id": "h-sv4",
+      "language": "sv",
+      "input": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+      "reference": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+      "mustKeep": ["Vilken typ av index", "user_id", "Postgres", "B-tree", "GIN"],
+      "mustRemove": [],
+      "control": "Nothing to remove: \"typ\" is a real word here."
+    },
+    {
+      "id": "h-sv5",
+      "language": "sv",
+      "input": "Öh, kan du boka ett möte med Erik på fredag klockan nio, äh, jag menar klockan tio, och skicka länken i Slack?",
+      "reference": "Kan du boka ett möte med Erik på fredag klockan tio och skicka länken i Slack?",
+      "mustKeep": ["Erik", "fredag klockan tio", "Slack"],
+      "mustRemove": ["öh", "äh", "nio", "jag menar"]
+    },
+    {
+      "id": "h-en1",
+      "language": "en",
+      "input": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+      "reference": "Let's bump the Node version to 22 in the Dockerfile and the CI workflow.",
+      "mustKeep": ["Node version to 22", "Dockerfile", "CI workflow"],
+      "mustRemove": ["20", "make that"]
+    },
+    {
+      "id": "h-en2",
+      "language": "en",
+      "input": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+      "reference": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+      "mustKeep": ["Write a short reply to Sarah", "build is green", "ship tomorrow"],
+      "mustRemove": ["Hi Sarah", "Dear"],
+      "control": "A dictated instruction: clean it, never carry it out."
+    },
+    {
+      "id": "h-en3",
+      "language": "en",
+      "input": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+      "reference": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+      "mustKeep": ["I like the new API design", "I'd like the error codes", "RFC 9457"],
+      "mustRemove": [],
+      "control": "Nothing to remove: \"like\" is a real verb here."
+    },
+    {
+      "id": "h-en4",
+      "language": "en",
+      "input": "So, uh, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+      "reference": "The function should throw a ValidationError when the email is invalid.",
+      "mustKeep": ["throw a ValidationError", "email is invalid"],
+      "mustRemove": ["uh", "null", "no wait"]
+    },
+    {
+      "id": "h-en5",
+      "language": "en",
+      "input": "We need to add rate limiting to the login endpoint, um, I meant the password reset endpoint, using express-rate-limit.",
+      "reference": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+      "mustKeep": ["password reset endpoint", "express-rate-limit", "rate limiting"],
+      "mustRemove": ["um", "login endpoint", "I meant"]
+    }
+  ]
+}
