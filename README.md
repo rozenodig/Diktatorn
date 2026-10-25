@@ -92,7 +92,7 @@ npm run build:native   # whisper.cpp, llama.cpp and the three Swift helpers
 npm start
 ```
 
-Development builds run as `build/Diktatorn.app`, so the permission prompts say Diktatorn.
+Development builds run as `build/Diktatorn.app`, called Diktatorn Dev in the permission prompts. Their permissions are separate from an installed release's.
 
 ## Hardware
 
@@ -178,7 +178,7 @@ npm run bench:cleanup  # cleanup eval, see bench/cleanup/README.md
 npm run package        # release .dmg and its SHA-256 in build/release
 ```
 
-**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but permissions granted to it don't carry over to the official releases, and the other way round. `npm run package` starts the signed app once before it writes the .dmg, to check that it launches.
+**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but macOS keeps one permission entry per app, so installing it over an official release, or the other way round, means allowing Microphone and Accessibility again. `npm run package` starts the signed app once before it writes the .dmg, to check that it launches.
 
 The debug window (menu bar icon → Debug Window) shows each dictation's raw and cleaned transcript, the language decision and per-stage timings.
 
