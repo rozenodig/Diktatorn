@@ -95,6 +95,7 @@ let microphoneWatch: NodeJS.Timeout | null = null;
 const hotkey = new Hotkey({ minHoldMs: MIN_HOLD_MS });
 const engineRestarts = new RestartPolicy();
 const cleanerRestarts = new RestartPolicy();
+const helperRestarts = new RestartPolicy();
 const statuses = new Map<string, StatusUpdate>();
 const recent: RecentDictation[] = [];
 let previousLanguage: Lang | null = null;
@@ -417,7 +418,7 @@ const SETTINGS_PANES: Record<Permission, string> = {
   accessibility: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
 };
 
-/** `restarted`: the helper is coming back after Input Monitoring was switched on, so it won't ask for Accessibility again. */
+/** `restarted`: the helper is coming back, after Input Monitoring was switched on or after a crash, so it won't ask for Accessibility again. */
 function startHelper(restarted = false): void {
   if (!existsSync(binary("diktatorn-helper"))) {
     setStatus({ key: "keys", ok: false, text: "missing helper; run npm run build:native" });
@@ -473,10 +474,21 @@ function startHelper(restarted = false): void {
         break;
     }
   });
-  proc.on("exit", (code: number | null) => {
+  proc.on("exit", (code: number | null, signal: string | null) => {
     if (helper !== proc) return; // superseded or shutting down
-    if (code === HELPER_EXIT_PERMISSION_GRANTED) startHelper(true);
-    else setStatus({ key: "keys", ok: false, text: `helper exited (code ${code})` });
+    if (code === HELPER_EXIT_PERMISSION_GRANTED) {
+      startHelper(true);
+      return;
+    }
+    helper = null;
+    const reason = `code ${code}, signal ${signal}`;
+    const delay = helperRestarts.crashed(Date.now());
+    if (delay === null) {
+      setStatus({ key: "keys", ok: false, text: `keyboard helper keeps stopping (${reason}); restart Diktatorn` });
+      return;
+    }
+    setStatus({ key: "keys", ok: false, text: `keyboard helper stopped (${reason}); restarting…` });
+    setTimeout(() => startHelper(true), delay);
   });
 }
 
