@@ -83,3 +83,17 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 - A future meeting mode reuses it by segmenting audio before calling `transcribe`.
 **Alternatives considered:** a streaming session API; a local HTTP service.
 **Rationale:** _TODO_
+
+## 11. Packaging and signing
+
+**Choice:**
+- `npm run package`: Electron Packager, a `.dmg` made with `hdiutil`, and its SHA-256. Apple Silicon only.
+- Signed with a self-signed code-signing certificate, under the hardened runtime. macOS ties privacy permissions to the designated requirement, which is then "this bundle identifier, signed by this certificate", so an update keeps Accessibility.
+- Not notarized: each downloaded version is opened once through Privacy & Security → Open Anyway.
+- Electron fuses: running as Node, `NODE_OPTIONS` and `--inspect` are off, and the app only loads its integrity-checked asar. The packaged app also refuses command-line switches, because none of the fuses covers Chromium's remote debugging. Together they stop other programs from using Diktatorn's permissions by starting it with different settings. They don't stop a program that can change files inside the installed app, for example by replacing a helper.
+- Library validation is off (`disable-library-validation`). It only lets the app load code signed with the app's own Team ID, and a self-signed certificate has none, so the app couldn't load Electron. The hardened runtime still ignores `DYLD_*` variables.
+- Development builds run as Diktatorn Dev, with their own bundle identifier. That copy of Electron runs any app directory it is given, so it must not satisfy the permissions people grant the release.
+
+**Alternatives considered:** Developer ID signing and notarization (needs the paid Apple Developer Program); ad-hoc signing (the requirement pins one build's cdhash, so every update loses Accessibility); electron-builder.
+
+**Rationale:** _TODO_
