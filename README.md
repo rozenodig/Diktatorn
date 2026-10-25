@@ -178,7 +178,7 @@ npm run bench:cleanup  # cleanup eval, see bench/cleanup/README.md
 npm run package        # release .dmg and its SHA-256 in build/release
 ```
 
-**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but macOS keeps one permission entry per app, so installing it over an official release, or the other way round, means allowing Microphone and Accessibility again. `npm run package` starts the signed app once before it writes the .dmg, to check that it launches.
+**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but macOS keeps one permission entry per app, so installing it over an official release, or the other way round, means allowing Microphone and Accessibility again. `npm run package` starts the signed app once before it writes the .dmg, to check that it and its speech and language-model engines start. It only builds a checkout without uncommitted changes, and records the commit in the app's `Info.plist` as `DiktatornCommit`.
 
 The debug window (menu bar icon → Debug Window) shows each dictation's raw and cleaned transcript, the language decision and per-stage timings.
 

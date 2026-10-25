@@ -2,7 +2,8 @@
 // Contents/MacOS, turns off the Electron switches that would let other code run with Diktatorn's
 // permissions, signs everything with the release certificate (see create-signing-identity.sh)
 // and writes build/release/Diktatorn-<version>-arm64.dmg plus its SHA-256.
-// Usage: npm run package. DIKTATORN_SIGN_IDENTITY overrides the certificate name.
+// Usage: npm run package, from a checkout without uncommitted changes. DIKTATORN_SIGN_IDENTITY
+// overrides the certificate name, and DIKTATORN_ALLOW_DIRTY=1 allows a test build with changes.
 import { flipFuses, FuseV1Options, FuseVersion } from "@electron/fuses";
 import { packager } from "@electron/packager";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -35,6 +36,15 @@ for (const name of HELPERS) {
   if (!existsSync(join(ROOT, "build", "bin", name))) throw new Error(`build/bin/${name} is missing; run npm run build:native`);
 }
 
+// The app records the commit it was built from, so a release can be traced to its source. A build
+// with uncommitted changes has no such commit and is refused unless it's only for testing.
+const git = (args: string[]) => execFileSync("git", args, { cwd: ROOT, encoding: "utf8" }).trim();
+const commit = git(["rev-parse", "HEAD"]);
+const dirty = git(["status", "--porcelain"]) !== "";
+if (dirty && !process.env.DIKTATORN_ALLOW_DIRTY) {
+  throw new Error("the checkout has uncommitted changes. Commit them, or set DIKTATORN_ALLOW_DIRTY=1 for a test build.");
+}
+
 rmSync(OUT, { recursive: true, force: true });
 const [outDir] = await packager({
   dir: ROOT,
@@ -52,7 +62,7 @@ const [outDir] = await packager({
   usageDescription: {
     Microphone: "Diktatorn listens only while you hold the dictation key, and everything it hears stays on your Mac.",
   },
-  extendInfo: { LSMinimumSystemVersion: "14.0" },
+  extendInfo: { LSMinimumSystemVersion: "14.0", DiktatornCommit: dirty ? `${commit}-dirty` : commit },
 });
 if (!outDir) throw new Error("Electron Packager produced no app");
 const app = join(outDir, "Diktatorn.app");
