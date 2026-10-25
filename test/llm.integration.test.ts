@@ -1,6 +1,6 @@
 // End-to-end check of the language-model process behind the cleanup pipeline. It checks
 // mechanics (loading, prompt-prefix reuse, the deletion-only contract, timeouts), not cleanup
-// quality, which is evaluated separately. Skips when the native build or the model is missing.
+// quality, which bench/cleanup evaluates. Skips when the native build or the model is missing.
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { join } from "node:path";

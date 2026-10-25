@@ -6,6 +6,8 @@ Results:
 - **Main set:** [RESULTS.md](RESULTS.md), with every transcript in [results.json](results.json).
 - **Held-out set:** [heldout/RESULTS.md](heldout/RESULTS.md).
 
+Cleanup is evaluated separately, on transcripts with hesitations and self-corrections: see [cleanup/](cleanup/README.md).
+
 ## Sentences
 
 [sentences.json](sentences.json) has 36 sentences of the kind people dictate at work: 12 Swedish, 12 English, and 12 that switch between the two mid-sentence. Each contains a technical term (GitHub Actions, PostgreSQL, Next.js, npm…), because terms are where dictation most often goes wrong. The sentences avoid digits, contractions and words with two accepted spellings (*i stället* / *istället*, *mejl* / *mail*), so the score counts recognition errors rather than spelling choices.

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "sv1", "lang": "sv",
+    "input": "Eh, vi måste deploya till staging innan standup, eller nej vänta, efter standup, så att Johan hinner kolla PR:en.",
+    "reference": "Vi måste deploya till staging efter standup, så att Johan hinner kolla PR:en.",
+    "mustInclude": ["deploya", "staging", "efter standup", "PR:en", "Johan"],
+    "mustExclude": ["eh", "innan", "nej vänta"]
+  },
+  {
+    "id": "sv2", "lang": "sv",
+    "input": "öh kan du köra npm install och sen typ npm run dev nej jag menar npm run build liksom för att se om det går igenom",
+    "reference": "Kan du köra npm install och sen npm run build för att se om det går igenom?",
+    "mustInclude": ["npm install", "npm run build", "går igenom"],
+    "mustExclude": ["öh", "typ", "liksom", "npm run dev", "jag menar"]
+  },
+  {
+    "id": "sv3", "lang": "sv",
+    "input": "Alltså funktionen heter getUserById och den returnerar typ ett Promise, nej förlåt, den returnerar ett Observable från RxJS.",
+    "reference": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+    "mustInclude": ["getUserById", "Observable", "RxJS", "returnerar"],
+    "mustExclude": ["alltså", "Promise", "förlåt", "typ"]
+  },
+  {
+    "id": "sv4", "lang": "sv",
+    "input": "vi behöver migrera databasen från MySQL till eh MongoDB nej till PostgreSQL innan releasen på fredag liksom",
+    "reference": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+    "mustInclude": ["MySQL", "PostgreSQL", "fredag", "migrera"],
+    "mustExclude": ["eh", "MongoDB", "liksom"]
+  },
+  {
+    "id": "sv5", "lang": "sv",
+    "input": "Hej Anna, ja alltså jag har pushat fixen till main, eller vänta, till branchen feature/login, så du kan typ granska den när du hinner.",
+    "reference": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+    "mustInclude": ["Hej Anna", "pushat", "feature/login", "granska"],
+    "mustExclude": ["alltså", "main", "eller vänta", "typ"]
+  },
+  {
+    "id": "en1", "lang": "en",
+    "input": "Um, so I think we should, uh, refactor the useEffect hook, actually no, the useMemo hook, because it re-renders on every keystroke.",
+    "reference": "I think we should refactor the useMemo hook, because it re-renders on every keystroke.",
+    "mustInclude": ["useMemo", "re-renders", "keystroke", "refactor"],
+    "mustExclude": ["um", "uh", "useEffect", "actually no"]
+  },
+  {
+    "id": "en2", "lang": "en",
+    "input": "can you like run kubectl get pods in the staging namespace sorry the production namespace and send me the output",
+    "reference": "Can you run kubectl get pods in the production namespace and send me the output?",
+    "mustInclude": ["kubectl get pods", "production namespace", "output"],
+    "mustExclude": ["like", "staging", "sorry"]
+  },
+  {
+    "id": "en3", "lang": "en",
+    "input": "The API returns a 404, uh, when the user ID is missing, wait no, a 400, and we log it to Sentry, you know.",
+    "reference": "The API returns a 400 when the user ID is missing, and we log it to Sentry.",
+    "mustInclude": ["API", "400", "user ID", "Sentry"],
+    "mustExclude": ["404", "uh", "wait no", "you know"]
+  },
+  {
+    "id": "en4", "lang": "en",
+    "input": "hey team um the deploy is scheduled for Tuesday scratch that Wednesday at 10 am so please like merge your PRs into the develop branch before then",
+    "reference": "Hey team, the deploy is scheduled for Wednesday at 10 a.m., so please merge your PRs into the develop branch before then.",
+    "mustInclude": ["Wednesday", "PRs", "develop branch", "merge"],
+    "mustExclude": ["um", "Tuesday", "scratch that", "like"]
+  },
+  {
+    "id": "en5", "lang": "en",
+    "input": "I mean we could use Redis for caching, uh, or actually let's use Memcached since it's simpler and, you know, we don't need persistence.",
+    "reference": "We could use Memcached for caching since it's simpler and we don't need persistence.",
+    "mustInclude": ["Memcached", "caching", "persistence"],
+    "mustExclude": ["I mean", "Redis", "uh", "you know"]
+  }
+]

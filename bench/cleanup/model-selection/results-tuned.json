@@ -1,0 +1,1314 @@
+{
+  "when": "2026-10-18T13:53:45.917Z",
+  "samples": "samples.json",
+  "repeats": 3,
+  "results": [
+    {
+      "model": "rules (naive regex)",
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "Vi måste deploya till staging efter standup, så att Johan hinner kolla PR:en.",
+          "ms": [
+            7.030583
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Kan du köra npm install och sen npm run build för att se om det går igenom.",
+          "ms": [
+            2.479750000000003
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "ms": [
+            0.02449999999999619
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+          "ms": [
+            0.0487500000000054
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, ja jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+          "ms": [
+            0.04012499999999619
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.058823529411764705
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "So I think we should, refactor the useMemo hook, because it re-renders on every keystroke.",
+          "ms": [
+            0.03608399999999534
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run kubectl get pods in the production namespace and send me the output.",
+          "ms": [
+            0.030416999999999916
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 400, and we log it to Sentry, .",
+          "ms": [
+            0.03108299999999531
+          ],
+          "missing": [
+            "user ID"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.35294117647058826
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team the deploy is scheduled Wednesday at 10 am so please merge your PRs into the develop branch before then.",
+          "ms": [
+            0.04145900000000324
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.13043478260869565
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for let's use Memcached since it's simpler and, we don't need persistence.",
+          "ms": [
+            0.03241700000000236
+          ],
+          "missing": [
+            "caching"
+          ],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.2857142857142857
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:2b-q4_K_M",
+      "coldMs": 3243.667167,
+      "loadMs": 2814.916667,
+      "memBytes": 1603796990,
+      "vramBytes": 1603796990,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "We must deploy to staging before the standup, or wait after the standup so that Johan can check the PR.",
+          "ms": [
+            208.89433299999973,
+            214.2046660000001,
+            204.76049999999987
+          ],
+          "evalTokens": 25,
+          "tokPerS": 132.87623907092933,
+          "promptMs": 15.269,
+          "missing": [
+            "deploya",
+            "efter standup",
+            "PR:en"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.3076923076923077
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Köra `npm install` och sedan `npm run build` för att se om det går igenom.",
+          "ms": [
+            366.1098750000001,
+            204.75,
+            201.9461250000004
+          ],
+          "evalTokens": 24,
+          "tokPerS": 131.58904740495433,
+          "promptMs": 15.396,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.4117647058823529
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Funktionen heter `getUserById` och den returnerar ett `Observable` från RxJS.",
+          "ms": [
+            336.08633400000053,
+            168.7739590000001,
+            169.9761669999998
+          ],
+          "evalTokens": 20,
+          "tokPerS": 131.46910147442597,
+          "promptMs": 15.123,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.2
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till MongoDB innan releasen på fredag.",
+          "ms": [
+            316.6268339999997,
+            157.09591699999964,
+            152.0109169999996
+          ],
+          "evalTokens": 18,
+          "tokPerS": 133.5787223937307,
+          "promptMs": 15.655,
+          "missing": [
+            "PostgreSQL"
+          ],
+          "leaked": [
+            "MongoDB"
+          ],
+          "pass": false,
+          "wer": 0.08333333333333333
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, ja, jag har pushat fixen till main eller vänta till branchen feature/login, så du kan typ granska den när du hinner.",
+          "ms": [
+            458.26316700000007,
+            303.9285410000002,
+            303.67229099999986
+          ],
+          "evalTokens": 37,
+          "tokPerS": 134.48774707580023,
+          "promptMs": 15.131,
+          "missing": [],
+          "leaked": [
+            "main",
+            "eller vänta",
+            "typ"
+          ],
+          "pass": false,
+          "wer": 0.35294117647058826
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "So I think we should refactor the useMemo hook, because it re-renders on every keystroke.",
+          "ms": [
+            346.8532500000001,
+            185.55375000000004,
+            189.0059170000004
+          ],
+          "evalTokens": 22,
+          "tokPerS": 134.47103982787704,
+          "promptMs": 16.283,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run `kubectl get pods` in the staging namespace? Sorry, I meant the production namespace. Send me the output.",
+          "ms": [
+            391.48470799999996,
+            227.8218340000003,
+            226.08899999999994
+          ],
+          "evalTokens": 27,
+          "tokPerS": 128.9176645848851,
+          "promptMs": 15.055,
+          "missing": [],
+          "leaked": [
+            "staging",
+            "sorry"
+          ],
+          "pass": false,
+          "wer": 0.6
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 400 when the user ID is missing, and we log it to Sentry.",
+          "ms": [
+            352.31012499999997,
+            189.23041700000067,
+            204.05137500000092
+          ],
+          "evalTokens": 23,
+          "tokPerS": 134.80485531922378,
+          "promptMs": 16.684,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team, the deploy is scheduled for Tuesday; change it to Wednesday at 10 a.m. So, please merge your PRs into the develop branch before then.",
+          "ms": [
+            454.03149999999914,
+            288.76237500000025,
+            292.90149999999994
+          ],
+          "evalTokens": 36,
+          "tokPerS": 132.1387015904361,
+          "promptMs": 15.526,
+          "missing": [],
+          "leaked": [
+            "Tuesday"
+          ],
+          "pass": false,
+          "wer": 0.17391304347826086
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for caching, or actually let's use Memcached since it's simpler and we don't need persistence.",
+          "ms": [
+            389.8461669999997,
+            211.8993329999994,
+            219.77358400000048
+          ],
+          "evalTokens": 26,
+          "tokPerS": 126.05877247846092,
+          "promptMs": 16.379999,
+          "missing": [],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.42857142857142855
+        }
+      ]
+    },
+    {
+      "model": "qwen3:1.7b",
+      "coldMs": 2443.214667,
+      "loadMs": 2068.1305,
+      "memBytes": 1214555094,
+      "vramBytes": 1214555094,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "Vi måste deploya till staging innan standup, efter standup så att Johan hinner kolla PR:en.",
+          "ms": [
+            186.84308299999975,
+            192.98945900000035,
+            194.95483400000012
+          ],
+          "evalTokens": 27,
+          "tokPerS": 154.42160529837685,
+          "promptMs": 7.816,
+          "missing": [],
+          "leaked": [
+            "innan"
+          ],
+          "pass": false,
+          "wer": 0.15384615384615385
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Kan du köra npm install och sedan npm run dev? Nej, jag menar npm run build. Liksom för att se om det går igenom.",
+          "ms": [
+            286.7249579999989,
+            250.19016699999884,
+            272.1257919999989
+          ],
+          "evalTokens": 36,
+          "tokPerS": 149.895073448586,
+          "promptMs": 8.654,
+          "missing": [],
+          "leaked": [
+            "liksom",
+            "npm run dev",
+            "jag menar"
+          ],
+          "pass": false,
+          "wer": 0.47058823529411764
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Alltså funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "ms": [
+            188.8976249999996,
+            178.9477909999987,
+            144.22491699999955
+          ],
+          "evalTokens": 20,
+          "tokPerS": 139.1265634347566,
+          "promptMs": 10.183,
+          "missing": [],
+          "leaked": [
+            "alltså"
+          ],
+          "pass": false,
+          "wer": 0.1
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till MongoDB. Nej till PostgreSQL innan releasen på fredag.",
+          "ms": [
+            232.4262920000001,
+            198.63612499999908,
+            196.48545899999954
+          ],
+          "evalTokens": 28,
+          "tokPerS": 149.03288304112243,
+          "promptMs": 7.843,
+          "missing": [],
+          "leaked": [
+            "MongoDB"
+          ],
+          "pass": false,
+          "wer": 0.25
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, jag har pushat fixen till main.",
+          "ms": [
+            138.0250419999993,
+            101.84333300000071,
+            106.04383299999972
+          ],
+          "evalTokens": 14,
+          "tokPerS": 151.59226013231842,
+          "promptMs": 10.566,
+          "missing": [
+            "feature/login",
+            "granska"
+          ],
+          "leaked": [
+            "main"
+          ],
+          "pass": false,
+          "wer": 0.5882352941176471
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "So I think we should, actually, refactor the useMemo hook. Because it re-renders on every keystroke.",
+          "ms": [
+            208.34470899999724,
+            202.61191600000166,
+            171.9051670000008
+          ],
+          "evalTokens": 25,
+          "tokPerS": 152.88649706457926,
+          "promptMs": 8.942,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.14285714285714285
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Run `kubectl get pods --namespace=production` and send me the output.",
+          "ms": [
+            159.01854200000162,
+            124.38654099999985,
+            123.63762499999939
+          ],
+          "evalTokens": 17,
+          "tokPerS": 149.37044749628768,
+          "promptMs": 7.44,
+          "missing": [
+            "production namespace"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.4666666666666667
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 404, when the user ID is missing, but a 400, and we log it to Sentry, you know.",
+          "ms": [
+            278.9131669999988,
+            240.2228329999998,
+            241.3625830000019
+          ],
+          "evalTokens": 34,
+          "tokPerS": 145.32460815783963,
+          "promptMs": 7.401,
+          "missing": [],
+          "leaked": [
+            "404",
+            "you know"
+          ],
+          "pass": false,
+          "wer": 0.35294117647058826
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team. The deploy is scheduled for Wednesday at 10 am. Please merge your PRs into the develop branch before then.",
+          "ms": [
+            246.65320900000006,
+            194.13741700000173,
+            199.7856670000001
+          ],
+          "evalTokens": 28,
+          "tokPerS": 139.8783058738897,
+          "promptMs": 7.347,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.13043478260869565
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "I mean we could use Redis for caching, or actually let's use Memcached since it's simpler and, you know, we don't need persistence.",
+          "ms": [
+            260.37720799999806,
+            230.03783300000214,
+            224.30583300000217
+          ],
+          "evalTokens": 32,
+          "tokPerS": 148.81921256034153,
+          "promptMs": 10.471,
+          "missing": [],
+          "leaked": [
+            "I mean",
+            "Redis",
+            "you know"
+          ],
+          "pass": false,
+          "wer": 0.7142857142857143
+        }
+      ]
+    },
+    {
+      "model": "gemma3:1b",
+      "coldMs": 1853.844083,
+      "loadMs": 1562.970875,
+      "memBytes": 877668597,
+      "vramBytes": 877668597,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "We need to deploy to staging before the standup, or wait, after the standup, so that Johan can check the PR.",
+          "ms": [
+            207.9109580000004,
+            206.92137500000172,
+            207.16012499999852
+          ],
+          "evalTokens": 28,
+          "tokPerS": 155.0885666493115,
+          "promptMs": 20.239,
+          "missing": [
+            "deploya",
+            "efter standup",
+            "PR:en"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.3846153846153846
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Can you run npm install and then type npm run dev? I mean npm run build, like, to see if it passes?",
+          "ms": [
+            269.5087089999979,
+            197.27141699999993,
+            199.37937500000044
+          ],
+          "evalTokens": 27,
+          "tokPerS": 162.7211802709609,
+          "promptMs": 18.211,
+          "missing": [
+            "går igenom"
+          ],
+          "leaked": [
+            "npm run dev"
+          ],
+          "pass": false,
+          "wer": 1.0588235294117647
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "The function is called `getUserById` and it returns an Observable from RxJS.  Sorry, I meant an Observable.",
+          "ms": [
+            264.9383330000019,
+            191.33116599999994,
+            190.11549999999988
+          ],
+          "evalTokens": 26,
+          "tokPerS": 162.88889724216568,
+          "promptMs": 20.37,
+          "missing": [
+            "returnerar"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.5
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "We need to migrate the database from MySQL to MongoDB, no to PostgreSQL before the release on Friday, like.",
+          "ms": [
+            237.93879200000083,
+            173.6227089999993,
+            172.24950000000172
+          ],
+          "evalTokens": 23,
+          "tokPerS": 159.89877712196105,
+          "promptMs": 19.856,
+          "missing": [
+            "fredag",
+            "migrera"
+          ],
+          "leaked": [
+            "MongoDB"
+          ],
+          "pass": false,
+          "wer": 1.4166666666666667
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "I’ve pushed the fix to the main branch, or wait, to the feature/login branch, so you can review it when you have time.",
+          "ms": [
+            305.48204199999964,
+            246.20383399999992,
+            240.16870800000106
+          ],
+          "evalTokens": 32,
+          "tokPerS": 158.76008374594417,
+          "promptMs": 25.842,
+          "missing": [
+            "Hej Anna",
+            "pushat",
+            "granska"
+          ],
+          "leaked": [
+            "main"
+          ],
+          "pass": false,
+          "wer": 1.2941176470588236
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "We should refactor the useMemo hook, actually, no, the useEffect hook, because it re-renders on every keystroke.",
+          "ms": [
+            282.75,
+            218.55858400000216,
+            212.83033299999806
+          ],
+          "evalTokens": 29,
+          "tokPerS": 162.08361278783815,
+          "promptMs": 19.364,
+          "missing": [],
+          "leaked": [
+            "useEffect"
+          ],
+          "pass": false,
+          "wer": 0.5
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run kubectl get pods in the staging namespace, and send me the output?",
+          "ms": [
+            204.9897920000003,
+            140.72329199999876,
+            142.76270800000202
+          ],
+          "evalTokens": 18,
+          "tokPerS": 164.98322670528495,
+          "promptMs": 19.785,
+          "missing": [
+            "production namespace"
+          ],
+          "leaked": [
+            "staging"
+          ],
+          "pass": false,
+          "wer": 0.06666666666666667
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 404 when the user ID is missing, a 400 for missing data, and we log it to Sentry.",
+          "ms": [
+            315.5865410000006,
+            248.06833299999926,
+            231.5387499999997
+          ],
+          "evalTokens": 33,
+          "tokPerS": 156.41589564689824,
+          "promptMs": 20.076,
+          "missing": [],
+          "leaked": [
+            "404"
+          ],
+          "pass": false,
+          "wer": 0.35294117647058826
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "The deploy is scheduled for Tuesday at 10 am, please merge your PRs into the develop branch before then.",
+          "ms": [
+            257.69174999999814,
+            181.8992909999979,
+            188.31320799999958
+          ],
+          "evalTokens": 25,
+          "tokPerS": 162.70109855781746,
+          "promptMs": 19.762,
+          "missing": [
+            "Wednesday"
+          ],
+          "leaked": [
+            "Tuesday"
+          ],
+          "pass": false,
+          "wer": 0.2608695652173913
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for caching, or let’s use Memcached since it’s simpler and we don’t need persistence.",
+          "ms": [
+            278.55341599999883,
+            212.68262500000128,
+            214.07983299999978
+          ],
+          "evalTokens": 28,
+          "tokPerS": 159.52779771875248,
+          "promptMs": 22.43,
+          "missing": [],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.5
+        }
+      ]
+    },
+    {
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "coldMs": 4257.345999999998,
+      "loadMs": 3557.781875,
+      "memBytes": 2876160081,
+      "vramBytes": 2876160081,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "Vi måste deploya till staging innan standup så att Johan hinner kolla PR:en.",
+          "ms": [
+            304.74554100000023,
+            303.6601669999982,
+            320.3614579999994
+          ],
+          "evalTokens": 23,
+          "tokPerS": 81.30886054469866,
+          "promptMs": 13.401,
+          "missing": [
+            "efter standup"
+          ],
+          "leaked": [
+            "innan"
+          ],
+          "pass": false,
+          "wer": 0.07692307692307693
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Can you run npm install and then npm run build to see if it goes through?",
+          "ms": [
+            323.43333300000086,
+            239.93645800000377,
+            243.33841699999903
+          ],
+          "evalTokens": 18,
+          "tokPerS": 79.96659173500849,
+          "promptMs": 13.92,
+          "missing": [
+            "går igenom"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.7058823529411765
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "ms": [
+            328.92670799999905,
+            275.7877920000028,
+            259.63787500000035
+          ],
+          "evalTokens": 19,
+          "tokPerS": 82.05181356100552,
+          "promptMs": 13.607,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+          "ms": [
+            382.8873749999984,
+            308.98458299999766,
+            306.3717499999984
+          ],
+          "evalTokens": 23,
+          "tokPerS": 80.57396690161569,
+          "promptMs": 13.698,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+          "ms": [
+            458.86854100000346,
+            390.08050000000367,
+            382.09066699999676
+          ],
+          "evalTokens": 29,
+          "tokPerS": 80.78444481586718,
+          "promptMs": 13.235,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "So I think we should refactor the useMemo hook because it re-renders on every keystroke.",
+          "ms": [
+            361.0184169999993,
+            279.1012499999997,
+            286.39870900000096
+          ],
+          "evalTokens": 21,
+          "tokPerS": 79.48223034511273,
+          "promptMs": 13.196,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run kubectl get pods in the production namespace and send me the output?",
+          "ms": [
+            290.0268750000032,
+            241.32275000000664,
+            241.89337499999965
+          ],
+          "evalTokens": 18,
+          "tokPerS": 82.01576525265412,
+          "promptMs": 13.296,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 400 when the user ID is missing, and we log it to Sentry.",
+          "ms": [
+            387.6703340000022,
+            317.14908399999695,
+            335.7039589999986
+          ],
+          "evalTokens": 23,
+          "tokPerS": 79.6652673289275,
+          "promptMs": 13.404,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team, the deploy is scheduled for Wednesday at 10 am. So please merge your PRs into the develop branch before then.",
+          "ms": [
+            464.8311660000036,
+            381.5179170000047,
+            392.109457999999
+          ],
+          "evalTokens": 29,
+          "tokPerS": 78.87207493391064,
+          "promptMs": 13.371,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.08695652173913043
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for caching, or let's use Memcached since it's simpler and we don't need persistence.",
+          "ms": [
+            407.50445899999613,
+            331.968166000006,
+            338.4862910000011
+          ],
+          "evalTokens": 25,
+          "tokPerS": 80.65921160460209,
+          "promptMs": 13.823,
+          "missing": [],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.35714285714285715
+        }
+      ]
+    },
+    {
+      "model": "gemma3:4b",
+      "coldMs": 5416.231459000002,
+      "loadMs": 4619.101,
+      "memBytes": 2329872956,
+      "vramBytes": 2329872956,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "Vi måste deploya till staging innan standup, så att Johan hinner kolla PR:en.",
+          "ms": [
+            317.97812500000146,
+            317.42941599999904,
+            333.39129200000025
+          ],
+          "evalTokens": 22,
+          "tokPerS": 80.75795006956197,
+          "promptMs": 39.922,
+          "missing": [
+            "efter standup"
+          ],
+          "leaked": [
+            "innan"
+          ],
+          "pass": false,
+          "wer": 0.07692307692307693
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Kan du köra npm install och sen npm run build?",
+          "ms": [
+            526.7522919999974,
+            205.52712500000052,
+            203.67316700000083
+          ],
+          "evalTokens": 13,
+          "tokPerS": 82.59684480052861,
+          "promptMs": 41.266,
+          "missing": [
+            "går igenom"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.4117647058823529
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "ms": [
+            583.7557499999966,
+            248.21920800000225,
+            241.6627920000028
+          ],
+          "evalTokens": 16,
+          "tokPerS": 73.77963866421965,
+          "promptMs": 42.434,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+          "ms": [
+            605.6967909999948,
+            282.7779999999984,
+            279.61499999999796
+          ],
+          "evalTokens": 19,
+          "tokPerS": 79.81482959533882,
+          "promptMs": 39.578,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan typ granska den när du hinner.",
+          "ms": [
+            740.6862920000058,
+            414.2540419999932,
+            408.4609580000033
+          ],
+          "evalTokens": 29,
+          "tokPerS": 78.26098689803132,
+          "promptMs": 43.06,
+          "missing": [],
+          "leaked": [
+            "typ"
+          ],
+          "pass": false,
+          "wer": 0.058823529411764705
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "So I think we should refactor the useMemo hook because it re-renders on every keystroke.",
+          "ms": [
+            643.3796250000014,
+            340.5917079999999,
+            330.0528340000019
+          ],
+          "evalTokens": 22,
+          "tokPerS": 79.7358568523908,
+          "promptMs": 40.751,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run kubectl get pods in the production namespace and send me the output?",
+          "ms": [
+            589.393541999998,
+            257.39383299999463,
+            256.7986660000024
+          ],
+          "evalTokens": 17,
+          "tokPerS": 76.57071305350492,
+          "promptMs": 40.744,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 400, and we log it to Sentry.",
+          "ms": [
+            590.3074590000033,
+            285.9748330000002,
+            274.0763339999976
+          ],
+          "evalTokens": 18,
+          "tokPerS": 80.97639538074651,
+          "promptMs": 40.579,
+          "missing": [
+            "user ID"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.35294117647058826
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team, the deploy is scheduled for Wednesday at 10 am, so please merge your PRs into the develop branch before then.",
+          "ms": [
+            741.5011669999949,
+            410.8338749999966,
+            412.6529159999991
+          ],
+          "evalTokens": 29,
+          "tokPerS": 77.82539737916264,
+          "promptMs": 40.483,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.08695652173913043
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for caching, let's use Memcached since it’s simpler and we don’t need persistence.",
+          "ms": [
+            716.3365830000039,
+            382.85220899999695,
+            388.54037499999686
+          ],
+          "evalTokens": 27,
+          "tokPerS": 78.7149062709542,
+          "promptMs": 41.239,
+          "missing": [],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.42857142857142855
+        }
+      ]
+    },
+    {
+      "model": "gemma4:e2b-it-qat",
+      "coldMs": 4473.033542000005,
+      "loadMs": 3867.928417,
+      "memBytes": 228526652,
+      "vramBytes": 228526652,
+      "rows": [
+        {
+          "id": "sv1",
+          "lang": "sv",
+          "out": "Vi måste deploya till staging efter standup så att Johan hinner kolla PR:en.",
+          "ms": [
+            208.83004199999414,
+            214.08591700000397,
+            214.34879100000398
+          ],
+          "evalTokens": 21,
+          "tokPerS": 117.11365043248398,
+          "promptMs": 25.763,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv2",
+          "lang": "sv",
+          "out": "Kan du köra npm install och sen npm run build för att se om det går igenom?",
+          "ms": [
+            406.11683300000004,
+            213.47587500000373,
+            214.67145799999707
+          ],
+          "evalTokens": 21,
+          "tokPerS": 112.8110361425072,
+          "promptMs": 25.76,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv3",
+          "lang": "sv",
+          "out": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "ms": [
+            354.02816699999676,
+            170.5132910000102,
+            164.09812500000407
+          ],
+          "evalTokens": 16,
+          "tokPerS": 116.99412835718309,
+          "promptMs": 25.807,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv4",
+          "lang": "sv",
+          "out": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+          "ms": [
+            502.89641700001084,
+            198.66445799999929,
+            192.82770799999707
+          ],
+          "evalTokens": 19,
+          "tokPerS": 115.05180358840519,
+          "promptMs": 26.228,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "sv5",
+          "lang": "sv",
+          "out": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+          "ms": [
+            462.4100000000035,
+            280.14262499999313,
+            273.08141699999396
+          ],
+          "evalTokens": 28,
+          "tokPerS": 114.500226955807,
+          "promptMs": 26.332,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en1",
+          "lang": "en",
+          "out": "I think we should refactor the useMemo hook because it re-renders on every keystroke.",
+          "ms": [
+            401.6391250000015,
+            211.88716600000043,
+            219.45062499999767
+          ],
+          "evalTokens": 21,
+          "tokPerS": 114.78797022072087,
+          "promptMs": 25.753,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en2",
+          "lang": "en",
+          "out": "Can you run kubectl get pods in the production namespace and send me the output?",
+          "ms": [
+            343.1960420000105,
+            177.74674999999115,
+            175.02016699999513
+          ],
+          "evalTokens": 17,
+          "tokPerS": 118.20413158205803,
+          "promptMs": 26.54,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "en3",
+          "lang": "en",
+          "out": "The API returns a 404 when the user ID is missing. Wait, no, a 400, and we log it to Sentry.",
+          "ms": [
+            524.3283329999977,
+            330.11154199999874,
+            328.42474999999104
+          ],
+          "evalTokens": 34,
+          "tokPerS": 112.84022156509387,
+          "promptMs": 26.633,
+          "missing": [],
+          "leaked": [
+            "404"
+          ],
+          "pass": false,
+          "wer": 0.29411764705882354
+        },
+        {
+          "id": "en4",
+          "lang": "en",
+          "out": "Hey team, the deploy is scheduled for Wednesday at 10 am, so please merge your PRs into the develop branch before then.",
+          "ms": [
+            469.0884589999914,
+            283.04404200000863,
+            286.58654200000456
+          ],
+          "evalTokens": 29,
+          "tokPerS": 114.98764874048874,
+          "promptMs": 25.796,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.08695652173913043
+        },
+        {
+          "id": "en5",
+          "lang": "en",
+          "out": "We could use Redis for caching, or let's use Memcached since it's simpler and we don't need persistence.",
+          "ms": [
+            461.7845410000009,
+            289.1400419999991,
+            296.72095800000534
+          ],
+          "evalTokens": 28,
+          "tokPerS": 113.22463768115942,
+          "promptMs": 28.075,
+          "missing": [],
+          "leaked": [
+            "Redis"
+          ],
+          "pass": false,
+          "wer": 0.35714285714285715
+        }
+      ]
+    }
+  ]
+}

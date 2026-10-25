@@ -17,6 +17,7 @@
     "fetch-models": "node scripts/fetch-models.ts",
     "icons": "electron scripts/render-icons.ts",
     "bench": "node bench/run.ts",
+    "bench:cleanup": "node bench/cleanup/run.ts",
     "start": "npm run build && scripts/dev.sh",
     "typecheck": "tsc -p . --noEmit && tsc -p src/renderer --noEmit && tsc -p bench",
     "test": "node --test test/*.test.ts"

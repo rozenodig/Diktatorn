@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { containsPhrase, loadCleanupSet, scoreCleanup, type CleanupSample } from "../bench/cleanup/score.ts";
 import { hasTerm, normalizeWords, wer, wordErrors } from "../bench/wer.ts";
 import { BenchRecorder, loadBenchSentences } from "../src/main/bench.ts";
 import { decodeWav, encodeWav } from "../src/main/wav.ts";
@@ -76,4 +77,52 @@ test("the recorder starts at the first unrecorded sentence and saves each take a
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test("the cleanup eval sets load, and each reference is its input with words deleted", async () => {
+  for (const file of ["samples.json", "heldout.json"]) {
+    const set = await loadCleanupSet(join(import.meta.dirname, "..", "bench", "cleanup", file));
+    assert.equal(set.samples.length, 10, file);
+  }
+});
+
+test("a cleanup sample that no deletion-only cleanup could pass is refused", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "diktatorn-cleanup-eval-"));
+  const good = {
+    id: "en1", language: "en", input: "Ship it on, uh, Monday, no wait, Tuesday.", reference: "Ship it on Tuesday.",
+    mustKeep: ["Tuesday"], mustRemove: ["uh", "Monday", "no wait"],
+  };
+  const load = (sample: object) => {
+    writeFileSync(join(dir, "set.json"), JSON.stringify({ title: "Test", samples: [sample] }));
+    return loadCleanupSet(join(dir, "set.json"));
+  };
+  try {
+    assert.equal((await load(good)).samples[0]?.id, "en1");
+    await assert.rejects(load({ ...good, reference: "Ship it on Wednesday." }), /not its input with words deleted/);
+    await assert.rejects(load({ ...good, reference: "Tuesday ship it." }), /not its input with words deleted/);
+    await assert.rejects(load({ ...good, mustKeep: ["Monday"] }), /mustKeep terms its reference lacks: Monday/);
+    await assert.rejects(load({ ...good, mustRemove: ["ship"] }), /mustRemove phrases its reference still contains: ship/);
+    await assert.rejects(load({ ...good, language: "de" }), /needs an id, a language/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("cleanup scoring counts words lost apart from words left in", () => {
+  const sample: CleanupSample = {
+    id: "sv1", language: "sv", input: "Vi ses vid sju, nej förlåt, åtta på torsdag.", reference: "Vi ses vid åtta på torsdag.",
+    mustKeep: ["åtta", "torsdag"], mustRemove: ["sju", "nej förlåt"],
+  };
+  assert.deepEqual(scoreCleanup(sample, "Vi ses vid åtta på torsdag."), { missing: [], leftover: [], words: 6, lost: 0, leftIn: 0, pass: true });
+  // Nothing cleaned: every meant word is still there, with three too many.
+  assert.deepEqual(scoreCleanup(sample, sample.input), { missing: [], leftover: ["sju", "nej förlåt"], words: 6, lost: 0, leftIn: 3, pass: false });
+  // The corrected value deleted along with the taken-back one.
+  assert.deepEqual(scoreCleanup(sample, "Vi ses på torsdag."), { missing: ["åtta"], leftover: [], words: 6, lost: 2, leftIn: 0, pass: false });
+});
+
+test("a must-remove phrase matches whole words in any case", () => {
+  assert.ok(containsPhrase("Eh, kör igen.", "eh"));
+  assert.ok(containsPhrase("Then, No Wait, the other one.", "no wait"));
+  assert.ok(!containsPhrase("Vilken typen av index?", "typ"));
+  assert.ok(!containsPhrase("I liked it.", "like"));
 });

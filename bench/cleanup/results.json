@@ -1,0 +1,1446 @@
+{
+  "date": "2026-10-25",
+  "hardware": {
+    "chip": "Apple M1 Max",
+    "memoryGB": 64,
+    "macOS": "14.7.2"
+  },
+  "model": "gemma-4-e2b-it-qat-q4_0.gguf",
+  "runs": 3,
+  "systems": {
+    "raw": "Raw transcript",
+    "rules": "Rules only",
+    "diktatorn": "Diktatorn"
+  },
+  "criteria": [
+    {
+      "text": "No word the speaker meant is deleted",
+      "result": "0 words lost",
+      "pass": true
+    },
+    {
+      "text": "Every control is left as dictated",
+      "result": "4/4 intact",
+      "pass": true
+    }
+  ],
+  "sets": [
+    {
+      "title": "Main set",
+      "file": "samples.json",
+      "samples": [
+        {
+          "id": "sv1",
+          "language": "sv",
+          "input": "Eh, vi måste deploya till staging innan standup, eller nej vänta, efter standup, så att Johan hinner kolla PR:en.",
+          "reference": "Vi måste deploya till staging efter standup, så att Johan hinner kolla PR:en.",
+          "mustKeep": [
+            "deploya",
+            "staging",
+            "efter standup",
+            "PR:en",
+            "Johan"
+          ],
+          "mustRemove": [
+            "eh",
+            "innan",
+            "nej vänta"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Eh, vi måste deploya till staging innan standup, eller nej vänta, efter standup, så att Johan hinner kolla PR:en.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "eh",
+                  "innan",
+                  "nej vänta"
+                ],
+                "words": 13,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Vi måste deploya till staging innan standup, eller nej vänta, efter standup, så att Johan hinner kolla PR:en.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "innan",
+                  "nej vänta"
+                ],
+                "words": 13,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Vi måste deploya till staging efter standup, så att Johan hinner kolla PR:en.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 13,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 282,
+                "detail": "deleted 5 of 18 words"
+              },
+              "modelMs": [
+                282,
+                241,
+                240
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "sv2",
+          "language": "sv",
+          "input": "öh kan du köra npm install och sen typ npm run dev nej jag menar npm run build liksom för att se om det går igenom",
+          "reference": "Kan du köra npm install och sen npm run build för att se om det går igenom?",
+          "mustKeep": [
+            "npm install",
+            "npm run build",
+            "går igenom"
+          ],
+          "mustRemove": [
+            "öh",
+            "typ",
+            "liksom",
+            "npm run dev",
+            "jag menar"
+          ],
+          "runs": {
+            "raw": {
+              "text": "öh kan du köra npm install och sen typ npm run dev nej jag menar npm run build liksom för att se om det går igenom",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "öh",
+                  "typ",
+                  "liksom",
+                  "npm run dev",
+                  "jag menar"
+                ],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 9,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "kan du köra npm install och sen typ npm run dev nej jag menar npm run build liksom för att se om det går igenom",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "typ",
+                  "liksom",
+                  "npm run dev",
+                  "jag menar"
+                ],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 8,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "kan du köra npm install och sen npm run build för att se om det går igenom",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 266,
+                "detail": "deleted 8 of 25 words"
+              },
+              "modelMs": [
+                266,
+                223,
+                252
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "sv3",
+          "language": "sv",
+          "input": "Alltså funktionen heter getUserById och den returnerar typ ett Promise, nej förlåt, den returnerar ett Observable från RxJS.",
+          "reference": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+          "mustKeep": [
+            "getUserById",
+            "Observable",
+            "RxJS",
+            "returnerar"
+          ],
+          "mustRemove": [
+            "alltså",
+            "Promise",
+            "förlåt",
+            "typ"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Alltså funktionen heter getUserById och den returnerar typ ett Promise, nej förlåt, den returnerar ett Observable från RxJS.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "alltså",
+                  "Promise",
+                  "förlåt",
+                  "typ"
+                ],
+                "words": 10,
+                "lost": 0,
+                "leftIn": 8,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Alltså funktionen heter getUserById och den returnerar typ ett Promise, nej förlåt, den returnerar ett Observable från RxJS.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "alltså",
+                  "Promise",
+                  "förlåt",
+                  "typ"
+                ],
+                "words": 10,
+                "lost": 0,
+                "leftIn": 8,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Funktionen heter getUserById och den returnerar ett Observable från RxJS.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 10,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 214,
+                "detail": "deleted 8 of 18 words"
+              },
+              "modelMs": [
+                214,
+                162,
+                164
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "sv4",
+          "language": "sv",
+          "input": "vi behöver migrera databasen från MySQL till eh MongoDB nej till PostgreSQL innan releasen på fredag liksom",
+          "reference": "Vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag.",
+          "mustKeep": [
+            "MySQL",
+            "PostgreSQL",
+            "fredag",
+            "migrera"
+          ],
+          "mustRemove": [
+            "eh",
+            "MongoDB",
+            "liksom"
+          ],
+          "runs": {
+            "raw": {
+              "text": "vi behöver migrera databasen från MySQL till eh MongoDB nej till PostgreSQL innan releasen på fredag liksom",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "eh",
+                  "MongoDB",
+                  "liksom"
+                ],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "vi behöver migrera databasen från MySQL till MongoDB nej till PostgreSQL innan releasen på fredag liksom",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "MongoDB",
+                  "liksom"
+                ],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 4,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "vi behöver migrera databasen från MySQL till PostgreSQL innan releasen på fredag",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 231,
+                "detail": "deleted 4 of 16 words"
+              },
+              "modelMs": [
+                231,
+                215,
+                201
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "sv5",
+          "language": "sv",
+          "input": "Hej Anna, ja alltså jag har pushat fixen till main, eller vänta, till branchen feature/login, så du kan typ granska den när du hinner.",
+          "reference": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+          "mustKeep": [
+            "Hej Anna",
+            "pushat",
+            "feature/login",
+            "granska"
+          ],
+          "mustRemove": [
+            "alltså",
+            "main",
+            "eller vänta",
+            "typ"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Hej Anna, ja alltså jag har pushat fixen till main, eller vänta, till branchen feature/login, så du kan typ granska den när du hinner.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "alltså",
+                  "main",
+                  "eller vänta",
+                  "typ"
+                ],
+                "words": 18,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Hej Anna, ja alltså jag har pushat fixen till main, eller vänta, till branchen feature/login, så du kan typ granska den när du hinner.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "alltså",
+                  "main",
+                  "eller vänta",
+                  "typ"
+                ],
+                "words": 18,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Hej Anna, jag har pushat fixen till branchen feature/login, så du kan granska den när du hinner.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 18,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 345,
+                "detail": "deleted 7 of 24 words"
+              },
+              "modelMs": [
+                345,
+                352,
+                288
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "en1",
+          "language": "en",
+          "input": "Um, so I think we should, uh, refactor the useEffect hook, actually no, the useMemo hook, because it re-renders on every keystroke.",
+          "reference": "I think we should refactor the useMemo hook, because it re-renders on every keystroke.",
+          "mustKeep": [
+            "useMemo",
+            "re-renders",
+            "keystroke",
+            "refactor"
+          ],
+          "mustRemove": [
+            "um",
+            "uh",
+            "useEffect",
+            "actually no"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Um, so I think we should, uh, refactor the useEffect hook, actually no, the useMemo hook, because it re-renders on every keystroke.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "um",
+                  "uh",
+                  "useEffect",
+                  "actually no"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 8,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "So I think we should refactor the useEffect hook, actually no, the useMemo hook, because it re-renders on every keystroke.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "useEffect",
+                  "actually no"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "So I think we should refactor the useMemo hook, because it re-renders on every keystroke.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 1,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 301,
+                "detail": "deleted 5 of 20 words"
+              },
+              "modelMs": [
+                301,
+                240,
+                230
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "en2",
+          "language": "en",
+          "input": "can you like run kubectl get pods in the staging namespace sorry the production namespace and send me the output",
+          "reference": "Can you run kubectl get pods in the production namespace and send me the output?",
+          "mustKeep": [
+            "kubectl get pods",
+            "production namespace",
+            "output"
+          ],
+          "mustRemove": [
+            "like",
+            "staging",
+            "sorry"
+          ],
+          "runs": {
+            "raw": {
+              "text": "can you like run kubectl get pods in the staging namespace sorry the production namespace and send me the output",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "like",
+                  "staging",
+                  "sorry"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "can you like run kubectl get pods in the staging namespace sorry the production namespace and send me the output",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "like",
+                  "staging",
+                  "sorry"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "can you run kubectl get pods in the production namespace and send me the output",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 218,
+                "detail": "deleted 5 of 20 words"
+              },
+              "modelMs": [
+                218,
+                189,
+                172
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "en3",
+          "language": "en",
+          "input": "The API returns a 404, uh, when the user ID is missing, wait no, a 400, and we log it to Sentry, you know.",
+          "reference": "The API returns, when the user ID is missing, a 400, and we log it to Sentry.",
+          "mustKeep": [
+            "API",
+            "400",
+            "user ID",
+            "Sentry"
+          ],
+          "mustRemove": [
+            "404",
+            "uh",
+            "wait no",
+            "you know"
+          ],
+          "note": "The correction comes a clause after the value it replaces, so the reference keeps the dictated word order.",
+          "runs": {
+            "raw": {
+              "text": "The API returns a 404, uh, when the user ID is missing, wait no, a 400, and we log it to Sentry, you know.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "404",
+                  "uh",
+                  "wait no",
+                  "you know"
+                ],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "The API returns a 404 when the user ID is missing, wait no, a 400, and we log it to Sentry, you know.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "404",
+                  "wait no",
+                  "you know"
+                ],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "The API returns a 404 when the user ID is missing, wait no, a 400, and we log it to Sentry, you know.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "404",
+                  "wait no",
+                  "you know"
+                ],
+                "words": 17,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              },
+              "llm": {
+                "status": "rejected",
+                "ms": 297,
+                "detail": "not a deletion of the input: The API returns a 400 when the user ID is missing, and we log it to Sentry."
+              },
+              "modelMs": [
+                297,
+                267,
+                265
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "en4",
+          "language": "en",
+          "input": "hey team um the deploy is scheduled for Tuesday scratch that Wednesday at 10 am so please like merge your PRs into the develop branch before then",
+          "reference": "Hey team, the deploy is scheduled for Wednesday at 10 am, so please merge your PRs into the develop branch before then.",
+          "mustKeep": [
+            "Wednesday",
+            "PRs",
+            "develop branch",
+            "merge"
+          ],
+          "mustRemove": [
+            "um",
+            "Tuesday",
+            "scratch that",
+            "like"
+          ],
+          "note": "The reference keeps the dictated \"10 am\": cleanup does not reformat.",
+          "runs": {
+            "raw": {
+              "text": "hey team um the deploy is scheduled for Tuesday scratch that Wednesday at 10 am so please like merge your PRs into the develop branch before then",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "um",
+                  "Tuesday",
+                  "scratch that",
+                  "like"
+                ],
+                "words": 22,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "hey team the deploy is scheduled for Tuesday scratch that Wednesday at 10 am so please like merge your PRs into the develop branch before then",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "Tuesday",
+                  "scratch that",
+                  "like"
+                ],
+                "words": 22,
+                "lost": 0,
+                "leftIn": 4,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "hey team the deploy is scheduled for Wednesday at 10 am so please merge your PRs into the develop branch before then",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 22,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 310,
+                "detail": "deleted 4 of 26 words"
+              },
+              "modelMs": [
+                310,
+                286,
+                271
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "en5",
+          "language": "en",
+          "input": "I mean we could use Redis for caching, uh, or actually let's use Memcached since it's simpler and, you know, we don't need persistence.",
+          "reference": "Let's use Memcached since it's simpler and we don't need persistence.",
+          "mustKeep": [
+            "Memcached",
+            "persistence"
+          ],
+          "mustRemove": [
+            "I mean",
+            "Redis",
+            "uh",
+            "you know"
+          ],
+          "note": "The correction rephrases the sentence, so even the best deletion loses \"for caching\": a limit of deletion-only cleanup.",
+          "runs": {
+            "raw": {
+              "text": "I mean we could use Redis for caching, uh, or actually let's use Memcached since it's simpler and, you know, we don't need persistence.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "I mean",
+                  "Redis",
+                  "uh",
+                  "you know"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 13,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "I mean we could use Redis for caching or actually let's use Memcached since it's simpler and, you know, we don't need persistence.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "I mean",
+                  "Redis",
+                  "you know"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 12,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "I mean we could use Redis for caching or actually let's use Memcached since it's simpler and we don't need persistence.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "I mean",
+                  "Redis"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 10,
+                "pass": false
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 326,
+                "detail": "deleted 2 of 23 words; kept \"I mean\", \"actually\", no correction phrase"
+              },
+              "modelMs": [
+                326,
+                275,
+                298
+              ],
+              "stable": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Held-out set",
+      "file": "heldout.json",
+      "samples": [
+        {
+          "id": "h-sv1",
+          "language": "sv",
+          "input": "Jag tror att vi ska använda Tailwind, äh, eller förresten, vi kör på CSS modules för det här projektet.",
+          "reference": "Jag tror att vi kör på CSS modules för det här projektet.",
+          "mustKeep": [
+            "CSS modules",
+            "projektet"
+          ],
+          "mustRemove": [
+            "Tailwind",
+            "äh",
+            "förresten"
+          ],
+          "note": "The reference keeps the speaker's \"vi kör på\" rather than rewording it.",
+          "runs": {
+            "raw": {
+              "text": "Jag tror att vi ska använda Tailwind, äh, eller förresten, vi kör på CSS modules för det här projektet.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "Tailwind",
+                  "äh",
+                  "förresten"
+                ],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Jag tror att vi ska använda Tailwind eller förresten, vi kör på CSS modules för det här projektet.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "Tailwind",
+                  "förresten"
+                ],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Jag tror att vi ska använda Tailwind eller förresten, vi kör på CSS modules för det här projektet.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "Tailwind",
+                  "förresten"
+                ],
+                "words": 12,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              },
+              "llm": {
+                "status": "rejected",
+                "ms": 258,
+                "detail": "deletes \"förresten,\" without a correction phrase"
+              },
+              "modelMs": [
+                258,
+                211,
+                212
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-sv2",
+          "language": "sv",
+          "input": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, liksom.",
+          "reference": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "mustKeep": [
+            "Skriv ett mejl till Lisa",
+            "kundmötet",
+            "onsdag"
+          ],
+          "mustRemove": [
+            "liksom",
+            "Hej Lisa"
+          ],
+          "control": "A dictated instruction: clean it, never carry it out.",
+          "runs": {
+            "raw": {
+              "text": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, liksom.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "liksom"
+                ],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 1,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, liksom.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "liksom"
+                ],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 1,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 271,
+                "detail": "deleted 1 of 15 words"
+              },
+              "modelMs": [
+                271,
+                232,
+                225
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-sv3",
+          "language": "sv",
+          "input": "Sätt timeouten till trettio sekunder, nej stryk det, sextio sekunder, i config-filen app.config.ts.",
+          "reference": "Sätt timeouten till sextio sekunder i config-filen app.config.ts.",
+          "mustKeep": [
+            "sextio sekunder",
+            "app.config.ts"
+          ],
+          "mustRemove": [
+            "trettio",
+            "stryk det"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Sätt timeouten till trettio sekunder, nej stryk det, sextio sekunder, i config-filen app.config.ts.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "trettio",
+                  "stryk det"
+                ],
+                "words": 9,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Sätt timeouten till trettio sekunder, nej stryk det, sextio sekunder, i config-filen app.config.ts.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "trettio",
+                  "stryk det"
+                ],
+                "words": 9,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Sätt timeouten till sextio sekunder, i config-filen app.config.ts.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 9,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 292,
+                "detail": "deleted 5 of 13 words"
+              },
+              "modelMs": [
+                292,
+                234,
+                223
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-sv4",
+          "language": "sv",
+          "input": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "reference": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "mustKeep": [
+            "Vilken typ av index",
+            "user_id",
+            "Postgres",
+            "B-tree",
+            "GIN"
+          ],
+          "mustRemove": [],
+          "control": "Nothing to remove: \"typ\" is a real word here.",
+          "runs": {
+            "raw": {
+              "text": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "rules": {
+              "text": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "diktatorn": {
+              "text": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "unchanged",
+                "ms": 321,
+                "detail": ""
+              },
+              "modelMs": [
+                321,
+                285,
+                287
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-sv5",
+          "language": "sv",
+          "input": "Öh, kan du boka ett möte med Erik på fredag klockan nio, äh, jag menar klockan tio, och skicka länken i Slack?",
+          "reference": "Kan du boka ett möte med Erik på fredag klockan tio och skicka länken i Slack?",
+          "mustKeep": [
+            "Erik",
+            "fredag klockan tio",
+            "Slack"
+          ],
+          "mustRemove": [
+            "öh",
+            "äh",
+            "nio",
+            "jag menar"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Öh, kan du boka ett möte med Erik på fredag klockan nio, äh, jag menar klockan tio, och skicka länken i Slack?",
+              "score": {
+                "missing": [
+                  "fredag klockan tio"
+                ],
+                "leftover": [
+                  "öh",
+                  "äh",
+                  "nio",
+                  "jag menar"
+                ],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Kan du boka ett möte med Erik på fredag klockan nio jag menar klockan tio, och skicka länken i Slack?",
+              "score": {
+                "missing": [
+                  "fredag klockan tio"
+                ],
+                "leftover": [
+                  "nio",
+                  "jag menar"
+                ],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 4,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Kan du boka ett möte med Erik på fredag klockan tio, och skicka länken i Slack?",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 314,
+                "detail": "deleted 4 of 20 words"
+              },
+              "modelMs": [
+                314,
+                266,
+                288
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-en1",
+          "language": "en",
+          "input": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+          "reference": "Let's bump the Node version to 22 in the Dockerfile and the CI workflow.",
+          "mustKeep": [
+            "Node version to 22",
+            "Dockerfile",
+            "CI workflow"
+          ],
+          "mustRemove": [
+            "20",
+            "make that"
+          ],
+          "runs": {
+            "raw": {
+              "text": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+              "score": {
+                "missing": [
+                  "Node version to 22"
+                ],
+                "leftover": [
+                  "20",
+                  "make that"
+                ],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 3,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+              "score": {
+                "missing": [
+                  "Node version to 22"
+                ],
+                "leftover": [
+                  "20",
+                  "make that"
+                ],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 3,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "Let's bump the Node version to 22, in the Dockerfile and the CI workflow.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 14,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 268,
+                "detail": "deleted 3 of 17 words"
+              },
+              "modelMs": [
+                268,
+                230,
+                215
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-en2",
+          "language": "en",
+          "input": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+          "reference": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+          "mustKeep": [
+            "Write a short reply to Sarah",
+            "build is green",
+            "ship tomorrow"
+          ],
+          "mustRemove": [
+            "Hi Sarah",
+            "Dear"
+          ],
+          "control": "A dictated instruction: clean it, never carry it out.",
+          "runs": {
+            "raw": {
+              "text": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "rules": {
+              "text": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "diktatorn": {
+              "text": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "rejected",
+                "ms": 161,
+                "detail": "deletes \"Write a short reply to Sarah saying\" without a correction phrase"
+              },
+              "modelMs": [
+                161,
+                169,
+                203
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-en3",
+          "language": "en",
+          "input": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "reference": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "mustKeep": [
+            "I like the new API design",
+            "I'd like the error codes",
+            "RFC 9457"
+          ],
+          "mustRemove": [],
+          "control": "Nothing to remove: \"like\" is a real verb here.",
+          "runs": {
+            "raw": {
+              "text": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "rules": {
+              "text": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              }
+            },
+            "diktatorn": {
+              "text": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 16,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "unchanged",
+                "ms": 328,
+                "detail": ""
+              },
+              "modelMs": [
+                328,
+                255,
+                274
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-en4",
+          "language": "en",
+          "input": "So, uh, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+          "reference": "The function should throw a ValidationError when the email is invalid.",
+          "mustKeep": [
+            "throw a ValidationError",
+            "email is invalid"
+          ],
+          "mustRemove": [
+            "uh",
+            "null",
+            "no wait"
+          ],
+          "runs": {
+            "raw": {
+              "text": "So, uh, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "uh",
+                  "null",
+                  "no wait"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 8,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "So the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "null",
+                  "no wait"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "So the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "null",
+                  "no wait"
+                ],
+                "words": 11,
+                "lost": 0,
+                "leftIn": 7,
+                "pass": false
+              },
+              "llm": {
+                "status": "rejected",
+                "ms": 252,
+                "detail": "deletes \"no wait,\" without a correction phrase"
+              },
+              "modelMs": [
+                252,
+                209,
+                202
+              ],
+              "stable": true
+            }
+          }
+        },
+        {
+          "id": "h-en5",
+          "language": "en",
+          "input": "We need to add rate limiting to the login endpoint, um, I meant the password reset endpoint, using express-rate-limit.",
+          "reference": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+          "mustKeep": [
+            "password reset endpoint",
+            "express-rate-limit",
+            "rate limiting"
+          ],
+          "mustRemove": [
+            "um",
+            "login endpoint",
+            "I meant"
+          ],
+          "runs": {
+            "raw": {
+              "text": "We need to add rate limiting to the login endpoint, um, I meant the password reset endpoint, using express-rate-limit.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "um",
+                  "login endpoint",
+                  "I meant"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 6,
+                "pass": false
+              }
+            },
+            "rules": {
+              "text": "We need to add rate limiting to the login endpoint I meant the password reset endpoint, using express-rate-limit.",
+              "score": {
+                "missing": [],
+                "leftover": [
+                  "login endpoint",
+                  "I meant"
+                ],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 5,
+                "pass": false
+              }
+            },
+            "diktatorn": {
+              "text": "We need to add rate limiting to the password reset endpoint, using express-rate-limit.",
+              "score": {
+                "missing": [],
+                "leftover": [],
+                "words": 15,
+                "lost": 0,
+                "leftIn": 0,
+                "pass": true
+              },
+              "llm": {
+                "status": "accepted",
+                "ms": 252,
+                "detail": "deleted 5 of 18 words"
+              },
+              "modelMs": [
+                252,
+                213,
+                191
+              ],
+              "stable": true
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

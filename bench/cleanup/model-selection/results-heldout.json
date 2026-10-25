@@ -1,0 +1,1303 @@
+{
+  "when": "2026-10-18T13:54:54.649Z",
+  "samples": "samples-heldout.json",
+  "repeats": 3,
+  "results": [
+    {
+      "model": "rules (naive regex)",
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind, äh, eller förresten, vi kör på CSS modules för det här projektet.",
+          "ms": [
+            6.741291
+          ],
+          "missing": [],
+          "leaked": [
+            "Tailwind",
+            "äh",
+            "förresten"
+          ],
+          "pass": false,
+          "wer": 0.5384615384615384
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag, .",
+          "ms": [
+            2.327209
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sätt timeouten till stryk det, sextio sekunder, i config-filen app.config.ts.",
+          "ms": [
+            0.06283400000000228
+          ],
+          "missing": [],
+          "leaked": [
+            "stryk det"
+          ],
+          "pass": false,
+          "wer": 0.2
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "ms": [
+            0.042791000000001134
+          ],
+          "missing": [
+            "Vilken typ av index"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.06666666666666667
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Kan du boka ett möte med Erik på fredag klockan tio, och skicka länken i Slack?",
+          "ms": [
+            0.031500000000001194
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let's bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+          "ms": [
+            0.02599999999999625
+          ],
+          "missing": [
+            "Node version to 22"
+          ],
+          "leaked": [
+            "20",
+            "make that"
+          ],
+          "pass": false,
+          "wer": 0.21428571428571427
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+          "ms": [
+            0.02704100000000409
+          ],
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I the new API design, but I'd the error codes to follow RFC 9457.",
+          "ms": [
+            0.025124999999995623
+          ],
+          "missing": [
+            "I like the new API design",
+            "I'd like the error codes"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.125
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "So, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+          "ms": [
+            0.024166999999998495
+          ],
+          "missing": [],
+          "leaked": [
+            "null",
+            "no wait"
+          ],
+          "pass": false,
+          "wer": 0.6363636363636364
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the login endpoint, I meant the password reset endpoint, using express-rate-limit.",
+          "ms": [
+            0.028041999999999234
+          ],
+          "missing": [],
+          "leaked": [
+            "login endpoint",
+            "I meant"
+          ],
+          "pass": false,
+          "wer": 0.38461538461538464
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:2b-q4_K_M",
+      "coldMs": 3239.218875,
+      "loadMs": 2814.174458,
+      "memBytes": 1603796990,
+      "vramBytes": 1603796990,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind, eller förresten, vi kör på CSS modules för det här projektet.",
+          "ms": [
+            218.06791699999985,
+            220.10904200000004,
+            218.676958
+          ],
+          "evalTokens": 27,
+          "tokPerS": 136.101057555625,
+          "promptMs": 15.653,
+          "missing": [],
+          "leaked": [
+            "Tailwind",
+            "förresten"
+          ],
+          "pass": false,
+          "wer": 0.46153846153846156
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "ms": [
+            369.6591659999999,
+            209.69629200000054,
+            205.30570800000078
+          ],
+          "evalTokens": 25,
+          "tokPerS": 135.2989565744469,
+          "promptMs": 15.016,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sett timeouten till 60 sekunder i config-filen app.config.ts.",
+          "ms": [
+            320.4695410000004,
+            158.6084579999997,
+            151.92295900000045
+          ],
+          "evalTokens": 18,
+          "tokPerS": 130.71800495275997,
+          "promptMs": 16.015999,
+          "missing": [
+            "sextio sekunder"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.2
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres: B-tree eller GIN?",
+          "ms": [
+            379.9817919999996,
+            228.77666599999975,
+            217.21791699999994
+          ],
+          "evalTokens": 27,
+          "tokPerS": 136.14635228625022,
+          "promptMs": 15.795,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.06666666666666667
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Öh, kan du boka ett möte med Erik på fredag klockan 10, ja, jag menar klockan 10, och skicka länken i Slack?",
+          "ms": [
+            526.502375,
+            367.4124580000007,
+            352.6724170000007
+          ],
+          "evalTokens": 44,
+          "tokPerS": 127.90363042827367,
+          "promptMs": 16.297,
+          "missing": [
+            "fredag klockan tio"
+          ],
+          "leaked": [
+            "öh",
+            "jag menar"
+          ],
+          "pass": false,
+          "wer": 0.4375
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Bump the Node version to 22 in the Dockerfile and the CI workflow.",
+          "ms": [
+            325.34549999999945,
+            157.32774999999947,
+            174.98270799999955
+          ],
+          "evalTokens": 19,
+          "tokPerS": 132.52146498992138,
+          "promptMs": 14.765,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "Reply to Sarah: The build is green, so we can ship tomorrow.",
+          "ms": [
+            300.7532079999992,
+            145.22295900000063,
+            138.5701250000002
+          ],
+          "evalTokens": 16,
+          "tokPerS": 134.04151936062195,
+          "promptMs": 16.338,
+          "missing": [
+            "Write a short reply to Sarah"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.375
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "ms": [
+            375.81283299999996,
+            212.06795799999963,
+            202.97712499999943
+          ],
+          "evalTokens": 24,
+          "tokPerS": 124.57566414400948,
+          "promptMs": 20.156,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "The function should throw a ValidationError when the email is invalid.",
+          "ms": [
+            279.8344159999997,
+            115.56891700000051,
+            123.69866700000057
+          ],
+          "evalTokens": 13,
+          "tokPerS": 134.91495169006922,
+          "promptMs": 15.251,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the login and password reset endpoints using express-rate-limit.",
+          "ms": [
+            327.37275000000045,
+            156.89837500000067,
+            156.29079199999978
+          ],
+          "evalTokens": 19,
+          "tokPerS": 130.33427311203945,
+          "promptMs": 14.586,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.23076923076923078
+        }
+      ]
+    },
+    {
+      "model": "qwen3:1.7b",
+      "coldMs": 2430.0014580000006,
+      "loadMs": 2072.883208,
+      "memBytes": 1214555094,
+      "vramBytes": 1214555094,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind, eller vi kör på CSS modules för det här projektet.",
+          "ms": [
+            188.1389589999999,
+            191.99033299999974,
+            182.0411669999994
+          ],
+          "evalTokens": 26,
+          "tokPerS": 147.3329895563577,
+          "promptMs": 7.236,
+          "missing": [],
+          "leaked": [
+            "Tailwind"
+          ],
+          "pass": false,
+          "wer": 0.38461538461538464
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "ms": [
+            225.59837499999958,
+            191.49774999999863,
+            196.9007500000007
+          ],
+          "evalTokens": 27,
+          "tokPerS": 148.89486919310008,
+          "promptMs": 9.012,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sätt timeouten till trettio sekunder, sextio sekunder, i config-filen app.config.ts.",
+          "ms": [
+            211.85654200000135,
+            175.5354589999988,
+            176.7116249999999
+          ],
+          "evalTokens": 25,
+          "tokPerS": 150.78589609042328,
+          "promptMs": 7.429,
+          "missing": [],
+          "leaked": [
+            "trettio"
+          ],
+          "pass": false,
+          "wer": 0.2
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "ms": [
+            230.08429199999955,
+            197.2822500000002,
+            198.36908399999993
+          ],
+          "evalTokens": 28,
+          "tokPerS": 152.74921306878625,
+          "promptMs": 7.493,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Öh, kan du boka ett möte med Erik på fredag klockan tio, och skicka länken i Slack?",
+          "ms": [
+            262.4951669999991,
+            234.1013750000002,
+            224.8271249999998
+          ],
+          "evalTokens": 32,
+          "tokPerS": 147.36832409978678,
+          "promptMs": 12.175,
+          "missing": [],
+          "leaked": [
+            "öh"
+          ],
+          "pass": false,
+          "wer": 0.0625
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let's bump the Node version to 22, in the Dockerfile and the CI workflow.",
+          "ms": [
+            185.29120799999873,
+            150.3708749999987,
+            147.8239169999979
+          ],
+          "evalTokens": 21,
+          "tokPerS": 150.58189145196795,
+          "promptMs": 9.17,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "The build is green. We can ship tomorrow.",
+          "ms": [
+            116.01208300000144,
+            83.47516700000051,
+            80.91016600000148
+          ],
+          "evalTokens": 11,
+          "tokPerS": 154.9470362857787,
+          "promptMs": 7.396,
+          "missing": [
+            "Write a short reply to Sarah"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.5
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "ms": [
+            205.53000000000247,
+            172.9757499999978,
+            168.22045799999978
+          ],
+          "evalTokens": 24,
+          "tokPerS": 149.9306570711046,
+          "promptMs": 8.089,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "So, the function should return null, no wait, it should throw a ValidationError when the email is invalid.",
+          "ms": [
+            206.9985000000015,
+            163.0245419999992,
+            164.45874999999796
+          ],
+          "evalTokens": 23,
+          "tokPerS": 141.57592470622996,
+          "promptMs": 7.556,
+          "missing": [],
+          "leaked": [
+            "null",
+            "no wait"
+          ],
+          "pass": false,
+          "wer": 0.6363636363636364
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+          "ms": [
+            154.34933399999863,
+            131.36170800000036,
+            128.33499999999913
+          ],
+          "evalTokens": 17,
+          "tokPerS": 156.02914991647853,
+          "promptMs": 7.53,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        }
+      ]
+    },
+    {
+      "model": "gemma3:1b",
+      "coldMs": 1837.9704160000001,
+      "loadMs": 1561.148208,
+      "memBytes": 877668597,
+      "vramBytes": 877668597,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "We should use Tailwind, uh, or, by the way, we’re using CSS modules for this project.",
+          "ms": [
+            181.531167000001,
+            182.36437500000102,
+            178.4952919999996
+          ],
+          "evalTokens": 24,
+          "tokPerS": 153.38697616749855,
+          "promptMs": 18.376,
+          "missing": [
+            "projektet"
+          ],
+          "leaked": [
+            "Tailwind"
+          ],
+          "pass": false,
+          "wer": 1.1538461538461537
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Write an email to Lisa and ask if she can take the customer meeting on Wednesday, like?",
+          "ms": [
+            223.89120899999762,
+            157.726458000001,
+            153.6834170000002
+          ],
+          "evalTokens": 20,
+          "tokPerS": 155.4678026180778,
+          "promptMs": 19.916,
+          "missing": [
+            "Skriv ett mejl till Lisa",
+            "kundmötet",
+            "onsdag"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.1428571428571428
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Set the timeout to 30 seconds, no, delete it. Set the timeout to 60 seconds, in the config file app.config.ts.",
+          "ms": [
+            323.8087080000005,
+            242.5274169999975,
+            241.16799999999785
+          ],
+          "evalTokens": 34,
+          "tokPerS": 155.2553951249806,
+          "promptMs": 19.118,
+          "missing": [
+            "sextio sekunder"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.9
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "We should use B-tree.",
+          "ms": [
+            149.15120799999931,
+            84.57483299999876,
+            78.40308299999742
+          ],
+          "evalTokens": 8,
+          "tokPerS": 175.58106358229264,
+          "promptMs": 25.617,
+          "missing": [
+            "Vilken typ av index",
+            "user_id",
+            "Postgres",
+            "GIN"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.9333333333333333
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Can you book a meeting with Erik on Friday at 10:00 AM, uh, I mean 10:00 AM, and send the link in Slack?",
+          "ms": [
+            349.0954160000001,
+            268.0590830000001,
+            274.65829099999974
+          ],
+          "evalTokens": 38,
+          "tokPerS": 155.21797914360522,
+          "promptMs": 19.521,
+          "missing": [
+            "fredag klockan tio"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 1.3125
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let's bump the Node version to 22 in the Dockerfile and CI workflow.",
+          "ms": [
+            224.47941600000195,
+            151.15958300000057,
+            153.466124999999
+          ],
+          "evalTokens": 20,
+          "tokPerS": 164.50615253010463,
+          "promptMs": 20.531,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.07142857142857142
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "The build is green and we can ship tomorrow.",
+          "ms": [
+            160.80624999999782,
+            92.59404100000029,
+            95.19574999999895
+          ],
+          "evalTokens": 11,
+          "tokPerS": 169.6065155052195,
+          "promptMs": 19.373,
+          "missing": [
+            "Write a short reply to Sarah"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.4375
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I’d like the error codes to follow RFC 9457.",
+          "ms": [
+            212.05291699999725,
+            134.60954200000197,
+            130.74983299999803
+          ],
+          "evalTokens": 17,
+          "tokPerS": 158.68422772120115,
+          "promptMs": 19.949,
+          "missing": [
+            "I like the new API design",
+            "I'd like the error codes"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.5
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "The function should throw a ValidationError when the email is invalid.",
+          "ms": [
+            180.07654099999854,
+            106.8937079999996,
+            105.04958299999998
+          ],
+          "evalTokens": 13,
+          "tokPerS": 169.33698059137686,
+          "promptMs": 19.03,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the login endpoint, specifically the password reset endpoint, using the express-rate-limit library.",
+          "ms": [
+            268.6791659999981,
+            193.22408399999767,
+            203.07245799999873
+          ],
+          "evalTokens": 27,
+          "tokPerS": 163.69092727878993,
+          "promptMs": 20.102,
+          "missing": [],
+          "leaked": [
+            "login endpoint"
+          ],
+          "pass": false,
+          "wer": 0.46153846153846156
+        }
+      ]
+    },
+    {
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "coldMs": 4302.311666000001,
+      "loadMs": 3557.901417,
+      "memBytes": 2876160081,
+      "vramBytes": 2876160081,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind, eller vi kör på CSS modules för det här projektet.",
+          "ms": [
+            344.6977909999987,
+            352.5684170000022,
+            347.3769169999978
+          ],
+          "evalTokens": 26,
+          "tokPerS": 80.48239911840818,
+          "promptMs": 13.8,
+          "missing": [],
+          "leaked": [
+            "Tailwind"
+          ],
+          "pass": false,
+          "wer": 0.38461538461538464
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "ms": [
+            438.17762500000026,
+            360.49375000000146,
+            360.48733399999765
+          ],
+          "evalTokens": 27,
+          "tokPerS": 79.08009349024385,
+          "promptMs": 13.332,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sätt timeouten till sextio sekunder i config-filen app.config.ts.",
+          "ms": [
+            338.97533399999884,
+            244.04187500000262,
+            248.55870799999684
+          ],
+          "evalTokens": 18,
+          "tokPerS": 74.5906836236154,
+          "promptMs": 14.588,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "ms": [
+            442.9011670000036,
+            381.2982499999998,
+            369.2023330000011
+          ],
+          "evalTokens": 28,
+          "tokPerS": 80.94825093957792,
+          "promptMs": 13.447,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Kan du boka ett möte med Erik på fredag klockan tiotio och skicka länken i Slack?",
+          "ms": [
+            480.74129099999845,
+            413.3017919999984,
+            399.21220899999753
+          ],
+          "evalTokens": 30,
+          "tokPerS": 78.88032014892605,
+          "promptMs": 13.259,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0.0625
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let's bump the Node version to 22 in the Dockerfile and the CI workflow.",
+          "ms": [
+            343.237291999998,
+            269.3559170000008,
+            266.9363749999975
+          ],
+          "evalTokens": 20,
+          "tokPerS": 81.14808307940746,
+          "promptMs": 14.488,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "The build is green, we can ship tomorrow.",
+          "ms": [
+            205.43675000000076,
+            158.02683300000353,
+            152.08641599999828
+          ],
+          "evalTokens": 11,
+          "tokPerS": 81.01579071411736,
+          "promptMs": 13.191,
+          "missing": [
+            "Write a short reply to Sarah"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.5
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "ms": [
+            368.8717499999984,
+            339.14224999999715,
+            326.2850419999959
+          ],
+          "evalTokens": 24,
+          "tokPerS": 80.64245153052651,
+          "promptMs": 13.497,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "The function should throw a ValidationError when the email is invalid.",
+          "ms": [
+            253.54233399999794,
+            176.20362500000192,
+            183.81124999999884
+          ],
+          "evalTokens": 13,
+          "tokPerS": 83.55185356573602,
+          "promptMs": 15.426,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the password reset endpoint, using express-rate-limit.",
+          "ms": [
+            320.04525000000285,
+            241.04420799999934,
+            245.4009159999987
+          ],
+          "evalTokens": 18,
+          "tokPerS": 81.2069152199805,
+          "promptMs": 13.308,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        }
+      ]
+    },
+    {
+      "model": "gemma3:4b",
+      "coldMs": 4851.167500000003,
+      "loadMs": 4371.0885,
+      "memBytes": 2329872956,
+      "vramBytes": 2329872956,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind.",
+          "ms": [
+            154.17962499999703,
+            151.11308300000383,
+            153.28725000000122
+          ],
+          "evalTokens": 9,
+          "tokPerS": 83.39974424078433,
+          "promptMs": 40.494,
+          "missing": [
+            "CSS modules",
+            "projektet"
+          ],
+          "leaked": [
+            "Tailwind"
+          ],
+          "pass": false,
+          "wer": 0.6153846153846154
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "ms": [
+            628.2587499999936,
+            320.70404199999757,
+            312.15029199999844
+          ],
+          "evalTokens": 21,
+          "tokPerS": 80.70869924479717,
+          "promptMs": 39.979,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sätt timeouten till sextio sekunder i config-filen app.config.ts.",
+          "ms": [
+            635.494666999999,
+            313.88637500000186,
+            306.6324170000007
+          ],
+          "evalTokens": 21,
+          "tokPerS": 78.8255740190908,
+          "promptMs": 43.209,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "ms": [
+            738.6172080000033,
+            383.5615420000031,
+            393.0436249999984
+          ],
+          "evalTokens": 27,
+          "tokPerS": 72.40954840578311,
+          "promptMs": 42.309,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Kan du boka ett möte med Erik på fredag klockan tio och skicka länken i Slack?",
+          "ms": [
+            684.7690000000002,
+            359.6490000000049,
+            365.54820800000016
+          ],
+          "evalTokens": 25,
+          "tokPerS": 79.45235083615654,
+          "promptMs": 41.528,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let’s bump the Node version to 20, make that 22, in the Dockerfile and the CI workflow.",
+          "ms": [
+            719.9457079999993,
+            404.74866699999984,
+            398.80504199999996
+          ],
+          "evalTokens": 28,
+          "tokPerS": 79.2927090354042,
+          "promptMs": 40.518,
+          "missing": [
+            "Node version to 22"
+          ],
+          "leaked": [
+            "20",
+            "make that"
+          ],
+          "pass": false,
+          "wer": 0.2857142857142857
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "Build is green, we can ship tomorrow.",
+          "ms": [
+            597.2184159999961,
+            163.50950000000012,
+            165.58779199999844
+          ],
+          "evalTokens": 10,
+          "tokPerS": 84.80181815098116,
+          "promptMs": 41.05,
+          "missing": [
+            "Write a short reply to Sarah",
+            "build is green"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.5625
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I like the new API design, but I’d like the error codes to follow RFC 9457.",
+          "ms": [
+            688.6206669999956,
+            374.20783400000073,
+            376.3717089999991
+          ],
+          "evalTokens": 25,
+          "tokPerS": 78.29161434177108,
+          "promptMs": 42.282,
+          "missing": [
+            "I'd like the error codes"
+          ],
+          "leaked": [],
+          "pass": false,
+          "wer": 0.0625
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "The function should throw a ValidationError when the email is invalid.",
+          "ms": [
+            527.0535000000018,
+            210.27104099999997,
+            207.18137500000012
+          ],
+          "evalTokens": 13,
+          "tokPerS": 80.61165644552203,
+          "promptMs": 45.409,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+          "ms": [
+            604.1728339999972,
+            284.1788749999978,
+            281.2729580000014
+          ],
+          "evalTokens": 19,
+          "tokPerS": 80.65748586371433,
+          "promptMs": 41.117,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        }
+      ]
+    },
+    {
+      "model": "gemma4:e2b-it-qat",
+      "coldMs": 4084.183334000001,
+      "loadMs": 3618.378791,
+      "memBytes": 228526652,
+      "vramBytes": 228526652,
+      "rows": [
+        {
+          "id": "h-sv1",
+          "lang": "sv",
+          "out": "Jag tror att vi ska använda Tailwind, eller förresten, vi kör på CSS modules för det här projektet.",
+          "ms": [
+            245.05458299999736,
+            258.90637500000594,
+            245.39974999999686
+          ],
+          "evalTokens": 25,
+          "tokPerS": 116.26987633535954,
+          "promptMs": 25.175,
+          "missing": [],
+          "leaked": [
+            "Tailwind",
+            "förresten"
+          ],
+          "pass": false,
+          "wer": 0.46153846153846156
+        },
+        {
+          "id": "h-sv2",
+          "lang": "sv",
+          "out": "Skriv ett mejl till Lisa och fråga om hon kan ta kundmötet på onsdag.",
+          "ms": [
+            380.4559999999983,
+            210.62112499999785,
+            210.71020800000406
+          ],
+          "evalTokens": 21,
+          "tokPerS": 116.88875530173998,
+          "promptMs": 26.652,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv3",
+          "lang": "sv",
+          "out": "Sätt timeouten till trettio sekunder i config-filen app.config.ts.",
+          "ms": [
+            409.41362500000105,
+            219.86824999999953,
+            225.91787499999919
+          ],
+          "evalTokens": 22,
+          "tokPerS": 114.08184854078945,
+          "promptMs": 28.007,
+          "missing": [
+            "sextio sekunder"
+          ],
+          "leaked": [
+            "trettio"
+          ],
+          "pass": false,
+          "wer": 0.1
+        },
+        {
+          "id": "h-sv4",
+          "lang": "sv",
+          "out": "Vilken typ av index ska vi lägga på kolumnen user_id i Postgres, B-tree eller GIN?",
+          "ms": [
+            466.23779099999956,
+            263.5115000000005,
+            265.02362499999435
+          ],
+          "evalTokens": 27,
+          "tokPerS": 108.2376899671679,
+          "promptMs": 26.231,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-sv5",
+          "lang": "sv",
+          "out": "Kan du boka ett möte med Erik på fredag klockan tio och skicka länken i Slack?",
+          "ms": [
+            432.32074999999895,
+            246.55391699999745,
+            254.21783299999515
+          ],
+          "evalTokens": 25,
+          "tokPerS": 116.02058669290278,
+          "promptMs": 25.176,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en1",
+          "lang": "en",
+          "out": "Let's bump the Node version to 22 in the Dockerfile and the CI workflow.",
+          "ms": [
+            397.4681249999994,
+            210.72929199999635,
+            234.72620900000038
+          ],
+          "evalTokens": 21,
+          "tokPerS": 115.9305079412398,
+          "promptMs": 24.943,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en2",
+          "lang": "en",
+          "out": "Write a short reply to Sarah saying the build is green and we can ship tomorrow.",
+          "ms": [
+            357.8587499999994,
+            183.5592500000057,
+            194.21145899999829
+          ],
+          "evalTokens": 18,
+          "tokPerS": 113.89593707882233,
+          "promptMs": 25.738,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en3",
+          "lang": "en",
+          "out": "I like the new API design, but I'd like the error codes to follow RFC 9457.",
+          "ms": [
+            433.0507499999949,
+            251.40033299999777,
+            246.19929199999024
+          ],
+          "evalTokens": 25,
+          "tokPerS": 114.18862133226148,
+          "promptMs": 25.387,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        },
+        {
+          "id": "h-en4",
+          "lang": "en",
+          "out": "The function should return null. Wait, it should throw a ValidationError when the email is invalid.",
+          "ms": [
+            395.79375000001164,
+            201.24495899998874,
+            204.16649999999208
+          ],
+          "evalTokens": 20,
+          "tokPerS": 113.87640993230049,
+          "promptMs": 25.507,
+          "missing": [],
+          "leaked": [
+            "null"
+          ],
+          "pass": false,
+          "wer": 0.45454545454545453
+        },
+        {
+          "id": "h-en5",
+          "lang": "en",
+          "out": "We need to add rate limiting to the password reset endpoint using express-rate-limit.",
+          "ms": [
+            387.4451250000129,
+            196.7431660000002,
+            195.09191699999792
+          ],
+          "evalTokens": 19,
+          "tokPerS": 111.87855876862925,
+          "promptMs": 26.945,
+          "missing": [],
+          "leaked": [],
+          "pass": true,
+          "wer": 0
+        }
+      ]
+    }
+  ]
+}

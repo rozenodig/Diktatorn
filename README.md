@@ -45,6 +45,21 @@ Word error rate (lower is better) on 54 sentences read by one speaker on an M1 M
 - **Sample size:** one speaker and 54 sentences, so differences of a word or two are noise.
 <!-- bench:end -->
 
+## Cleanup eval
+
+Cleanup is measured on its own on 20 transcripts with hesitations, fillers and self-corrections in Swedish and English. Four of them are controls: two dictated instructions that must not be carried out, and *typ* and *like* used as real words. The method, every output, and how the model was chosen are in [bench/cleanup/](bench/cleanup/README.md).
+
+| | Pass | Words lost | Words left in | Median model time |
+|---|---:|---:|---:|---:|
+| Raw transcript | 3/20 | 0 | 37.7% | – |
+| Rules only | 3/20 | 0 | 33.2% | – |
+| **Diktatorn** | 16/20 | **0** | 10.4% | 0.24 s |
+
+- **No meant word was deleted** in any sample, and all four controls were left as dictated. These are the eval's pass criteria.
+- **Words left in fall from 38% to 10% of the meant text.** In each of the four failures, words were left in and none were lost. Twice the model deleted only a correction phrase and kept what it took back; the guard then put the phrase back, so the text shows the correction instead of silently keeping the wrong value.
+- **Model choice:** six local models were compared on the same samples. Gemma 4 E2B tied for the best pass rate and was the only one whose failures almost never changed the meaning.
+- **Regression sets:** the samples were written before the model was chosen, but the pipeline was built with them in view, so they catch regressions rather than measure how cleanup generalises.
+
 ## Install
 
 There's no packaged release yet; Diktatorn runs from source.
@@ -137,7 +152,7 @@ flowchart LR
 | `src/renderer` | App window, overlay, debug window, microphone capture |
 | `native/helper` | Swift: dictation key (event tap and HID), Esc, paste and clipboard restore |
 | `native/asr`, `native/llm` | Swift processes linking whisper.cpp and llama.cpp (git submodules in `native/vendor`) |
-| `bench` | Accuracy benchmark: sentences, harness and results |
+| `bench` | Speech recognition benchmark, and the cleanup eval in `bench/cleanup`: samples, harnesses and results |
 | `test` | Unit tests, plus integration tests that run the real models |
 
 Every design choice, with the alternatives considered, is recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
@@ -145,9 +160,10 @@ Every design choice, with the alternatives considered, is recorded in [docs/DECI
 ## Development
 
 ```sh
-npm test            # unit and integration tests (integration tests skip if models are missing)
+npm test               # unit and integration tests (integration tests skip if models are missing)
 npm run typecheck
-npm run bench       # accuracy benchmark, see bench/README.md
+npm run bench          # accuracy benchmark, see bench/README.md
+npm run bench:cleanup  # cleanup eval, see bench/cleanup/README.md
 ```
 
 The debug window (menu bar icon → Debug Window) shows each dictation's raw and cleaned transcript, the language decision and per-stage timings.
