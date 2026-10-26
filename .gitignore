@@ -8,3 +8,7 @@ native/*/.build/
 bench/recordings/
 .env
 CLAUDE.md
+# Signing keys and certificates never belong in the repository.
+*.p12
+*.pem
+*.key
