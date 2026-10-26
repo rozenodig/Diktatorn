@@ -16,6 +16,7 @@ import {
   type IpcMainInvokeEvent,
   type Tray,
 } from "electron";
+import { once } from "node:events";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import {
@@ -601,14 +602,31 @@ models.on("ready", (id: ModelId) => {
 
 /**
  * `npm run package` starts the signed app with DIKTATORN_LAUNCH_CHECK=1 to prove that it loads its
- * frameworks, helper processes and packaged files, and quits before it would ask for any permission.
+ * frameworks, helper processes and packaged files, and that the speech and language-model engines
+ * start. It quits before it would ask for any permission, so the keyboard helper isn't started.
  */
 async function launchCheck(): Promise<void> {
+  const problems: string[] = [];
   const win = new BrowserWindow({ show: false, webPreferences });
   await win.loadFile(renderer("overlay.html"));
   const icon = nativeImage.createFromPath(join(app.getAppPath(), "assets", "trayTemplate.png"));
-  console.log(icon.isEmpty() ? "launch check: menu bar icon missing" : "launch check: ok");
-  app.exit(icon.isEmpty() ? 1 : 0);
+  if (icon.isEmpty()) problems.push("menu bar icon missing");
+  for (const name of ["diktatorn-asr", "diktatorn-llm"]) {
+    if (!(await engineStarts(name))) problems.push(`${name} doesn't start`);
+  }
+  console.log(`launch check: ${problems.length > 0 ? problems.join(", ") : "ok"}`);
+  app.exit(problems.length > 0 ? 1 : 0);
+}
+
+/** Starts an engine without loading a model: it reports ready, then exits cleanly when asked. */
+async function engineStarts(name: string): Promise<boolean> {
+  const proc = new JsonLinesProcess(name, binary(name));
+  const exited = once(proc, "exit");
+  const ready = await Promise.race([once(proc, "event").then(([msg]) => msg.event === "ready"), exited.then(() => false)]);
+  if (!ready) return false;
+  proc.close();
+  const [code] = await exited;
+  return code === 0;
 }
 
 app.whenReady().then(async () => {

@@ -3,7 +3,8 @@
 # in the login keychain. macOS ties Diktatorn's permissions to this certificate rather than to
 # one build, so an update signed with the same certificate keeps them. Run it once per signing
 # Mac, then back the identity up (Keychain Access → My Certificates → Export, .p12): signing
-# with a new certificate makes every user grant Accessibility again.
+# with a new certificate makes every user grant Accessibility again. It prints the certificate's
+# SHA-1, the value macOS pins (codesign -d -r- shows it as certificate leaf = H"…").
 set -euo pipefail
 
 NAME="${1:-Diktatorn Code Signing}"
@@ -11,9 +12,13 @@ KEYCHAIN="$HOME/Library/Keychains/login.keychain-db"
 # The system LibreSSL writes a .p12 that the keychain imports; OpenSSL 3's default does not.
 OPENSSL=/usr/bin/openssl
 
-if security find-certificate -c "$NAME" "$KEYCHAIN" >/dev/null 2>&1; then
-  echo "A certificate named \"$NAME\" is already in the login keychain; nothing to do." >&2
-  exit 1
+# In the same form as codesign: lowercase hex without colons.
+sha1() { "$OPENSSL" x509 -noout -fingerprint -sha1 | sed 's/.*=//; s/://g' | tr 'A-F' 'a-f'; }
+
+if PEM="$(security find-certificate -c "$NAME" -p "$KEYCHAIN" 2>/dev/null)"; then
+  echo "\"$NAME\" is already in the login keychain; nothing to do. Certificate SHA-1:"
+  sha1 <<<"$PEM"
+  exit 0
 fi
 
 TMP="$(mktemp -d)"
@@ -42,5 +47,5 @@ P12_PASSWORD="$("$OPENSSL" rand -hex 16)"
   -passout "pass:$P12_PASSWORD" -out "$TMP/identity.p12"
 security import "$TMP/identity.p12" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign
 
-echo "Created \"$NAME\" in the login keychain. Certificate SHA-256:"
-"$OPENSSL" x509 -in "$TMP/cert.pem" -noout -fingerprint -sha256
+echo "Created \"$NAME\" in the login keychain. Certificate SHA-1:"
+sha1 <"$TMP/cert.pem"

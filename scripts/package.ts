@@ -2,25 +2,14 @@
 // Contents/MacOS, turns off the Electron switches that would let other code run with Diktatorn's
 // permissions, signs everything with the release certificate (see create-signing-identity.sh)
 // and writes build/release/Diktatorn-<version>-arm64.dmg plus its SHA-256.
-// Usage: npm run package. DIKTATORN_SIGN_IDENTITY overrides the certificate name.
+// Usage: npm run package, from a checkout without uncommitted changes. DIKTATORN_SIGN_IDENTITY
+// overrides the certificate name, and DIKTATORN_ALLOW_DIRTY=1 allows a test build with changes.
 import { flipFuses, FuseV1Options, FuseVersion } from "@electron/fuses";
 import { packager } from "@electron/packager";
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  closeSync,
-  cpSync,
-  existsSync,
-  mkdirSync,
-  openSync,
-  readdirSync,
-  readFileSync,
-  readSync,
-  realpathSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { isMachO, walk } from "./bundle-files.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const OUT = join(ROOT, "build", "release");
@@ -47,6 +36,15 @@ for (const name of HELPERS) {
   if (!existsSync(join(ROOT, "build", "bin", name))) throw new Error(`build/bin/${name} is missing; run npm run build:native`);
 }
 
+// The app records the commit it was built from, so a release can be traced to its source. A build
+// with uncommitted changes has no such commit and is refused unless it's only for testing.
+const git = (args: string[]) => execFileSync("git", args, { cwd: ROOT, encoding: "utf8" }).trim();
+const commit = git(["rev-parse", "HEAD"]);
+const dirty = git(["status", "--porcelain"]) !== "";
+if (dirty && !process.env.DIKTATORN_ALLOW_DIRTY) {
+  throw new Error("the checkout has uncommitted changes. Commit them, or set DIKTATORN_ALLOW_DIRTY=1 for a test build.");
+}
+
 rmSync(OUT, { recursive: true, force: true });
 const [outDir] = await packager({
   dir: ROOT,
@@ -64,7 +62,7 @@ const [outDir] = await packager({
   usageDescription: {
     Microphone: "Diktatorn listens only while you hold the dictation key, and everything it hears stays on your Mac.",
   },
-  extendInfo: { LSMinimumSystemVersion: "14.0" },
+  extendInfo: { LSMinimumSystemVersion: "14.0", DiktatornCommit: dirty ? `${commit}-dirty` : commit },
 });
 if (!outDir) throw new Error("Electron Packager produced no app");
 const app = join(outDir, "Diktatorn.app");
@@ -83,16 +81,22 @@ cpSync(join(ROOT, "native", "vendor", "whisper.cpp", "LICENSE"), join(licenses, 
 cpSync(join(ROOT, "native", "vendor", "llama.cpp", "LICENSE"), join(licenses, "llama.cpp-LICENSE"));
 cpSync(join(ROOT, "assets", "THIRD-PARTY-NOTICES.txt"), join(licenses, "THIRD-PARTY-NOTICES.txt"));
 
-// Without these, anyone who can start the app could run their own code inside it, with the
-// Accessibility access the user gave Diktatorn: as plain Node, through NODE_OPTIONS or a
-// debugger, or by editing the app's files.
+// Without the first five, anyone who can start the app could run their own code inside it, with
+// the Accessibility access the user gave Diktatorn: as plain Node, through NODE_OPTIONS or a
+// debugger, or by editing the app's files. The rest keep Electron's defaults. Every fuse is set
+// explicitly, so an Electron upgrade that adds one fails here until it has been decided.
 await flipFuses(app, {
   version: FuseVersion.V1,
+  strictlyRequireAllFuses: true,
   [FuseV1Options.RunAsNode]: false,
   [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
   [FuseV1Options.EnableNodeCliInspectArguments]: false,
   [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
   [FuseV1Options.OnlyLoadAppFromAsar]: true,
+  [FuseV1Options.EnableCookieEncryption]: false,
+  [FuseV1Options.LoadBrowserProcessSpecificV8Snapshot]: false,
+  [FuseV1Options.GrantFileProtocolExtraPrivileges]: true,
+  [FuseV1Options.WasmTrapHandlers]: true,
 });
 
 // Inside out: every executable and library, then the frameworks and Electron helper apps from the
@@ -105,8 +109,9 @@ console.log(`signing with "${IDENTITY}"`);
 const files = walk(app);
 const code = files.filter(isMachO);
 for (const file of code) {
+  // A helper's identifier is its file name, because Electron's helper apps already use BUNDLE_ID.helper.
   const helper = HELPERS.includes(basename(file)) && file.startsWith(join(contents, "MacOS"));
-  sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file).replace("diktatorn-", "")}`] : []);
+  sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file)}`] : []);
 }
 const bundles = walk(join(contents, "Frameworks"), true)
   .filter((dir) => dir.endsWith(".framework") || dir.endsWith(".app"))
@@ -145,23 +150,6 @@ rmSync(stage, { recursive: true });
 const sha = execFileSync("shasum", ["-a", "256", basename(dmg)], { cwd: OUT, encoding: "utf8" });
 writeFileSync(`${dmg}.sha256`, sha);
 console.log(`\n${dmg}\n${sha.trim()}`);
-
-/** Real paths of the files (or directories) under `dir`, each once: frameworks reach the same files through Versions/Current symlinks. */
-function walk(dir: string, directories = false): string[] {
-  const found = new Set<string>();
-  for (const entry of readdirSync(dir, { withFileTypes: true, recursive: true })) {
-    if (directories ? entry.isDirectory() : entry.isFile()) found.add(realpathSync(join(entry.parentPath, entry.name)));
-  }
-  return [...found];
-}
-
-function isMachO(file: string): boolean {
-  const head = Buffer.alloc(4);
-  const fd = openSync(file, "r");
-  const bytes = readSync(fd, head, 0, 4, 0);
-  closeSync(fd);
-  return bytes === 4 && [0xfeedfacf, 0xcffaedfe, 0xcafebabe, 0xbebafeca].includes(head.readUInt32BE(0));
-}
 
 function signedByIdentity(file: string): boolean {
   // codesign prints the signature details on stderr.

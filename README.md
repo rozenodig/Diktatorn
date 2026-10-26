@@ -73,6 +73,8 @@ Diktatorn needs an Apple Silicon Mac with macOS 14 or later.
 
 **Updating:** Diktatorn never checks for updates (see [Privacy](#privacy)). To update, quit it from the menu bar, download the new release and replace the app in Applications. Microphone and Accessibility stay allowed.
 
+**Checking who signed it:** `codesign -d -r- /Applications/Diktatorn.app` should end with `designated => identifier "com.rozenodigital.diktatorn" and certificate leaf = H"cabb507c9ba0bdc642f62df55ad145c4b726c1ce"`. That hash identifies Diktatorn's certificate, and macOS only keeps Diktatorn's permissions for an app that matches it.
+
 **First launch:**
 - It downloads about 4.5 GB of models from Hugging Face. Each one is pinned to a fixed commit and checked against its SHA-256 before use, and an interrupted download resumes where it stopped.
 - macOS asks for two permissions, each explained under [Privacy](#privacy). The first-run screen lists them, with a button that opens the right pane of System Settings, and marks each one as allowed as soon as you switch it on.
@@ -178,7 +180,7 @@ npm run bench:cleanup  # cleanup eval, see bench/cleanup/README.md
 npm run package        # release .dmg and its SHA-256 in build/release
 ```
 
-**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but macOS keeps one permission entry per app, so installing it over an official release, or the other way round, means allowing Microphone and Accessibility again. `npm run package` starts the signed app once before it writes the .dmg, to check that it launches.
+**Release builds** are signed with a certificate called "Diktatorn Code Signing", which `scripts/create-signing-identity.sh` creates in your login keychain. A build signed with your own certificate works, but macOS keeps one permission entry per app, so installing it over an official release, or the other way round, means allowing Microphone and Accessibility again. `npm run package` starts the signed app once before it writes the .dmg, to check that it and its speech and language-model engines start. It only builds a checkout without uncommitted changes, and records the commit in the app's `Info.plist` as `DiktatornCommit`.
 
 The debug window (menu bar icon → Debug Window) shows each dictation's raw and cleaned transcript, the language decision and per-stage timings.
 
