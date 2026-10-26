@@ -7,6 +7,7 @@ import {
   clipboard,
   ipcMain,
   Menu,
+  nativeImage,
   nativeTheme,
   session,
   shell,
@@ -15,8 +16,9 @@ import {
   type IpcMainInvokeEvent,
   type Tray,
 } from "electron";
+import { once } from "node:events";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   FIRST_RUN_MODELS,
   IPC,
@@ -47,6 +49,14 @@ import { RestartPolicy } from "./restart.ts";
 import { SettingsStore } from "./settings.ts";
 import { WhisperProcessEngine } from "./speech-engine.ts";
 
+// Finder and LaunchServices start the packaged app without arguments. A command-line switch such
+// as --remote-debugging-port, which no Electron fuse turns off, would let other code drive the app
+// and use its permissions, so the packaged app refuses to start with any.
+if (app.isPackaged && process.argv.length > 1) {
+  console.error(`Diktatorn doesn't take command-line arguments: ${process.argv.slice(1).join(" ")}`);
+  process.exit(1);
+}
+
 const MIN_HOLD_MS = 150;
 /** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
@@ -60,7 +70,10 @@ const KEY_NAMES: Record<Settings["hotkey"], string> = {
   rightControl: "right ⌃",
 };
 
-const binary = (name: string) => join(app.getAppPath(), "build", "bin", name);
+// A packaged app keeps the helpers beside its own executable in Contents/MacOS, where they are
+// signed with the app. Development builds run them from build/bin.
+const binary = (name: string) =>
+  app.isPackaged ? join(dirname(process.execPath), name) : join(app.getAppPath(), "build", "bin", name);
 const renderer = (file: string) => join(import.meta.dirname, "..", "renderer", file);
 const preload = join(import.meta.dirname, "..", "preload", "preload.cjs");
 const webPreferences = { preload, sandbox: true, contextIsolation: true, nodeIntegration: false };
@@ -587,7 +600,37 @@ models.on("ready", (id: ModelId) => {
   else void loadSpeechEngine();
 });
 
+/**
+ * `npm run package` starts the signed app with DIKTATORN_LAUNCH_CHECK=1 to prove that it loads its
+ * frameworks, helper processes and packaged files, and that the speech and language-model engines
+ * start. It quits before it would ask for any permission, so the keyboard helper isn't started.
+ */
+async function launchCheck(): Promise<void> {
+  const problems: string[] = [];
+  const win = new BrowserWindow({ show: false, webPreferences });
+  await win.loadFile(renderer("overlay.html"));
+  const icon = nativeImage.createFromPath(join(app.getAppPath(), "assets", "trayTemplate.png"));
+  if (icon.isEmpty()) problems.push("menu bar icon missing");
+  for (const name of ["diktatorn-asr", "diktatorn-llm"]) {
+    if (!(await engineStarts(name))) problems.push(`${name} doesn't start`);
+  }
+  console.log(`launch check: ${problems.length > 0 ? problems.join(", ") : "ok"}`);
+  app.exit(problems.length > 0 ? 1 : 0);
+}
+
+/** Starts an engine without loading a model: it reports ready, then exits cleanly when asked. */
+async function engineStarts(name: string): Promise<boolean> {
+  const proc = new JsonLinesProcess(name, binary(name));
+  const exited = once(proc, "exit");
+  const ready = await Promise.race([once(proc, "event").then(([msg]) => msg.event === "ready"), exited.then(() => false)]);
+  if (!ready) return false;
+  proc.close();
+  const [code] = await exited;
+  return code === 0;
+}
+
 app.whenReady().then(async () => {
+  if (process.env.DIKTATORN_LAUNCH_CHECK) return launchCheck();
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "media"));
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === "media");
   // View has only the zoom items, so text in the app window can be made larger (⌘+, ⌘−, ⌘0).
