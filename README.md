@@ -108,7 +108,7 @@ Measured on an M1 Max with 64 GB:
 
 ## Privacy
 
-**Audio.** Diktatorn listens only while you hold the dictation key, or while hands-free mode is on. The audio stays in memory, is transcribed on your Mac and is then discarded. It is never written to disk.
+**Audio.** Diktatorn listens only while you hold the dictation key, or while hands-free mode is on. The audio stays in memory, is transcribed on your Mac and is then discarded. It is never written to disk, except in a development build when you record the benchmark sentences with Record Benchmark in the menu bar.
 
 **Network.** The only network requests are model downloads from Hugging Face, on first launch and when you pick another model. There's no telemetry, analytics, crash reporting, account or update check.
 

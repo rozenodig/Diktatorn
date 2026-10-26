@@ -85,7 +85,7 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Choice:**
 - JSON files for settings and the dictionary, written atomically.
-- No history on disk: recent dictations are kept in memory for the current session only. No audio is ever stored.
+- No history on disk: recent dictations are kept in memory for the current session only. No audio is stored, except benchmark takes recorded on purpose in a development build.
 
 **Alternatives considered:** SQLite history (`node:sqlite`); JSONL history; SQLite for everything.
 
