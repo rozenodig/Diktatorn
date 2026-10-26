@@ -124,7 +124,7 @@ Measured on an M1 Max with 64 GB:
 - Content from password managers is never restored.
 - Dictated text is marked as transient, so clipboard managers don't keep it.
 
-**Stored on disk.** `~/Library/Application Support/Diktatorn` holds three things: `settings.json`, `dictionary.json` and the models. Recent dictations are shown for the current session only and are never saved.
+**Stored on disk.** Diktatorn writes three things to `~/Library/Application Support/Diktatorn`: `settings.json`, `dictionary.json` and the models. Recent dictations are shown for the current session only and are never saved. Electron also keeps its usual browser caches and storage folders there, and Diktatorn puts nothing you dictate in them.
 
 ## Architecture
 
