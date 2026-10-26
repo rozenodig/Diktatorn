@@ -1,6 +1,6 @@
 # Design decisions
 
-Each entry records the choice, the alternatives that were considered, and why. Rationale sections are written by the author.
+Each entry records the choice, the alternatives that were considered, and why.
 
 ## 1. Native helper
 
