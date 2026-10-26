@@ -1,0 +1,19 @@
+# Monthly version updates. Security fixes don't wait for these: Dependabot opens those as soon
+# as an alert appears. Minor and patch updates come as one pull request; each major update gets
+# its own. The whisper.cpp and llama.cpp submodules are updated by hand.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      npm:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        update-types: [minor, patch]
