@@ -55,7 +55,7 @@ Cleanup is measured on its own on 20 transcripts with hesitations, fillers and s
 |---|---:|---:|---:|---:|
 | Raw transcript | 3/20 | 0 | 37.7% | – |
 | Rules only | 3/20 | 0 | 33.2% | – |
-| **Diktatorn** | 16/20 | **0** | 10.4% | 0.24 s |
+| **Diktatorn** | 16/20 | **0** | 10.4% | 0.22 s |
 
 - **No meant word was deleted** in any sample, and all four controls were left as dictated. These are the eval's pass criteria.
 - **Words left in fall from 38% to 10% of the meant text.** In each of the four failures, words were left in and none were lost. Twice the model deleted only a correction phrase and kept what it took back; the guard then put the phrase back, so the text shows the correction instead of silently keeping the wrong value.
