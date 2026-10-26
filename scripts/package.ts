@@ -145,7 +145,8 @@ const stage = join(OUT, "dmg");
 mkdirSync(stage);
 run("ditto", [app, join(stage, "Diktatorn.app")]);
 symlinkSync("/Applications", join(stage, "Applications"));
-run("hdiutil", ["create", "-quiet", "-volname", "Diktatorn", "-srcfolder", stage, "-format", "UDZO", "-ov", dmg]);
+// Not -quiet: it also hides why hdiutil failed.
+run("hdiutil", ["create", "-volname", "Diktatorn", "-srcfolder", stage, "-format", "UDZO", "-ov", dmg]);
 rmSync(stage, { recursive: true });
 const sha = execFileSync("shasum", ["-a", "256", basename(dmg)], { cwd: OUT, encoding: "utf8" });
 writeFileSync(`${dmg}.sha256`, sha);
