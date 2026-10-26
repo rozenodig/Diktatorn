@@ -629,9 +629,19 @@ async function engineStarts(name: string): Promise<boolean> {
   return code === 0;
 }
 
+// Every window shows one bundled page and nothing else, so none may navigate or open another.
+app.on("web-contents-created", (_e, wc) => {
+  wc.on("will-navigate", (e) => e.preventDefault());
+  wc.setWindowOpenHandler(() => ({ action: "deny" }));
+});
+
 app.whenReady().then(async () => {
   if (process.env.DIKTATORN_LAUNCH_CHECK) return launchCheck();
-  session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "media"));
+  // Only the hidden capture window records. Any window may check media access, because the app
+  // window's microphone list shows device names only when it can.
+  session.defaultSession.setPermissionRequestHandler((wc, permission, cb) =>
+    cb(permission === "media" && captureWin !== null && wc === captureWin.webContents),
+  );
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === "media");
   // View has only the zoom items, so text in the app window can be made larger (⌘+, ⌘−, ⌘0).
   Menu.setApplicationMenu(
