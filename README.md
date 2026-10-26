@@ -5,10 +5,12 @@
   </picture>
 </h1>
 
+[![CI](https://github.com/rozenodig/Diktatorn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rozenodig/Diktatorn/actions/workflows/ci.yml)
+
 Local dictation for macOS that speaks Swedish first and English too. Hold **fn**, talk, release, and the text appears wherever you were typing. Speech recognition, language detection and text cleanup all run on your Mac: no account, no cloud service, and no audio ever leaves the machine.
 
 - **Swedish and English, detected for every dictation.** Swedish goes to [KB-Whisper](https://huggingface.co/KBLab/kb-whisper-medium), the National Library of Sweden's Whisper model trained on Swedish speech. English goes to Whisper large-v3 turbo.
-- **Cleanup that cannot put words in your mouth.** Hesitations (*eh*, *öh*, *um*) and self-corrections (*klockan tre, nej förlåt, fyra*) are removed by a small local language model, Gemma 4 E2B. Its answer is only used to decide which of your words to delete. Anything that adds, changes or reorders a word is rejected.
+- **Cleanup that cannot put words in your mouth.** Hesitations (*eh*, *öh*, *um*) are removed by rules, and fillers and self-corrections (*klockan tre, nej förlåt, fyra*) by a small local language model, Gemma 4 E2B. Its answer is only used to decide which of your words to delete. Anything that adds, changes or reorders a word is rejected.
 - **Your words, spelled your way.** A personal dictionary fixes terms the recogniser gets wrong and nudges it towards them in the first place.
 - **Works in every app.** Text is pasted into the focused field and your clipboard is put back afterwards.
 - **Push-to-talk or hands-free.** Hold the key to talk, double-tap for hands-free, Esc to cancel. The key can be fn or a right-hand ⌥, ⌘ or ⌃.
@@ -37,7 +39,7 @@ Word error rate (lower is better) on 54 sentences read by one speaker on an M1 M
 
 **What the numbers show:**
 - **Everyday Swedish:** Diktatorn makes a third of stock Whisper's errors.
-- **English brand names inside Swedish speech** are its weak spot: KB-Whisper writes *Postgress QL* and *Versel*. Adding the terms to the dictionary fixes some of them, and KB-Whisper large fixes most.
+- **English brand names inside Swedish speech** are its weak spot: in the Swedish sentences, KB-Whisper spells 5 of the 12 terms right, against stock Whisper's 10, and writes *Postgress QL* and *Versel*. The dictionary and KB-Whisper large each bring it to 7 of 12, and neither fixes those two.
 - **Mixed Swedish and English:** stock Whisper often translates one language into the other ("It only happens on mobile" became "Det sker bara på mobilen"). Diktatorn did that less on the main set but not on the held-out set. Over all 18 mixed sentences, its error rate is 21% against stock Whisper's 34%, and 10% with KB-Whisper large.
 - **English** is the same model either way, so the result is identical.
 - **Acceptance criteria**, set before measuring (English no worse than stock, Swedish and mixed better): English passes. Mixed passes on the main set. Swedish fails on the main set because of the technical terms, and passes on everyday Swedish.
@@ -53,7 +55,7 @@ Cleanup is measured on its own on 20 transcripts with hesitations, fillers and s
 |---|---:|---:|---:|---:|
 | Raw transcript | 3/20 | 0 | 37.7% | – |
 | Rules only | 3/20 | 0 | 33.2% | – |
-| **Diktatorn** | 16/20 | **0** | 10.4% | 0.24 s |
+| **Diktatorn** | 16/20 | **0** | 10.4% | 0.22 s |
 
 - **No meant word was deleted** in any sample, and all four controls were left as dictated. These are the eval's pass criteria.
 - **Words left in fall from 38% to 10% of the meant text.** In each of the four failures, words were left in and none were lost. Twice the model deleted only a correction phrase and kept what it took back; the guard then put the phrase back, so the text shows the correction instead of silently keeping the wrong value.
@@ -106,7 +108,7 @@ Measured on an M1 Max with 64 GB:
 
 ## Privacy
 
-**Audio.** Diktatorn listens only while you hold the dictation key, or while hands-free mode is on. The audio stays in memory, is transcribed on your Mac and is then discarded. It is never written to disk.
+**Audio.** Diktatorn listens only while you hold the dictation key, or while hands-free mode is on. The audio stays in memory, is transcribed on your Mac and is then discarded. It is never written to disk, except in a development build when you record the benchmark sentences with Record Benchmark in the menu bar.
 
 **Network.** The only network requests are model downloads from Hugging Face, on first launch and when you pick another model. There's no telemetry, analytics, crash reporting, account or update check.
 
@@ -122,7 +124,7 @@ Measured on an M1 Max with 64 GB:
 - Content from password managers is never restored.
 - Dictated text is marked as transient, so clipboard managers don't keep it.
 
-**Stored on disk.** `~/Library/Application Support/Diktatorn` holds three things: `settings.json`, `dictionary.json` and the models. Recent dictations are shown for the current session only and are never saved.
+**Stored on disk.** Diktatorn writes three things to `~/Library/Application Support/Diktatorn`: `settings.json`, `dictionary.json` and the models. Recent dictations are shown for the current session only and are never saved. Electron also keeps its usual browser caches and storage folders there, and Diktatorn puts nothing you dictate in them.
 
 ## Architecture
 

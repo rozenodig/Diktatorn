@@ -1,22 +1,25 @@
 # Design decisions
 
-Each entry records the choice, the alternatives that were considered, and why. Rationale sections are written by the author.
+Each entry records the choice, the alternatives that were considered, and why.
 
 ## 1. Native helper
 
 **Choice:** A small Swift executable for OS integration, talking to Electron over stdio with one JSON message per line.
+
 **Alternatives considered:** N-API add-on (Objective-C++), Rust (napi-rs).
+
 **Rationale:** _TODO_
 
 ## 2. Key capture
 
 **Choice:**
-- Hold fn = push-to-talk; double-tap fn = hands-free toggle.
-- Esc cancels. A configurable fallback hotkey covers keyboards without fn.
+- Hold the dictation key = push-to-talk; double-tap it = hands-free toggle. Esc cancels.
+- The key is fn by default, or a right-hand ⌥, ⌘ or ⌃ for keyboards without fn.
 - An active CGEventTap, plus IOHID where fn is not reported.
 - Permissions: Accessibility only. It also gives the helper keyboard access, so Input Monitoring isn't requested separately; macOS doesn't list Diktatorn under Input Monitoring, so a step there could never be completed.
 
 **Alternatives considered:** CGEventTap only; Electron `globalShortcut` (no fn, no key-up).
+
 **Rationale:** _TODO_
 
 ## 3. Audio capture and voice activity detection
@@ -26,6 +29,7 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - Voice activity detection: whisper.cpp's built-in Silero, used only to trim silence and to skip empty recordings.
 
 **Alternatives considered:** capture in the Swift helper (AVAudioEngine); a native Node audio module; Silero in the renderer; an energy gate.
+
 **Rationale:** _TODO_
 
 ## 4. Speech-recognition runtime and models
@@ -37,12 +41,15 @@ Each entry records the choice, the alternatives that were considered, and why. R
 - kb-whisper-large (q5_0) as an optional higher-accuracy model.
 
 **Alternatives considered:** a Node binding for whisper.cpp in a utility process; the whisper.cpp HTTP server; WhisperKit (Core ML).
+
 **Rationale:** _TODO_
 
 ## 5. Language handling
 
 **Choice:** Automatic detection restricted to Swedish and English, routing to the Swedish or English model, with a manual override (Auto / Svenska / English).
+
 **Alternatives considered:** a separate hotkey or setting per language; one model for everything.
+
 **Rationale:** _TODO_
 
 ## 6. Text cleanup
@@ -50,29 +57,38 @@ Each entry records the choice, the alternatives that were considered, and why. R
 **Choice:** a hybrid pipeline.
 1. Conservative rules always run (unambiguous fillers, spacing, capitalisation).
 2. An optional local LLM pass follows, accepted only if its output passes a deletion-only check. Otherwise the rule output is used. Each deleted run must also be fillers or a self-correction (a correction phrase plus the words it takes back); any other deleted words are kept.
-3. Dictionary replacements and snippets are applied deterministically at the end.
+3. Dictionary replacements are applied deterministically at the end. The same terms are passed to Whisper as a prompt.
 
-Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is downloaded separately from the speech models.
+Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a pinned llama.cpp release with Metal. It is part of the first-run download, and the pass can be switched off under Smart cleanup (on by default).
 
 **Alternatives considered:** rules only; LLM only. For the runtime: node-llama-cpp in a utility process; Ollama. For enforcing deletion-only output: a grammar that only allows subsequences of the input during decoding.
+
 **Rationale:** _TODO_
 
 ## 7. Insertion
 
-**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table (e.g. terminals: plain text, no trailing newline).
+**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table: in terminals newlines become spaces, and Chromium and Electron apps get a longer restore delay.
+
 **Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
+
 **Rationale:** _TODO_
 
 ## 8. Overlay
 
 **Choice:** A click-through, non-focusable Electron panel shown without activation. A native non-activating panel is the fallback if the overlay ever needs to be clickable.
+
 **Alternatives considered:** native non-activating `NSPanel` from the start; a clickable window that re-activates the previous app.
+
 **Rationale:** _TODO_
 
 ## 9. Storage
 
-**Choice:** JSON files for settings and the dictionary, SQLite for history. No audio is stored by default.
-**Alternatives considered:** JSON/JSONL only; SQLite for everything.
+**Choice:**
+- JSON files for settings and the dictionary, written atomically.
+- No history on disk: recent dictations are kept in memory for the current session only. No audio is stored, except benchmark takes recorded on purpose in a development build.
+
+**Alternatives considered:** SQLite history (`node:sqlite`); JSONL history; SQLite for everything.
+
 **Rationale:** _TODO_
 
 ## 10. Speech engine boundary
@@ -81,7 +97,9 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 - An utterance-level interface behind a process boundary: `ensureLoaded`, `speechSegments`, `detectLanguage`, `transcribe` and `close`.
 - The engine provides mechanisms only. Policy (silence trimming, the empty-recording gate, language routing) lives in the caller.
 - A future meeting mode reuses it by segmenting audio before calling `transcribe`.
+
 **Alternatives considered:** a streaming session API; a local HTTP service.
+
 **Rationale:** _TODO_
 
 ## 11. Packaging and signing

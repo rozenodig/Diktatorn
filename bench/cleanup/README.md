@@ -60,7 +60,7 @@ From [RESULTS.md](RESULTS.md), run on 2026-10-25:
   - **en5:** the correction rephrases the sentence, and the model kept *Redis*.
   - **h-en4, h-sv1:** the model deleted only the correction phrase and kept the words it took back (*return null*, *ska använda Tailwind*). The guard put the phrase back, so the text still shows that a correction happened instead of hiding it.
 - **Known gap:** in h-sv1 even a correct answer would be put back, because *förresten* is not one of the guard's correction cues.
-- **Speed:** the model pass takes a median of 237 ms over both sets, at most 352 ms, well inside the 1.5 s after which the rule output is used.
+- **Speed:** the model pass takes a median of 221 ms over both sets, at most 431 ms, well inside the 1.5 s after which the rule output is used.
 
 ## Limits
 
