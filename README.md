@@ -39,7 +39,7 @@ Word error rate (lower is better) on 54 sentences read by one speaker on an M1 M
 
 **What the numbers show:**
 - **Everyday Swedish:** Diktatorn makes a third of stock Whisper's errors.
-- **English brand names inside Swedish speech** are its weak spot: KB-Whisper writes *Postgress QL* and *Versel*. Adding the terms to the dictionary fixes some of them, and KB-Whisper large fixes most.
+- **English brand names inside Swedish speech** are its weak spot: in the Swedish sentences, KB-Whisper spells 5 of the 12 terms right, against stock Whisper's 10, and writes *Postgress QL* and *Versel*. The dictionary and KB-Whisper large each bring it to 7 of 12, and neither fixes those two.
 - **Mixed Swedish and English:** stock Whisper often translates one language into the other ("It only happens on mobile" became "Det sker bara på mobilen"). Diktatorn did that less on the main set but not on the held-out set. Over all 18 mixed sentences, its error rate is 21% against stock Whisper's 34%, and 10% with KB-Whisper large.
 - **English** is the same model either way, so the result is identical.
 - **Acceptance criteria**, set before measuring (English no worse than stock, Swedish and mixed better): English passes. Mixed passes on the main set. Swedish fails on the main set because of the technical terms, and passes on everyday Swedish.
