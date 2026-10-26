@@ -10,7 +10,7 @@
 Local dictation for macOS that speaks Swedish first and English too. Hold **fn**, talk, release, and the text appears wherever you were typing. Speech recognition, language detection and text cleanup all run on your Mac: no account, no cloud service, and no audio ever leaves the machine.
 
 - **Swedish and English, detected for every dictation.** Swedish goes to [KB-Whisper](https://huggingface.co/KBLab/kb-whisper-medium), the National Library of Sweden's Whisper model trained on Swedish speech. English goes to Whisper large-v3 turbo.
-- **Cleanup that cannot put words in your mouth.** Hesitations (*eh*, *öh*, *um*) and self-corrections (*klockan tre, nej förlåt, fyra*) are removed by a small local language model, Gemma 4 E2B. Its answer is only used to decide which of your words to delete. Anything that adds, changes or reorders a word is rejected.
+- **Cleanup that cannot put words in your mouth.** Hesitations (*eh*, *öh*, *um*) are removed by rules, and fillers and self-corrections (*klockan tre, nej förlåt, fyra*) by a small local language model, Gemma 4 E2B. Its answer is only used to decide which of your words to delete. Anything that adds, changes or reorders a word is rejected.
 - **Your words, spelled your way.** A personal dictionary fixes terms the recogniser gets wrong and nudges it towards them in the first place.
 - **Works in every app.** Text is pasted into the focused field and your clipboard is put back afterwards.
 - **Push-to-talk or hands-free.** Hold the key to talk, double-tap for hands-free, Esc to cancel. The key can be fn or a right-hand ⌥, ⌘ or ⌃.
