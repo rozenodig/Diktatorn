@@ -45,17 +45,25 @@ export async function downloadModel(
   const count = new Transform({
     transform(chunk: Buffer, _enc, done) {
       received += chunk.length;
+      // A pinned model has an exact size, so a server sending more is wrong: stop before it fills the disk.
+      if (received > model.bytes) return done(new Error(`${model.id}: server sent more than ${model.bytes} bytes`));
       hash.update(chunk);
       opts.onProgress?.(received, model.bytes);
       done(null, chunk);
     },
   });
-  await pipeline(
-    Readable.fromWeb(res.body),
-    count,
-    createWriteStream(partial, { flags: received > 0 ? "a" : "w" }),
-    { signal: opts.signal },
-  );
+  try {
+    await pipeline(
+      Readable.fromWeb(res.body),
+      count,
+      createWriteStream(partial, { flags: received > 0 ? "a" : "w" }),
+      { signal: opts.signal },
+    );
+  } catch (err) {
+    // A cancelled or interrupted download keeps its partial file; an oversized one can't be resumed.
+    if (received > model.bytes) await rm(partial, { force: true });
+    throw err;
+  }
 
   const digest = hash.digest("hex");
   if (received !== model.bytes || digest !== model.sha256) {
