@@ -69,11 +69,12 @@ export async function cleanUp(raw: string, opts: CleanupOptions): Promise<Cleanu
           const checked = restoreUnexplained(words, keep);
           const deleted = checked.keep.filter((k) => !k).length;
           const restored = checked.restored.map((run) => `"${run}"`).join(", ");
+          const putBack = `put back ${restored}: neither fillers nor a correction phrase with the words it takes back`;
           if (deleted === 0) {
-            llm = { status: "rejected", ms, detail: `deletes ${restored} without a correction phrase` };
+            llm = { status: "rejected", ms, detail: putBack };
           } else {
             text = joinKept(words, checked.keep);
-            const note = restored ? `; kept ${restored}, no correction phrase` : "";
+            const note = restored ? `; ${putBack}` : "";
             llm = { status: "accepted", ms, detail: `deleted ${deleted} of ${words.length} words${note}` };
           }
         }

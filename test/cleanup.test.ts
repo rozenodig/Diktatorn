@@ -146,7 +146,7 @@ test("words the model deletes without a reason are kept, while its filler deleti
   const result = await cleanUp("However, we should, like, ship it today.", opts(llm));
   assert.equal(result.text, "However, we should ship it today.");
   assert.equal(result.llm?.status, "accepted");
-  assert.match(result.llm?.detail ?? "", /kept "However,"/);
+  assert.match(result.llm?.detail ?? "", /put back "However,"/);
 
   const only = await cleanUp("The fix is actually simple, we just clear the cache.", opts(fakeCleaner(() => ({ text: "The fix is simple, we just clear the cache." }))));
   assert.equal(only.text, "The fix is actually simple, we just clear the cache.");
