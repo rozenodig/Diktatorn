@@ -125,6 +125,12 @@ case "${1:-}" in
       echo "Couldn't read $BACKUP: wrong password, or not a .p12 file." >&2
       exit 1
     fi
+    # Keychain Access exports only the items selected: the private key on its own has no certificate.
+    if ! grep -q "PRIVATE KEY" "$TMP/key.pem" || ! grep -q "CERTIFICATE" "$TMP/cert.pem"; then
+      echo "$BACKUP must hold both the certificate and its private key. In Keychain Access, export" >&2
+      echo "\"$RELEASE_NAME\" from login → My Certificates, or select the certificate and its key together." >&2
+      exit 1
+    fi
     SUBJECT="$("$OPENSSL" x509 -noout -subject -in "$TMP/cert.pem")"
     if [[ "$SUBJECT" != *"/CN=$RELEASE_NAME" ]]; then
       echo "$BACKUP holds \"${SUBJECT##*CN=}\", not \"$RELEASE_NAME\"." >&2
