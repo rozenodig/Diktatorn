@@ -2,10 +2,11 @@
 # Makes build/Diktatorn.app: a local copy of the Electron runtime called "Diktatorn Dev", so the
 # Dock, the menu bar and the permission prompts name it during development. It has its own bundle
 # identifier: this copy runs any app directory it is given, so it must never satisfy the
-# permissions people grant the released app. It is signed with the release certificate when this
-# Mac has it (see create-signing-identity.sh), so its permissions survive rebuilds. Otherwise it
-# is ad-hoc signed, like the runtime it comes from; macOS then ties the permissions to this one
-# build, so the bundle is only rebuilt when the Electron version changes.
+# permissions people grant the released app. It is signed with the development certificate when
+# this Mac has it (create-signing-identity.sh --dev), so its permissions survive rebuilds; the
+# release certificate stays locked away for releases. Otherwise it is ad-hoc signed, like the
+# runtime it comes from; macOS then ties the permissions to this one build, so the bundle is only
+# rebuilt when the Electron version changes.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -14,7 +15,7 @@ DEST="$ROOT/build/Diktatorn.app"
 STAMP="$ROOT/build/Diktatorn.app.electron-version"
 VERSION="$(node -p 'require("electron/package.json").version')"
 BUNDLE_ID="com.rozenodigital.diktatorn.dev"
-IDENTITY="${DIKTATORN_SIGN_IDENTITY:-Diktatorn Code Signing}"
+IDENTITY="${DIKTATORN_DEV_SIGN_IDENTITY:-Diktatorn Dev Signing}"
 SIGN_ERROR=""
 
 # Signs with the certificate if it is there; codesign stops before touching the bundle if not.
@@ -47,4 +48,5 @@ if ! sign_with_certificate; then
   codesign --force --deep --sign - "$DEST" 2>/dev/null
   echo "$VERSION $BUNDLE_ID ad-hoc" >"$STAMP"
   echo "build/Diktatorn.app: ad-hoc signed, so its permissions last until it is rebuilt (\"$IDENTITY\": ${SIGN_ERROR##*: })"
+  echo "scripts/create-signing-identity.sh --dev creates a certificate that keeps them across rebuilds."
 fi

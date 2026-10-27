@@ -3,11 +3,13 @@
 // permissions, signs everything with the release certificate (see create-signing-identity.sh)
 // and writes build/release/Diktatorn-<version>-arm64.dmg plus its SHA-256.
 // Usage: npm run package, from a checkout without uncommitted changes. DIKTATORN_SIGN_IDENTITY
-// overrides the certificate name, and DIKTATORN_ALLOW_DIRTY=1 allows a test build with changes.
+// overrides the certificate name, DIKTATORN_SIGN_KEYCHAIN the keychain it is kept in, and
+// DIKTATORN_ALLOW_DIRTY=1 allows a test build with changes.
 import { flipFuses, FuseV1Options, FuseVersion } from "@electron/fuses";
 import { packager } from "@electron/packager";
 import { execFileSync, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { basename, join } from "node:path";
 import { isMachO, walk } from "./bundle-files.ts";
 
@@ -16,6 +18,8 @@ const OUT = join(ROOT, "build", "release");
 const HELPERS = ["diktatorn-helper", "diktatorn-asr", "diktatorn-llm"];
 const BUNDLE_ID = "com.rozenodigital.diktatorn";
 const IDENTITY = process.env.DIKTATORN_SIGN_IDENTITY ?? "Diktatorn Code Signing";
+/** Where create-signing-identity.sh keeps the release identity, locked except while signing. */
+const KEYCHAIN = process.env.DIKTATORN_SIGN_KEYCHAIN ?? join(homedir(), "Library", "Keychains", "diktatorn-signing.keychain-db");
 const ENTITLEMENTS = join(ROOT, "scripts", "entitlements.plist");
 /** Everything the packaged app reads at runtime; nothing else in the checkout is copied. */
 const KEEP = [
@@ -103,21 +107,29 @@ await flipFuses(app, {
 // deepest up, then the app itself. codesign --deep would skip code outside the standard bundle
 // locations, such as Electron's Libraries/*.dylib. The hardened runtime also stops DYLD_*
 // variables from loading code.
+// The release keychain is unlocked only while the app is signed, and locked again even if signing
+// fails. Without it, codesign looks in the keychain search list, as for an identity of your own.
+const keychain = existsSync(KEYCHAIN) ? ["--keychain", KEYCHAIN] : [];
 const sign = (path: string, extra: string[] = []) =>
-  run("codesign", ["--force", "--timestamp=none", "--options", "runtime", "--sign", IDENTITY, ...extra, path]);
-console.log(`signing with "${IDENTITY}"`);
+  run("codesign", ["--force", "--timestamp=none", "--options", "runtime", ...keychain, "--sign", IDENTITY, ...extra, path]);
+console.log(`signing with "${IDENTITY}"${keychain.length > 0 ? ` from ${KEYCHAIN}` : ""}`);
 const files = walk(app);
 const code = files.filter(isMachO);
-for (const file of code) {
-  // A helper's identifier is its file name, because Electron's helper apps already use BUNDLE_ID.helper.
-  const helper = HELPERS.includes(basename(file)) && file.startsWith(join(contents, "MacOS"));
-  sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file)}`] : []);
+if (keychain.length > 0) execFileSync("security", ["unlock-keychain", KEYCHAIN], { stdio: "inherit" });
+try {
+  for (const file of code) {
+    // A helper's identifier is its file name, because Electron's helper apps already use BUNDLE_ID.helper.
+    const helper = HELPERS.includes(basename(file)) && file.startsWith(join(contents, "MacOS"));
+    sign(file, helper ? ["--identifier", `${BUNDLE_ID}.${basename(file)}`] : []);
+  }
+  const bundles = walk(join(contents, "Frameworks"), true)
+    .filter((dir) => dir.endsWith(".framework") || dir.endsWith(".app"))
+    .sort((a, b) => b.split("/").length - a.split("/").length);
+  for (const bundle of bundles) sign(bundle, bundle.endsWith(".app") ? ["--entitlements", ENTITLEMENTS] : []);
+  sign(app, ["--entitlements", ENTITLEMENTS]);
+} finally {
+  if (keychain.length > 0) run("security", ["lock-keychain", KEYCHAIN]);
 }
-const bundles = walk(join(contents, "Frameworks"), true)
-  .filter((dir) => dir.endsWith(".framework") || dir.endsWith(".app"))
-  .sort((a, b) => b.split("/").length - a.split("/").length);
-for (const bundle of bundles) sign(bundle, bundle.endsWith(".app") ? ["--entitlements", ENTITLEMENTS] : []);
-sign(app, ["--entitlements", ENTITLEMENTS]);
 run("codesign", ["--verify", "--deep", "--strict", app]);
 const unsigned = code.filter((file) => !signedByIdentity(file));
 if (unsigned.length > 0) throw new Error(`not signed with "${IDENTITY}":\n${unsigned.join("\n")}`);
