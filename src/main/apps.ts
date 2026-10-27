@@ -43,9 +43,11 @@ export function appKind(bundleId: string | null): AppKind {
 
 export function planInsertion(text: string, bundleId: string | null): InsertPlan | null {
   const kind = appKind(bundleId);
-  let out = text.trim();
+  // Only newlines and tabs survive anywhere: Esc could end a bracketed paste in a terminal,
+  // including one inside an app such as VS Code, and a carriage return becomes a newline.
+  let out = text.replace(/\r\n?/g, "\n").replace(/[\x00-\x08\x0b-\x1f\x7f-\x9f]/g, "").trim();
   if (!out) return null;
-  if (kind === "terminal") out = out.replace(/\s*\n+\s*/g, " "); // a newline would run the command
+  if (kind === "terminal") out = out.replace(/\s*[\n\t]\s*/g, " "); // a newline would run the command
   else out += " ";
   return { text: out, kind, restoreDelayMs: RESTORE_DELAY_MS[kind] };
 }

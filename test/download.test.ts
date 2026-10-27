@@ -72,6 +72,18 @@ test("a corrupt download is rejected and leaves nothing behind", async () => {
   assert.equal(existsSync(`${path}.part`), false);
 });
 
+test("a download larger than the pinned size stops early and leaves nothing behind", async () => {
+  const path = join(dir, "e.bin");
+  let largest = 0;
+  await assert.rejects(
+    downloadModel(model({ bytes: 64 * 1024 }), path, { onProgress: (received) => (largest = received) }),
+    /more than 65536 bytes/,
+  );
+  assert.ok(largest <= 64 * 1024, `progress reported ${largest} bytes`);
+  assert.equal(existsSync(path), false);
+  assert.equal(existsSync(`${path}.part`), false);
+});
+
 test("a cancelled download resumes from its partial file", async () => {
   const path = join(dir, "c.bin");
   const abort = new AbortController();
