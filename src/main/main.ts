@@ -57,6 +57,14 @@ if (app.isPackaged && process.argv.length > 1) {
   process.exit(1);
 }
 
+// Two copies would each record and paste every dictation. Development builds and the installed
+// app keep the lock in the same data folder, so it holds between them too. The packaging launch
+// check runs beside an open app; it never starts the keyboard helper.
+if (!process.env.DIKTATORN_LAUNCH_CHECK && !app.requestSingleInstanceLock()) {
+  console.error("Diktatorn is already running; quit it first to start this copy.");
+  process.exit(0);
+}
+
 const MIN_HOLD_MS = 150;
 /** A second press within this window after a quick tap turns on hands-free mode. */
 const DOUBLE_TAP_MS = 300;
@@ -687,6 +695,10 @@ app.whenReady().then(async () => {
 // Dictation works without any window, so closing them does not quit the app.
 app.on("window-all-closed", () => {});
 app.on("activate", () => void appWindow.show());
+app.on("second-instance", () => {
+  console.log("[app] another copy was started and quit; showing this one's window");
+  void app.whenReady().then(() => appWindow.show()); // no window can open before ready
+});
 app.on("will-quit", () => {
   tray?.destroy();
   // Cleared first, so the exits that follow are not treated as crashes.
