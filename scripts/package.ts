@@ -10,7 +10,7 @@ import { packager } from "@electron/packager";
 import { execFileSync, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { isMachO, walk } from "./bundle-files.ts";
 
 const ROOT = join(import.meta.dirname, "..");
@@ -19,7 +19,7 @@ const HELPERS = ["diktatorn-helper", "diktatorn-asr", "diktatorn-llm"];
 const BUNDLE_ID = "com.rozenodigital.diktatorn";
 const IDENTITY = process.env.DIKTATORN_SIGN_IDENTITY ?? "Diktatorn Code Signing";
 /** Where create-signing-identity.sh keeps the release identity, locked except while signing. */
-const KEYCHAIN = process.env.DIKTATORN_SIGN_KEYCHAIN ?? join(homedir(), "Library", "Keychains", "diktatorn-signing.keychain-db");
+const KEYCHAIN = resolve(process.env.DIKTATORN_SIGN_KEYCHAIN ?? join(homedir(), "Library", "Keychains", "diktatorn-signing.keychain-db"));
 const ENTITLEMENTS = join(ROOT, "scripts", "entitlements.plist");
 /** Everything the packaged app reads at runtime; nothing else in the checkout is copied. */
 const KEEP = [
@@ -108,15 +108,21 @@ await flipFuses(app, {
 // locations, such as Electron's Libraries/*.dylib. The hardened runtime also stops DYLD_*
 // variables from loading code.
 // The release keychain is unlocked only while the app is signed, and locked again even if signing
-// fails. Without it, codesign looks in the keychain search list, as for an identity of your own.
+// fails. For that time it is also on the keychain search list: codesign --keychain finds the
+// identity in it, but signing still fails with "The specified item could not be found in the
+// keychain" while the keychain is off the list. Without the keychain, codesign looks in the search
+// list, as for an identity of your own.
 const keychain = existsSync(KEYCHAIN) ? ["--keychain", KEYCHAIN] : [];
 const sign = (path: string, extra: string[] = []) =>
   run("codesign", ["--force", "--timestamp=none", "--options", "runtime", ...keychain, "--sign", IDENTITY, ...extra, path]);
 console.log(`signing with "${IDENTITY}"${keychain.length > 0 ? ` from ${KEYCHAIN}` : ""}`);
 const files = walk(app);
 const code = files.filter(isMachO);
+// The list is restored without the release keychain even if a run that was cut short left it there.
+const searchList = keychain.length > 0 ? userSearchList().filter((path) => path !== KEYCHAIN) : [];
 if (keychain.length > 0) execFileSync("security", ["unlock-keychain", KEYCHAIN], { stdio: "inherit" });
 try {
+  if (keychain.length > 0) setUserSearchList([...searchList, KEYCHAIN]);
   for (const file of code) {
     // A helper's identifier is its file name, because Electron's helper apps already use BUNDLE_ID.helper.
     const helper = HELPERS.includes(basename(file)) && file.startsWith(join(contents, "MacOS"));
@@ -128,7 +134,13 @@ try {
   for (const bundle of bundles) sign(bundle, bundle.endsWith(".app") ? ["--entitlements", ENTITLEMENTS] : []);
   sign(app, ["--entitlements", ENTITLEMENTS]);
 } finally {
-  if (keychain.length > 0) run("security", ["lock-keychain", KEYCHAIN]);
+  if (keychain.length > 0) {
+    try {
+      setUserSearchList(searchList);
+    } finally {
+      run("security", ["lock-keychain", KEYCHAIN]);
+    }
+  }
 }
 run("codesign", ["--verify", "--deep", "--strict", app]);
 const unsigned = code.filter((file) => !signedByIdentity(file));
@@ -163,6 +175,18 @@ rmSync(stage, { recursive: true });
 const sha = execFileSync("shasum", ["-a", "256", basename(dmg)], { cwd: OUT, encoding: "utf8" });
 writeFileSync(`${dmg}.sha256`, sha);
 console.log(`\n${dmg}\n${sha.trim()}`);
+
+/** The user's keychain search list. security prints one quoted path per line. */
+function userSearchList(): string[] {
+  return execFileSync("security", ["list-keychains", "-d", "user"], { encoding: "utf8" })
+    .split("\n")
+    .map((line) => line.trim().replace(/^"(.*)"$/, "$1"))
+    .filter((path) => path !== "");
+}
+
+function setUserSearchList(paths: string[]): void {
+  run("security", ["list-keychains", "-d", "user", "-s", ...paths]);
+}
 
 function signedByIdentity(file: string): boolean {
   // codesign prints the signature details on stderr.

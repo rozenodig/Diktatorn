@@ -8,10 +8,10 @@
 # macOS ties Diktatorn's permissions to the release certificate rather than to one build, so an
 # update signed with it keeps them. Whoever holds its key can therefore sign an "update" that keeps
 # every user's Microphone and Accessibility. The key lives in a keychain of its own, which locks
-# after five minutes and when the Mac sleeps and is only unlocked by npm run package. It is kept off
-# the keychain search list, so nothing else ever asks to unlock it. A new release identity is also
-# saved as a password-protected .p12 on the Desktop: keep that copy offline. Signing with a new
-# certificate makes every user grant Accessibility again.
+# after five minutes and when the Mac sleeps and is only unlocked by npm run package. Except while
+# that signs, it is kept off the keychain search list, so nothing else asks to unlock it. A new
+# release identity is also saved as a password-protected .p12 on the Desktop: keep that copy
+# offline. Signing with a new certificate makes every user grant Accessibility again.
 #
 # The development identity sits in the login keychain, so development builds never need the release
 # key. It only covers Diktatorn Dev's own permissions, which other programs can use anyway while
