@@ -96,7 +96,7 @@ npm run build:native   # whisper.cpp, llama.cpp and the three Swift helpers
 npm start
 ```
 
-Development builds run as `build/Diktatorn.app`, called Diktatorn Dev in the permission prompts. Their permissions are separate from an installed release's.
+Development builds run as `build/Diktatorn.app`, called Diktatorn Dev in the permission prompts. Their permissions are separate from an installed release's. Only one copy of Diktatorn runs at a time, so `npm start` quits straight away while an installed one or another development build is open.
 
 ## Hardware
 
