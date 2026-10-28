@@ -111,7 +111,7 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 ## 7. Insertion
 
-**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table: in terminals newlines become spaces, and Chromium and Electron apps get a longer restore delay.
+**Choice:** Clipboard snapshot, then a synthetic Cmd+V, then a guarded clipboard restore, with a small per-app table: in terminals newlines and tabs become spaces, and Chromium and Electron apps get a longer restore delay. Other control characters are removed in every app, because Esc could end a terminal's bracketed paste.
 
 **Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
 
