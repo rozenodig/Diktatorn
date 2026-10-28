@@ -8,7 +8,13 @@ Each entry records the choice, the alternatives that were considered, and why.
 
 **Alternatives considered:** N-API add-on (Objective-C++), Rust (napi-rs).
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Native APIs in their own language.** Everything the helper does (the event tap, HID input, Accessibility, the pasteboard) is a macOS API that Swift calls directly. `swiftc` from the Command Line Tools builds it, so there's no Xcode project and no new dependency.
+- **A crash stays in its own process.** A bug in an add-on, or a stalled event-tap thread inside Node, would take down the Electron main process, and with it the menu bar, the window and the dictation in progress. A dead helper is just an exit event: pending requests fail at once, and it is restarted (at most three crashes in five minutes, with a growing delay).
+- **No ABI coupling.** An add-on has to be rebuilt for every Electron version. The executable doesn't care which Electron runs it.
+- **stdio rather than a socket.** There's no port and nothing listening, the helper exits when the app's end of the pipe closes, and the protocol can be tested by typing JSON into it. The same supervisor (`JsonLinesProcess`) now runs the speech and cleanup processes too (decisions 4 and 6).
+- **Rust** is memory-safe, but reaches these APIs through FFI crates, and it would add a second new toolchain for no gain over Swift.
 
 ## 2. Key capture
 
@@ -20,7 +26,14 @@ Each entry records the choice, the alternatives that were considered, and why.
 
 **Alternatives considered:** CGEventTap only; Electron `globalShortcut` (no fn, no key-up).
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Push-to-talk needs the release.** Electron's `globalShortcut` fires on press only and can't register fn, so it can't do hold-to-talk. An event tap sees both edges of every modifier.
+- **fn needs a second source.** On Apple keyboards fn is handled below the event-tap layer: in testing, the tap received ⌃, ⌥ and ⇧ but never fn. The helper also reads fn from the keyboard's HID reports, matched to the fn usage only, so that path sees no other key. Both sources feed one state, so a press seen by both counts once. If macOS disables the tap, the helper re-enables it, and fn keeps working through HID meanwhile.
+- **Active, but it swallows one key.** The tap is active only so that Esc can cancel a recording without reaching the app you're typing in. It swallows Esc only while recording and passes everything else through. The callback compares a few values against state the main process pushed beforehand and never waits for Electron, so it can't add typing lag.
+- **Keys that type nothing.** fn and the right-hand ⌥, ⌘ and ⌃ produce no characters on their own, so passing them through is harmless. Pressing another key while one is held (fn+arrow, ⌘C) cancels the dictation instead of blocking the shortcut.
+- **A testable state machine.** Hold, double-tap, tap to stop and cancel live in a pure `Hotkey` class that takes timestamps as input, so every edge case is a unit test without timers. The 150 ms minimum hold and the 300 ms double-tap window were tuned by feel; the window never delays push-to-talk, only the discarding of a stray tap.
+- **One permission.** Accessibility was needed anyway for pasting, and on macOS 14.7 it also unlocked keyboard listening, verified with fresh app identities that only had Microphone and Accessibility. macOS refused the Input Monitoring request without listing the app, so asking for it would have been a step users couldn't finish.
 
 ## 3. Audio capture and voice activity detection
 
@@ -30,7 +43,13 @@ Each entry records the choice, the alternatives that were considered, and why.
 
 **Alternatives considered:** capture in the Swift helper (AVAudioEngine); a native Node audio module; Silero in the renderer; an energy gate.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Chromium already does the hard parts.** `getUserMedia` handles device selection and unplugging, and an `AudioContext` created at 16 kHz, Whisper's input rate, does the resampling. Echo cancellation, noise suppression and automatic gain are off, so Whisper hears the raw signal.
+- **It keeps the helper small.** Capturing in the Swift helper would mean handling device changes by hand and streaming binary audio over stdio. A native Node audio module would add a dependency for nothing the renderer can't already do.
+- **The microphone is open only while dictating.** It opens on key down and its tracks stop on release, so the system's microphone indicator means a dictation is in progress. The benchmark is recorded through this same path, so anything lost at the start of a take shows up in its numbers.
+- **Voice detection has two jobs, and segmentation isn't one of them.** In push-to-talk, the key release already ends the utterance. Voice detection trims leading and trailing silence, so less audio is transcribed, and skips transcription when a press held no speech, because Whisper tends to invent text for silence.
+- **Silero inside whisper.cpp** runs in the speech process with no new dependency. Silero in the renderer would need an ONNX runtime, and an energy gate is fooled by background noise. The overlay's level meter is a separate, cheap `AnalyserNode` reading.
 
 ## 4. Speech-recognition runtime and models
 
@@ -42,7 +61,14 @@ Each entry records the choice, the alternatives that were considered, and why.
 
 **Alternatives considered:** a Node binding for whisper.cpp in a utility process; the whisper.cpp HTTP server; WhisperKit (Core ML).
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **whisper.cpp** is mature, runs on Metal, and loads the quantised ggml files that KB-Whisper is published in. It's a submodule pinned to a release, so every build compiles the same code.
+- **An own process gets the whole C API.** Swift imports `whisper.h` directly, which gives the per-language probabilities that routing needs (decision 5), the built-in voice detection, the prompt and the decoder settings. A Node binding exposes what its author chose and can lag behind upstream. The HTTP server has no detection-only call and serves one model per process. Both models stay loaded and are warmed up at start, so no dictation waits for a load.
+- **WhisperKit** would mean converting KB-Whisper to Core ML with Python tools, a compile on first run, and a second model format to maintain.
+- **KB-Whisper medium is the Swedish default.** On everyday Swedish it made a third of stock Whisper's errors (0.8% against 2.3%) at a median of 1.1 s. On the main set, where every Swedish sentence contains an English brand name, it fails against stock Whisper (7.8% against 2.1%); the dictionary brings that to 5.0%. KB-Whisper large is better on those terms and on mixed speech (3.5% and 5.5% on the main set), at about 0.3 s more per dictation, so it is one switch away rather than the default.
+- **English stays on stock large-v3 turbo,** so English results are identical to stock Whisper (1.3% for both).
+- **q5_0** keeps each default model under 600 MB (KB-Whisper medium 539 MB, turbo 574 MB), and the speech process uses about 1.7 GB with both loaded. The benchmark didn't compare quantised and full-precision models.
 
 ## 5. Language handling
 
@@ -50,7 +76,15 @@ Each entry records the choice, the alternatives that were considered, and why.
 
 **Alternatives considered:** a separate hotkey or setting per language; one model for everything.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **One specialised model per language.** KB-Whisper is the better Swedish model and stock turbo the better English one (decision 4), so each dictation goes to the model for its language.
+- **Only two languages are compared.** Whisper's language head scores about a hundred languages, and Swedish speech puts probability on Norwegian and Danish. Routing uses only p(sv) / (p(sv) + p(en)), so that probability can't misroute a dictation: 0.65 or more goes to Swedish, 0.35 or less to English, and anything between counts as ambiguous.
+- **Short or ambiguous dictations reuse the last language.** Detection is unreliable on very short clips, so dictations with less than 1.2 s of speech skip it and use the previous dictation's language, or Swedish if there is none. People tend to stay in one language from one dictation to the next.
+- **Measured:** all 12 Swedish and all 12 English benchmark sentences went to the right model.
+- **Checked on new data before shipping.** Sending confidently Swedish clips to turbo would have passed every criterion on the main set, but that rule was chosen after looking at those sentences. On the held-out set's everyday Swedish, turbo made four times as many errors as KB-Whisper medium, so the rule was dropped.
+- **The override** (Auto, Svenska, English) covers what detection gets wrong without a second key to remember. A key or setting per language would add a decision to every dictation, and one model for everything would give up either Swedish or English accuracy.
+- **Limit:** one dictation goes to one model, so a take that switches language can garble the part in the other language. Detecting per segment is the likely fix.
 
 ## 6. Text cleanup
 
@@ -63,7 +97,17 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** rules only; LLM only. For the runtime: node-llama-cpp in a utility process; Ollama. For enforcing deletion-only output: a grammar that only allows subsequences of the input during decoding.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Rules alone don't generalise.** When the cleanup model was chosen, a rule baseline written alongside the first sample set fell from 8/10 to 3/10 on new phrasing, and it deleted *typ* and *like* where they were real words. So the rules only remove hesitation sounds that are never words, and they always run.
+- **A model alone isn't safe.** Of six local models, those of 2B parameters or fewer translated, kept the wrong option or rewrote commands, and even the best changed the meaning of one output in 20.
+- **So the model only chooses deletions.** Its text never reaches the user: the reply must be the input with words removed, and the output is rebuilt from the input's own words. A translation, a rewrite or an added word is rejected by construction. A deletion can still be wrong, by dropping a real word or the instruction in "Write a short reply to Sarah…", so every deleted run must be fillers or a correction phrase with the words it takes back, and any other run is put back. A pass that deletes more than half of a longer transcript is rejected.
+- **Measured:** 16 of 20 eval samples pass, no meant word was lost, all four controls were left as dictated, and the words left in fell from 38% to 10% of the meant text. Every failure leaves words in rather than losing any.
+- **The grammar was tried and dropped.** Constraining decoding to subsequences of the input made greedy decoding fall back to the next input word whenever the model wanted to rewrite, and that was often the word being taken back. It scored 7/10 and 6/10, against 8/10 and 7/10 for free generation followed by the check.
+- **Gemma 4 E2B** tied for the best pass rate (15 of 20, with qwen3:4b), failed almost only by leaving taken-back words in, and was faster (about 0.22 s against 0.31 s warm).
+- **Its own Swift process,** for the same reasons as speech recognition: one protocol, build and supervisor, crash isolation, and direct control of llama.cpp. The fixed prompt is processed once and cached, a warm-up at start compiles the GPU paths, and a deadline is checked after every token. whisper.cpp and llama.cpp each bundle their own ggml, so they can't share a process. node-llama-cpp is a large native npm dependency with less control, and Ollama is a separate install with its own versions and model storage.
+- **Latency:** the model's median time is 0.22 s, inside a 1.5 s budget after which the rule output is used. Dictations of about 100 words exceed the budget today and get rules only.
+- **The dictionary runs last and deterministically,** so a term is spelled the user's way whatever the model did. Its terms also go to Whisper as a prompt; on the main set, the dictionary raised terms spelled right from 22 to 28 of 36.
 
 ## 7. Insertion
 
@@ -71,7 +115,14 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** setting the focused element's value through Accessibility; synthesizing keystrokes.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Paste works everywhere.** Native apps, browsers, Electron apps and terminals all support ⌘V, and the text goes in through the app's own paste handling: one undo step, and web inputs fire their normal events. One code path covered Terminal, Chrome and Electron apps in testing.
+- **Accessibility writes** work in native Cocoa fields, but Chromium and Electron apps often ignore them, terminals have no writable field, and they bypass the app's own input handling.
+- **Synthesised typing** leaves the clipboard alone, but it's slow for long text, collides with auto-closing brackets, autocomplete and input methods, and turns a newline into Enter.
+- **The clipboard is the price, so it's guarded.** Every item is saved with all its types, so a copied image or rich text survives. It's restored only if the pasteboard's change count is still ours, so anything the user copies in the meantime wins. Password-manager content is never restored, and the dictated text is marked transient so clipboard managers skip it.
+- **Per-app rules are data, keyed by bundle ID.** In a terminal a newline would run the command, so newlines become spaces. Chromium and Electron apps read the pasteboard asynchronously after ⌘V, so they get 800 ms before the restore instead of 400 ms.
+- **Limits:** the dictation sits on the clipboard for those 0.4–0.8 s, content an app only provides on demand can't be saved, and nothing confirms that the paste landed.
 
 ## 8. Overlay
 
@@ -79,7 +130,15 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** native non-activating `NSPanel` from the start; a clickable window that re-activates the previous app.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **The paste goes to the frontmost app,** so the overlay must never become the key window or activate Diktatorn. If it did, the text would land in the overlay, or nowhere.
+- **Electron does it with public APIs.** `type: "panel"` makes it an NSPanel, `focusable: false` keeps it from becoming key, `showInactive()` shows it without activating the app, and `setIgnoreMouseEvents(true)` passes clicks through to the window underneath. It floats at screen-saver level on every Space, full-screen apps included.
+- **It stays in the app's UI stack.** The overlay is HTML and CSS with the same tokens as the app window. A native `NSPanel` would mean a second UI toolkit and styling system, for interactivity the overlay doesn't need: Esc and the dictation key already cancel and stop.
+- **Re-activating the previous app** after a click causes a focus flicker, and some apps reset the caret or selection.
+- **Checked, not assumed.** The log records the frontmost app right before every paste. In live testing, every insert landed in the app being typed in while the overlay was showing.
+- **Created once.** The window is made hidden at startup and reused, so a key press never waits for a new window.
+- **Limit:** there's no automated test, because it needs a real window server.
 
 ## 9. Storage
 
@@ -89,7 +148,13 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** SQLite history (`node:sqlite`); JSONL history; SQLite for everything.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Settings are small and meant to be readable,** so a JSON file is enough. Writes go to a temporary file in the same folder that is renamed into place, so a crash leaves the old file or the new one, never half of each. Reading is forgiving per field: an invalid value falls back to its own default, so a hand edit or a version change can't stop the app from starting.
+- **The dictionary is the user's own content,** so it's read more carefully: if the file can't be parsed, the last good entries stay in effect instead of the dictionary being emptied. It's re-read when the file changes, so hand edits apply to the next dictation.
+- **No history, because dictated text is private.** Dictations can be messages, notes or anything else a person says, and text that is never written down has nothing to protect, purge or explain. The privacy promise stays simple to check: Diktatorn writes three things to disk. The recent list in the window covers copying a dictation again during the same session.
+- **SQLite history** was the original plan, but to be worth having it would need retention limits, a delete-all control and search. JSONL would be simpler, with the same privacy cost. If a saved history ever comes, it's a new decision with retention built in.
+- **SQLite for settings** would make them harder to read and edit by hand.
 
 ## 10. Speech engine boundary
 
@@ -100,7 +165,13 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** a streaming session API; a local HTTP service.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **One press, one call.** Push-to-talk produces one utterance per key press, so an utterance call is the exact fit. whisper.cpp has no true streaming, so a streaming API would re-decode a growing buffer: complexity with no gain for dictation.
+- **Mechanisms in the engine, policy in TypeScript.** The engine finds speech, scores languages and transcribes. Thresholds, the trimming pad, the empty-recording gate and routing live in `dictation.ts`, `language.ts` and `audio.ts`, where routing and trimming are unit-tested without models, and the Swift process stays small.
+- **The benchmark runs the same code.** It imports `transcribeUtterance` and the same engine class as the app, so it measures what ships.
+- **Meeting mode fits without a new API.** Continuous capture plus a segmenter outside the engine can send each segment to `transcribe`, and segments come back with timestamps for alignment.
+- **A local HTTP service** would add a port that any local process can reach, and with it the question of authentication on localhost, with no user for it.
 
 ## 11. Packaging and signing
 
