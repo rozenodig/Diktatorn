@@ -186,4 +186,11 @@ Model runtime: Gemma 4 E2B (QAT, q4_0) in a dedicated Swift process that links a
 
 **Alternatives considered:** Developer ID signing and notarization (needs the paid Apple Developer Program); ad-hoc signing (the requirement pins one build's cdhash, so every update loses Accessibility); electron-builder.
 
-**Rationale:** _TODO_
+**Rationale:**
+
+- **Permissions have to survive updates.** Diktatorn does nothing without Accessibility, and asking for it again after every update would teach people to click through the prompt. In a test, an update signed with the same certificate kept every permission without a prompt, while an ad-hoc build of the same app lost Accessibility.
+- **A certificate of its own instead of Developer ID.** Developer ID and notarization need a paid membership, which a free project shouldn't depend on. The cost is macOS's warning, once per downloaded version, and the README walks through Open Anyway. Moving to Developer ID later would change the designated requirement, so every user would allow Diktatorn once more.
+- **Nothing else may drive the app.** With Accessibility a program can type into any app, and with the microphone it can listen. A program that could start Diktatorn as plain Node, with `NODE_OPTIONS` or under a debugger would run its own code with those permissions. The fuses close Electron's routes. Remote debugging has none, and in review `--remote-debugging-port` did open a debugging port on the signed build, so the packaged app refuses every command-line argument. Opening it from Finder passes none.
+- **A release can be checked and traced.** The .dmg comes with its SHA-256, the README shows how to check the certificate with `codesign`, and every release records the commit it was built from and refuses uncommitted changes. Someone deciding whether to grant Accessibility to a stranger's app can check what they got.
+- **Electron Packager and `hdiutil`** do exactly the steps needed, in one script: package, sign every binary from the innermost out, check that the signed app and both engines start, and build the .dmg. electron-builder adds auto-update, installers and publishing, none of which Diktatorn uses: it never checks for updates.
+- **Apple Silicon only,** because the native engines are built for arm64 with Metal, and that's the only hardware the timings were measured on.
