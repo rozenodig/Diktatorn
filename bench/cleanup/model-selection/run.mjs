@@ -153,7 +153,7 @@ for (const r of results) {
 md += `\nPass (strict) = every must-include term present verbatim (case-sensitive) and no retracted phrase or filler left. WER is word-level vs my reference after lowercasing and stripping punctuation.\n`;
 for (const r of results) {
   md += `\n## ${r.model}\n\n| id | ms (median) | pass | WER | missing | leaked | output |\n|---|---|---|---|---|---|---|\n`;
-  for (const x of r.rows) md += `| ${x.id} | ${f0(median(x.ms))} | ${x.pass ? "✓" : "✗"} | ${(x.wer * 100).toFixed(0)}% | ${x.missing.join(", ")} | ${x.leaked.join(", ")} | ${x.out.replace(/\|/g, "\\|").replace(/\n/g, " ⏎ ")} |\n`;
+  for (const x of r.rows) md += `| ${x.id} | ${f0(median(x.ms))} | ${x.pass ? "✓" : "✗"} | ${(x.wer * 100).toFixed(0)}% | ${x.missing.join(", ")} | ${x.leaked.join(", ")} | ${x.out.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\n/g, " ⏎ ")} |\n`;
 }
 writeFileSync(join(here, `${OUT}.md`), md);
 console.log(md.split("\n## ")[0]);

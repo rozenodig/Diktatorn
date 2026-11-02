@@ -112,7 +112,8 @@ const median = (xs: number[]) => {
   const mid = s.length >> 1;
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 };
-const cell = (text: string) => text.replace(/\|/g, "\\|").replace(/\n/g, " ") || "_(nothing)_";
+// Backslashes first, or a \ just before a | in the text would be lost.
+const cell = (text: string) => text.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\n/g, " ") || "_(nothing)_";
 const sum = (rs: Result[], system: SystemId, key: "words" | "lost" | "leftIn") => rs.reduce((n, r) => n + r[system].score[key], 0);
 
 const unstable = all.filter((r) => !r.diktatorn.stable).map((r) => r.sample.id);

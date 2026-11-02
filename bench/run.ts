@@ -173,7 +173,8 @@ const median = (xs: number[]) => {
   const mid = s.length >> 1;
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 };
-const cell = (text: string) => text.replace(/\|/g, "\\|") || "_(nothing)_";
+// Backslashes first, or a \ just before a | in the text would be lost.
+const cell = (text: string) => text.replace(/\\/g, "\\\\").replace(/\|/g, "\\|") || "_(nothing)_";
 
 const criteria = [
   { language: "en" as const, text: "English WER no higher than stock Whisper", pass: (d: number, s: number) => d <= s },
